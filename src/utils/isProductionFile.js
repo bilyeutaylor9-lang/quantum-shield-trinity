@@ -19,7 +19,5 @@ export function isProductionFile(fileName = "") {
     ".github/"
   ];
 
-  return !excludedPaths.some(path =>
-    normalized.includes(path)
-  );
+  return !excludedPaths.some(path => normalized.includes(path));
 }
