@@ -4,8 +4,12 @@ import { dependencyIntelligenceEngine } from "./engines/dependencyIntelligenceEn
 import { attackSurfaceEngine } from "./engines/attackSurfaceEngine.js";
 import { smartContractAuditEngine } from "./engines/smartContractAuditEngine.js";
 import { exploitSimulationEngine } from "./engines/exploitSimulationEngine.js";
+import { securityScoreEngine } from "./engines/securityScoreEngine.js";
+import { htmlReportGenerator } from "./reporters/htmlReportGenerator.js";
+import { sarifReportGenerator } from "./reporters/sarifReportGenerator.js";
 import { summaryFormatter } from "./utils/summaryFormatter.js";
 import { markdownReportGenerator } from "./reporters/markdownReportGenerator.js";
+import fs from "fs";
 
 const targetDirectory = process.argv[2] ?? "src";
 
@@ -30,9 +34,51 @@ const exploitSimulationReport = exploitSimulationEngine(report);
 
 report.exploitSimulationReport = exploitSimulationReport;
 
+const securityScoreReport = securityScoreEngine({
+  dependencyReport,
+  attackSurfaceReport,
+  smartContractAuditReport,
+  exploitSimulationReport,
+  repositoryReport: report
+});
+
+report.securityScoreReport = securityScoreReport;
+
 const summary = summaryFormatter(report);
 
 const markdownReport = markdownReportGenerator(report);
+
+const htmlReport = htmlReportGenerator({
+  ...report,
+  executiveReport: {
+    summary,
+    markdownReport
+  }
+});
+
+const sarifReport = sarifReportGenerator({
+  ...report,
+  version: "1.3.0"
+});
+
+fs.writeFileSync("report.json", JSON.stringify(report, null, 2), "utf8");
+fs.writeFileSync("report.html", htmlReport, "utf8");
+fs.writeFileSync(
+  "executive-report.json",
+  JSON.stringify(
+    {
+      platform: "Quantum Shield Trinity",
+      version: "1.3.0",
+      summary,
+      markdownReport,
+      securityScoreReport
+    },
+    null,
+    2
+  ),
+  "utf8"
+);
+fs.writeFileSync("report.sarif", JSON.stringify(sarifReport, null, 2), "utf8");
 
 console.log("Executive Summary");
 console.log("-----------------");
@@ -42,6 +88,14 @@ console.log(`Scanned Files: ${summary.scannedFiles}`);
 console.log(`Critical Findings: ${summary.criticalFindings}`);
 console.log(`High Findings: ${summary.highFindings}`);
 console.log(`Medium Findings: ${summary.mediumFindings}`);
+console.log("");
+
+console.log("Executive Security Score");
+console.log("------------------------");
+console.log(`Security Score: ${securityScoreReport.securityScore ?? "N/A"}/100`);
+console.log(`Risk Level: ${securityScoreReport.riskLevel ?? "UNKNOWN"}`);
+console.log(`Grade: ${securityScoreReport.grade ?? securityScoreReport.securityGrade ?? "N/A"}`);
+console.log(`Top Priority: ${securityScoreReport.topPriority ?? "Review high and critical findings."}`);
 console.log("");
 
 console.log("Dependency Intelligence");
@@ -154,6 +208,10 @@ if (summary.topRecommendations.length > 0) {
 console.log("Report Generated");
 console.log("----------------");
 console.log(`Markdown Report: ${markdownReport.outputPath}`);
+console.log("HTML Report: report.html");
+console.log("JSON Report: report.json");
+console.log("Executive Report: executive-report.json");
+console.log("SARIF Report: report.sarif");
 console.log("");
 
 console.log("Full JSON Report");
