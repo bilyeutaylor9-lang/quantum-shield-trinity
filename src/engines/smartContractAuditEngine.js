@@ -1,4 +1,5 @@
 import { classifyFile } from "../utils/fileClassifier.js";
+import { isProductionFile } from "../utils/isProductionFile.js";
 import { smartContractContextEngine } from "./smartContractContextEngine.js";
 
 export function smartContractAuditEngine(files = []) {
@@ -38,6 +39,14 @@ export function smartContractAuditEngine(files = []) {
         "Avoid selfdestruct unless required. Restrict with strict access control and document the risk."
     },
     {
+      type: "Unchecked External Call",
+      regex: /\.call\s*\{/g,
+      severity: "HIGH",
+      category: "External Call Risk",
+      recommendation:
+        "Validate call success values and protect external calls against reentrancy."
+    },
+    {
       type: "Unchecked Transfer",
       regex: /\.transfer\s*\(|\.send\s*\(/g,
       severity: "MEDIUM",
@@ -63,7 +72,7 @@ export function smartContractAuditEngine(files = []) {
     },
     {
       type: "Upgradeable Contract",
-      regex: /\bUUPSUpgradeable\b|\bInitializable\b|\bupgradeTo\b|\bupgradeToAndCall\b|\bTransparentUpgradeableProxy\b/g,
+      regex: /\bUUPSUpgradeable\b|\bInitializable\b|\bupgradeTo\b|\bupgradeToAndCall\b|\bTransparentUpgradeableProxy\b|\bimplementation\b|\bproxy\b/g,
       severity: "HIGH",
       category: "Upgradeability Risk",
       recommendation:
@@ -127,11 +136,20 @@ export function smartContractAuditEngine(files = []) {
     }
   ];
 
+  let skippedNonSmartContractFiles = 0;
+  let skippedNonProductionFiles = 0;
+
   for (const file of files) {
     const fileName = file.name ?? "Unknown File";
     const fileType = classifyFile(fileName);
 
     if (fileType !== "SMART_CONTRACT") {
+      skippedNonSmartContractFiles += 1;
+      continue;
+    }
+
+    if (!isProductionFile(fileName)) {
+      skippedNonProductionFiles += 1;
       continue;
     }
 
@@ -146,17 +164,28 @@ export function smartContractAuditEngine(files = []) {
           return;
         }
 
+        if (isCommentOnlyLine(line)) {
+          return;
+        }
+
         const smartContractContext = smartContractContextEngine(line, fileName);
+        const confidence = calculateAuditConfidence(line, fileName, rule, smartContractContext);
+        const severity = adjustAuditSeverity(rule.severity, smartContractContext, confidence);
+
+        if (confidence < 40) {
+          return;
+        }
 
         auditFindings.push({
           file: fileName,
           line: index + 1,
           fileType,
           type: rule.type,
-          severity: adjustAuditSeverity(rule.severity, smartContractContext),
+          severity,
           originalSeverity: rule.severity,
           category: rule.category,
           recommendation: rule.recommendation,
+          confidence,
           occurrences: matches.length,
           smartContractContext,
           context: {
@@ -188,13 +217,14 @@ export function smartContractAuditEngine(files = []) {
 
   return {
     engine: "Smart Contract Audit Engine",
-    scannerVersion: "1.9.0",
-    auditedContracts: files.filter(file =>
-      classifyFile(file.name ?? "") === "SMART_CONTRACT"
+    scannerVersion: "1.9.1",
+    auditedContracts: files.filter(
+      file =>
+        classifyFile(file.name ?? "") === "SMART_CONTRACT" &&
+        isProductionFile(file.name ?? "")
     ).length,
-    skippedNonProductionFiles: files.filter(file =>
-      classifyFile(file.name ?? "") !== "SMART_CONTRACT"
-    ).length,
+    skippedNonSmartContractFiles,
+    skippedNonProductionFiles,
     auditScore,
     auditRiskLevel:
       auditScore >= 90
@@ -212,7 +242,15 @@ export function smartContractAuditEngine(files = []) {
   };
 }
 
-function adjustAuditSeverity(severity, smartContractContext = {}) {
+function adjustAuditSeverity(severity, smartContractContext = {}, confidence = 50) {
+  if (confidence < 50 && severity === "CRITICAL") {
+    return "HIGH";
+  }
+
+  if (confidence < 50 && severity === "HIGH") {
+    return "MEDIUM";
+  }
+
   if (smartContractContext.exploitability === "CRITICAL") {
     return "CRITICAL";
   }
@@ -226,4 +264,61 @@ function adjustAuditSeverity(severity, smartContractContext = {}) {
   }
 
   return severity;
+}
+
+function calculateAuditConfidence(line = "", fileName = "", rule = {}, smartContractContext = {}) {
+  const normalizedLine = line.toLowerCase();
+  const normalizedFile = fileName.toLowerCase();
+
+  let confidence = 65;
+
+  if (rule.severity === "CRITICAL") {
+    confidence += 15;
+  }
+
+  if (smartContractContext.exploitability === "CRITICAL") {
+    confidence += 15;
+  }
+
+  if (
+    normalizedLine.includes("onlyowner") ||
+    normalizedLine.includes("require(") ||
+    normalizedLine.includes("modifier") ||
+    normalizedLine.includes("external") ||
+    normalizedLine.includes("public")
+  ) {
+    confidence += 10;
+  }
+
+  if (
+    normalizedFile.includes("/legacy/") ||
+    normalizedFile.includes("vault") ||
+    normalizedFile.includes("bridge") ||
+    normalizedFile.includes("router") ||
+    normalizedFile.includes("wallet")
+  ) {
+    confidence += 10;
+  }
+
+  if (
+    normalizedLine.includes("test") ||
+    normalizedLine.includes("mock") ||
+    normalizedLine.includes("example") ||
+    normalizedLine.includes("todo")
+  ) {
+    confidence -= 25;
+  }
+
+  return Math.max(5, Math.min(100, confidence));
+}
+
+function isCommentOnlyLine(line = "") {
+  const trimmed = line.trim();
+
+  return (
+    trimmed.startsWith("//") ||
+    trimmed.startsWith("*") ||
+    trimmed.startsWith("/*") ||
+    trimmed.startsWith("*/")
+  );
 }
