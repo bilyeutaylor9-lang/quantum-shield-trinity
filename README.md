@@ -1,3 +1,5 @@
+![Quantum Shield Trinity Scan](https://github.com/bilyeutaylor9-lang/quantum-shield-trinity/actions/workflows/scan.yml/badge.svg)
+
 # Quantum Shield Trinity
 
 Quantum Shield Trinity is a quantum risk intelligence platform designed to help users, developers, and organizations identify cryptographic exposure, assess quantum-related risk, and prepare migration strategies.
