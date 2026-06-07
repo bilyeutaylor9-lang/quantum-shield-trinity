@@ -15,7 +15,12 @@ Quantum Shield Trinity helps answer three critical questions:
 ## Core Engines
 
 ### 1. Wallet Quantum Risk Engine
+## Running Scans
 
+### Scan a repository
+
+```bash
+npm run scan -- /path/to/repository
 Analyzes wallet exposure based on:
 
 - Transaction activity
