@@ -13,9 +13,13 @@ export function calculateRiskScore({
 
   score += signedMessages * 5;
 
-  if (score > 100) {
-    score = 100;
+  if (transactionCount > 50) {
+    score += 15;
   }
 
-  return score;
+  if (signedMessages > 10) {
+    score += 10;
+  }
+
+  return Math.min(score, 100);
 }
