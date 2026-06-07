@@ -3,6 +3,7 @@ import { repositoryScannerEngine } from "./engines/repositoryScannerEngine.js";
 import { dependencyIntelligenceEngine } from "./engines/dependencyIntelligenceEngine.js";
 import { attackSurfaceEngine } from "./engines/attackSurfaceEngine.js";
 import { smartContractAuditEngine } from "./engines/smartContractAuditEngine.js";
+import { exploitSimulationEngine } from "./engines/exploitSimulationEngine.js";
 import { summaryFormatter } from "./utils/summaryFormatter.js";
 import { markdownReportGenerator } from "./reporters/markdownReportGenerator.js";
 
@@ -24,6 +25,10 @@ const smartContractAuditReport = smartContractAuditEngine(scanResult.files);
 report.dependencyReport = dependencyReport;
 report.attackSurfaceReport = attackSurfaceReport;
 report.smartContractAuditReport = smartContractAuditReport;
+
+const exploitSimulationReport = exploitSimulationEngine(report);
+
+report.exploitSimulationReport = exploitSimulationReport;
 
 const summary = summaryFormatter(report);
 
@@ -66,6 +71,29 @@ console.log(`Critical Audit Findings: ${smartContractAuditReport.criticalFinding
 console.log(`High Audit Findings: ${smartContractAuditReport.highFindings}`);
 console.log(`Medium Audit Findings: ${smartContractAuditReport.mediumFindings}`);
 console.log("");
+
+console.log("Exploit Simulation");
+console.log("------------------");
+console.log(`Simulation Risk Level: ${exploitSimulationReport.simulationRiskLevel}`);
+console.log(`Simulation Score: ${exploitSimulationReport.simulationScore}/100`);
+console.log(`Total Simulations: ${exploitSimulationReport.totalSimulations}`);
+console.log(`Critical Simulations: ${exploitSimulationReport.criticalSimulations}`);
+console.log(`High Simulations: ${exploitSimulationReport.highSimulations}`);
+console.log("");
+
+if (exploitSimulationReport.simulations.length > 0) {
+  console.log("Top Exploit Simulations");
+  console.log("-----------------------");
+
+  exploitSimulationReport.simulations.slice(0, 5).forEach((item, index) => {
+    console.log(`${index + 1}. ${item.simulationName}`);
+    console.log(`   Impact: ${item.estimatedImpact}`);
+    console.log(`   Exploitability: ${item.exploitability}`);
+    console.log(`   Affected Area: ${item.affectedArea}`);
+    console.log(`   First Attack Step: ${item.attackPath?.[0] ?? "Not provided"}`);
+    console.log("");
+  });
+}
 
 if (smartContractAuditReport.auditFindings.length > 0) {
   console.log("Top Smart Contract Findings");
