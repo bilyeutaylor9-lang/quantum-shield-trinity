@@ -37,18 +37,22 @@ export function repositoryScannerEngine(files = []) {
   for (const file of files) {
     const fileName = file.name ?? "Unknown File";
     const content = file.content ?? "";
+    const lines = content.split("\n");
 
     for (const pattern of patterns) {
-      const matches = content.match(pattern.regex);
+      lines.forEach((line, index) => {
+        const matches = line.match(pattern.regex);
 
-      if (matches) {
-        findings.push({
-          file: fileName,
-          type: pattern.type,
-          severity: pattern.severity,
-          occurrences: matches.length
-        });
-      }
+        if (matches) {
+          findings.push({
+            file: fileName,
+            line: index + 1,
+            type: pattern.type,
+            severity: pattern.severity,
+            occurrences: matches.length
+          });
+        }
+      });
     }
   }
 
@@ -63,8 +67,8 @@ export function repositoryScannerEngine(files = []) {
   const score = Math.min(
     100,
     criticalFindings * 40 +
-    highFindings * 15 +
-    findings.length * 5
+      highFindings * 15 +
+      findings.length * 5
   );
 
   return {
