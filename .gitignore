@@ -5,3 +5,7 @@ report.txt
 report.json
 quantum-shield-report.md
 .DS_Store
+quantum-shield-report.md
+report.json
+report.txt
+*.zip
