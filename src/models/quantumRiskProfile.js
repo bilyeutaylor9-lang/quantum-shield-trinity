@@ -4,7 +4,8 @@ export function createQuantumRiskProfile({
   migrationReport = {},
   assessmentReport = {},
   forecastReport = {},
-  simulationReport = {}
+  simulationReport = {},
+  auditReport = {}
 }) {
   return {
     generatedAt: new Date().toISOString(),
@@ -45,6 +46,13 @@ export function createQuantumRiskProfile({
       attackPath: simulationReport.attackPath ?? [],
       estimatedImpact: simulationReport.estimatedImpact ?? "UNKNOWN",
       businessRisk: simulationReport.businessRisk ?? "UNKNOWN"
+    },
+
+    audit: {
+      verified: auditReport.verified ?? false,
+      auditHash: auditReport.auditHash ?? "UNAVAILABLE",
+      previousHash: auditReport.previousHash ?? "UNAVAILABLE",
+      auditTimestamp: auditReport.auditTimestamp ?? "UNAVAILABLE"
     }
   };
 }
