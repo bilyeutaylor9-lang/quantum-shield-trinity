@@ -3,16 +3,15 @@ export function sarifReportGenerator(report = {}) {
 
   return {
     version: "2.1.0",
-    $schema:
-      "https://json.schemastore.org/sarif-2.1.0.json",
+    $schema: "https://json.schemastore.org/sarif-2.1.0.json",
     runs: [
       {
         tool: {
           driver: {
             name: "Quantum Shield Trinity",
+            version: report.version ?? "1.3.0",
             informationUri:
               "https://github.com/bilyeutaylor9-lang/quantum-shield-trinity",
-            version: report.version ?? "1.2.0",
             rules: buildRules(findings)
           }
         },
@@ -25,14 +24,12 @@ export function sarifReportGenerator(report = {}) {
 function collectFindings(report = {}) {
   const findings = [];
 
-  addFindings(findings, report.dependencyRiskReport?.findings, "dependency-risk");
-  addFindings(findings, report.assessmentReport?.findings, "security-assessment");
-  addFindings(findings, report.walletReport?.findings, "wallet-risk");
-  addFindings(findings, report.inventoryReport?.findings, "crypto-inventory");
-  addFindings(findings, report.migrationReport?.findings, "migration-risk");
-  addFindings(findings, report.forecastReport?.findings, "quantum-forecast");
-  addFindings(findings, report.simulationReport?.findings, "attack-simulation");
-  addFindings(findings, report.auditReport?.findings, "audit-loop");
+  addFindings(findings, report.findings, "repository");
+  addFindings(findings, report.dependencyReport?.dependencyFindings, "dependency");
+  addFindings(findings, report.attackSurfaceReport?.attackFindings, "attack-surface");
+  addFindings(findings, report.smartContractAuditReport?.auditFindings, "smart-contract-audit");
+  addFindings(findings, report.exploitSimulationReport?.simulations, "exploit-simulation");
+  addFindings(findings, report.securityScoreReport?.findings, "security-score");
 
   return findings;
 }
@@ -49,28 +46,29 @@ function addFindings(target = [], findings = [], source = "unknown") {
 }
 
 function buildRules(findings = []) {
-  const uniqueRules = new Map();
+  const rules = new Map();
 
   for (const finding of findings) {
     const ruleId = getRuleId(finding);
 
-    if (!uniqueRules.has(ruleId)) {
-      uniqueRules.set(ruleId, {
+    if (!rules.has(ruleId)) {
+      rules.set(ruleId, {
         id: ruleId,
-        name: finding.type ?? finding.category ?? ruleId,
+        name: finding.type ?? finding.simulationName ?? finding.category ?? ruleId,
         shortDescription: {
           text:
-            finding.reason ??
             finding.description ??
+            finding.reason ??
             finding.recommendation ??
+            finding.simulationName ??
             "Quantum Shield Trinity finding"
         },
         fullDescription: {
           text:
             finding.recommendation ??
-            finding.reason ??
             finding.description ??
-            "Review this finding."
+            finding.reason ??
+            "Review this security finding."
         },
         help: {
           text:
@@ -78,25 +76,28 @@ function buildRules(findings = []) {
             "Review this finding and apply the recommended remediation."
         },
         properties: {
-          category: finding.category ?? finding.source ?? "security",
-          severity: finding.severity ?? "LOW"
+          category: finding.category ?? finding.affectedArea ?? finding.source ?? "security",
+          severity: finding.severity ?? finding.estimatedImpact ?? "LOW"
         }
       });
     }
   }
 
-  return Array.from(uniqueRules.values());
+  return Array.from(rules.values());
 }
 
 function toSarifResult(finding = {}) {
   return {
     ruleId: getRuleId(finding),
-    level: mapSeverityToSarifLevel(finding.severity),
+    level: mapSeverityToSarifLevel(
+      finding.severity ?? finding.estimatedImpact
+    ),
     message: {
       text:
-        finding.reason ??
         finding.description ??
+        finding.reason ??
         finding.recommendation ??
+        finding.simulationName ??
         finding.type ??
         "Quantum Shield Trinity finding"
     },
@@ -114,11 +115,13 @@ function toSarifResult(finding = {}) {
     ],
     properties: {
       source: finding.source ?? "unknown",
-      severity: finding.severity ?? "LOW",
-      category: finding.category ?? "security",
+      severity: finding.severity ?? finding.estimatedImpact ?? "LOW",
+      category: finding.category ?? finding.affectedArea ?? "security",
       confidence: finding.confidence ?? "unknown",
       recommendation:
         finding.recommendation ??
+        finding.firstAttackStep ??
+        finding.attackPath?.[0] ??
         "Review this finding manually."
     }
   };
@@ -129,6 +132,7 @@ function getRuleId(finding = {}) {
     finding.ruleId ??
       finding.id ??
       finding.type ??
+      finding.simulationName ??
       finding.category ??
       finding.source ??
       "QST_FINDING"
@@ -145,7 +149,6 @@ function mapSeverityToSarifLevel(severity = "LOW") {
   if (normalized === "HIGH") return "error";
   if (normalized === "MEDIUM") return "warning";
   if (normalized === "LOW") return "note";
-  if (normalized === "INFO") return "note";
 
   return "warning";
 }
