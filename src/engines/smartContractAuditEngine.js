@@ -1,3 +1,5 @@
+import { classifyFile } from "../utils/fileClassifier.js";
+
 export function smartContractAuditEngine(files = []) {
   const auditFindings = [];
 
@@ -126,8 +128,9 @@ export function smartContractAuditEngine(files = []) {
 
   for (const file of files) {
     const fileName = file.name ?? "Unknown File";
+    const fileType = classifyFile(fileName);
 
-    if (!fileName.endsWith(".sol")) {
+    if (fileType !== "SMART_CONTRACT") {
       continue;
     }
 
@@ -145,6 +148,7 @@ export function smartContractAuditEngine(files = []) {
         auditFindings.push({
           file: fileName,
           line: index + 1,
+          fileType,
           type: rule.type,
           severity: rule.severity,
           category: rule.category,
@@ -179,9 +183,12 @@ export function smartContractAuditEngine(files = []) {
 
   return {
     engine: "Smart Contract Audit Engine",
-    scannerVersion: "1.8.0",
+    scannerVersion: "1.8.1",
     auditedContracts: files.filter(file =>
-      (file.name ?? "").endsWith(".sol")
+      classifyFile(file.name ?? "") === "SMART_CONTRACT"
+    ).length,
+    skippedNonProductionFiles: files.filter(file =>
+      classifyFile(file.name ?? "") !== "SMART_CONTRACT"
     ).length,
     auditScore,
     auditRiskLevel:
