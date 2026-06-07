@@ -4,6 +4,7 @@ export { migrationShieldEngine } from "./engines/migrationShieldEngine.js";
 export { securityAssessmentEngine } from "./engines/securityAssessmentEngine.js";
 export { quantumExposureForecastEngine } from "./engines/quantumExposureForecastEngine.js";
 export { quantumAttackSimulationEngine } from "./engines/quantumAttackSimulationEngine.js";
+export { securityAuditLoopEngine } from "./engines/securityAuditLoopEngine.js";
 export { createQuantumRiskProfile } from "./models/quantumRiskProfile.js";
 
 import { walletRiskEngine } from "./engines/walletRiskEngine.js";
@@ -12,6 +13,7 @@ import { migrationShieldEngine } from "./engines/migrationShieldEngine.js";
 import { securityAssessmentEngine } from "./engines/securityAssessmentEngine.js";
 import { quantumExposureForecastEngine } from "./engines/quantumExposureForecastEngine.js";
 import { quantumAttackSimulationEngine } from "./engines/quantumAttackSimulationEngine.js";
+import { securityAuditLoopEngine } from "./engines/securityAuditLoopEngine.js";
 import { createQuantumRiskProfile } from "./models/quantumRiskProfile.js";
 
 export function quantumShieldTrinity(wallet, codeSample = "") {
@@ -53,10 +55,15 @@ export function quantumShieldTrinity(wallet, codeSample = "") {
     simulationReport
   });
 
+  const auditReport = securityAuditLoopEngine({
+    systemState: riskProfile
+  });
+
   return {
     platform: "Quantum Shield Trinity",
-    version: "0.5.0",
+    version: "0.6.0",
     riskProfile,
+    auditReport,
     assessmentReport,
     walletReport,
     inventoryReport,
