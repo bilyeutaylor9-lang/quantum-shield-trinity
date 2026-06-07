@@ -1,4 +1,5 @@
 import { QUANTUM_RULES } from "../data/quantumRules.js";
+import { securityCopilotEngine } from "./securityCopilotEngine.js";
 
 export function repositoryScannerEngine(files = []) {
   const findings = [];
@@ -29,6 +30,8 @@ export function repositoryScannerEngine(files = []) {
     }
   }
 
+  const copilotGuidance = securityCopilotEngine(findings);
+
   const criticalFindings = findings.filter(
     finding => finding.severity === "CRITICAL"
   ).length;
@@ -53,6 +56,7 @@ export function repositoryScannerEngine(files = []) {
     rulesUsed: QUANTUM_RULES.length,
     scannedFiles: files.length,
     findings,
+    copilotGuidance,
     criticalFindings,
     highFindings,
     mediumFindings,
