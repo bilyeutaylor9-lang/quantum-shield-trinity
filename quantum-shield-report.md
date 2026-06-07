@@ -14,7 +14,7 @@
 
 **Critical Findings:** 6
 
-**High Findings:** 37
+**High Findings:** 0
 
 **Medium Findings:** 0
 
@@ -822,21 +822,21 @@
 
 ### Copilot Finding #1
 
-**File:** /Users/user/reactive-smart-contract-demos/lib/forge-std/src/StdCheats.sol
+**File:** /Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol
 
-**Line:** 562
+**Line:** 19
 
-**Type:** Seed Phrase
+**Type:** Ethereum Private Key
 
-**Severity:** HIGH
+**Severity:** CRITICAL
 
-**Risk:** Possible wallet seed phrase reference detected.
+**Risk:** Potential Ethereum private key detected.
 
-**Business Impact:** Seed phrase exposure can result in total wallet compromise.
+**Business Impact:** If valid, this can lead to complete wallet compromise and asset loss.
 
-**Recommendation:** Never store seed phrases in source code. Treat exposure as critical until disproven.
+**Recommendation:** Treat the key as compromised. Move funds to a new wallet and remove it from the repository.
 
-**Migration Path:** Seed phrase in source → Secure offline storage
+**Migration Path:** Hardcoded wallet key → Hardware wallet, vault, or environment secret
 
 **Estimated Effort:** Immediate
 
@@ -844,21 +844,21 @@
 
 ### Copilot Finding #2
 
-**File:** /Users/user/reactive-smart-contract-demos/lib/forge-std/src/StdCheats.sol
+**File:** /Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol
 
-**Line:** 567
+**Line:** 20
 
-**Type:** Seed Phrase
+**Type:** Ethereum Private Key
 
-**Severity:** HIGH
+**Severity:** CRITICAL
 
-**Risk:** Possible wallet seed phrase reference detected.
+**Risk:** Potential Ethereum private key detected.
 
-**Business Impact:** Seed phrase exposure can result in total wallet compromise.
+**Business Impact:** If valid, this can lead to complete wallet compromise and asset loss.
 
-**Recommendation:** Never store seed phrases in source code. Treat exposure as critical until disproven.
+**Recommendation:** Treat the key as compromised. Move funds to a new wallet and remove it from the repository.
 
-**Migration Path:** Seed phrase in source → Secure offline storage
+**Migration Path:** Hardcoded wallet key → Hardware wallet, vault, or environment secret
 
 **Estimated Effort:** Immediate
 
@@ -866,21 +866,21 @@
 
 ### Copilot Finding #3
 
-**File:** /Users/user/reactive-smart-contract-demos/lib/forge-std/src/Vm.sol
+**File:** /Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol
 
-**Line:** 1332
+**Line:** 16
 
-**Type:** Seed Phrase
+**Type:** Ethereum Private Key
 
-**Severity:** HIGH
+**Severity:** CRITICAL
 
-**Risk:** Possible wallet seed phrase reference detected.
+**Risk:** Potential Ethereum private key detected.
 
-**Business Impact:** Seed phrase exposure can result in total wallet compromise.
+**Business Impact:** If valid, this can lead to complete wallet compromise and asset loss.
 
-**Recommendation:** Never store seed phrases in source code. Treat exposure as critical until disproven.
+**Recommendation:** Treat the key as compromised. Move funds to a new wallet and remove it from the repository.
 
-**Migration Path:** Seed phrase in source → Secure offline storage
+**Migration Path:** Hardcoded wallet key → Hardware wallet, vault, or environment secret
 
 **Estimated Effort:** Immediate
 
@@ -888,21 +888,21 @@
 
 ### Copilot Finding #4
 
-**File:** /Users/user/reactive-smart-contract-demos/lib/forge-std/src/Vm.sol
+**File:** /Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol
 
-**Line:** 1336
+**Line:** 17
 
-**Type:** Seed Phrase
+**Type:** Ethereum Private Key
 
-**Severity:** HIGH
+**Severity:** CRITICAL
 
-**Risk:** Possible wallet seed phrase reference detected.
+**Risk:** Potential Ethereum private key detected.
 
-**Business Impact:** Seed phrase exposure can result in total wallet compromise.
+**Business Impact:** If valid, this can lead to complete wallet compromise and asset loss.
 
-**Recommendation:** Never store seed phrases in source code. Treat exposure as critical until disproven.
+**Recommendation:** Treat the key as compromised. Move funds to a new wallet and remove it from the repository.
 
-**Migration Path:** Seed phrase in source → Secure offline storage
+**Migration Path:** Hardcoded wallet key → Hardware wallet, vault, or environment secret
 
 **Estimated Effort:** Immediate
 
@@ -910,21 +910,21 @@
 
 ### Copilot Finding #5
 
-**File:** /Users/user/reactive-smart-contract-demos/lib/forge-std/src/Vm.sol
+**File:** /Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoReactive.sol
 
-**Line:** 1343
+**Line:** 27
 
-**Type:** Seed Phrase
+**Type:** Ethereum Private Key
 
-**Severity:** HIGH
+**Severity:** CRITICAL
 
-**Risk:** Possible wallet seed phrase reference detected.
+**Risk:** Potential Ethereum private key detected.
 
-**Business Impact:** Seed phrase exposure can result in total wallet compromise.
+**Business Impact:** If valid, this can lead to complete wallet compromise and asset loss.
 
-**Recommendation:** Never store seed phrases in source code. Treat exposure as critical until disproven.
+**Recommendation:** Treat the key as compromised. Move funds to a new wallet and remove it from the repository.
 
-**Migration Path:** Seed phrase in source → Secure offline storage
+**Migration Path:** Hardcoded wallet key → Hardware wallet, vault, or environment secret
 
 **Estimated Effort:** Immediate
 
@@ -932,35 +932,13 @@
 
 ### Copilot Finding #6
 
-**File:** /Users/user/reactive-smart-contract-demos/lib/forge-std/src/Vm.sol
+**File:** /Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoReactive.sol
 
-**Line:** 1350
-
-**Type:** Seed Phrase
-
-**Severity:** HIGH
-
-**Risk:** Possible wallet seed phrase reference detected.
-
-**Business Impact:** Seed phrase exposure can result in total wallet compromise.
-
-**Recommendation:** Never store seed phrases in source code. Treat exposure as critical until disproven.
-
-**Migration Path:** Seed phrase in source → Secure offline storage
-
-**Estimated Effort:** Immediate
-
----
-
-### Copilot Finding #7
-
-**File:** /Users/user/reactive-smart-contract-demos/lib/forge-std/test/StdCheats.t.sol
-
-**Line:** 235
+**Line:** 28
 
 **Type:** Ethereum Private Key
 
-**Severity:** HIGH
+**Severity:** CRITICAL
 
 **Risk:** Potential Ethereum private key detected.
 
@@ -969,402 +947,6 @@
 **Recommendation:** Treat the key as compromised. Move funds to a new wallet and remove it from the repository.
 
 **Migration Path:** Hardcoded wallet key → Hardware wallet, vault, or environment secret
-
-**Estimated Effort:** Immediate
-
----
-
-### Copilot Finding #8
-
-**File:** /Users/user/reactive-smart-contract-demos/lib/forge-std/test/StdCheats.t.sol
-
-**Line:** 233
-
-**Type:** Seed Phrase
-
-**Severity:** HIGH
-
-**Risk:** Possible wallet seed phrase reference detected.
-
-**Business Impact:** Seed phrase exposure can result in total wallet compromise.
-
-**Recommendation:** Never store seed phrases in source code. Treat exposure as critical until disproven.
-
-**Migration Path:** Seed phrase in source → Secure offline storage
-
-**Estimated Effort:** Immediate
-
----
-
-### Copilot Finding #9
-
-**File:** /Users/user/reactive-smart-contract-demos/lib/openzeppelin-contracts/contracts/proxy/utils/Initializable.sol
-
-**Line:** 77
-
-**Type:** Ethereum Private Key
-
-**Severity:** HIGH
-
-**Risk:** Potential Ethereum private key detected.
-
-**Business Impact:** If valid, this can lead to complete wallet compromise and asset loss.
-
-**Recommendation:** Treat the key as compromised. Move funds to a new wallet and remove it from the repository.
-
-**Migration Path:** Hardcoded wallet key → Hardware wallet, vault, or environment secret
-
-**Estimated Effort:** Immediate
-
----
-
-### Copilot Finding #10
-
-**File:** /Users/user/reactive-smart-contract-demos/lib/openzeppelin-contracts/contracts/utils/ShortStrings.sol
-
-**Line:** 42
-
-**Type:** Ethereum Private Key
-
-**Severity:** HIGH
-
-**Risk:** Potential Ethereum private key detected.
-
-**Business Impact:** If valid, this can lead to complete wallet compromise and asset loss.
-
-**Recommendation:** Treat the key as compromised. Move funds to a new wallet and remove it from the repository.
-
-**Migration Path:** Hardcoded wallet key → Hardware wallet, vault, or environment secret
-
-**Estimated Effort:** Immediate
-
----
-
-### Copilot Finding #11
-
-**File:** /Users/user/reactive-smart-contract-demos/lib/openzeppelin-contracts/lib/forge-std/src/StdCheats.sol
-
-**Line:** 414
-
-**Type:** Seed Phrase
-
-**Severity:** HIGH
-
-**Risk:** Possible wallet seed phrase reference detected.
-
-**Business Impact:** Seed phrase exposure can result in total wallet compromise.
-
-**Recommendation:** Never store seed phrases in source code. Treat exposure as critical until disproven.
-
-**Migration Path:** Seed phrase in source → Secure offline storage
-
-**Estimated Effort:** Immediate
-
----
-
-### Copilot Finding #12
-
-**File:** /Users/user/reactive-smart-contract-demos/lib/openzeppelin-contracts/lib/forge-std/src/StdCheats.sol
-
-**Line:** 419
-
-**Type:** Seed Phrase
-
-**Severity:** HIGH
-
-**Risk:** Possible wallet seed phrase reference detected.
-
-**Business Impact:** Seed phrase exposure can result in total wallet compromise.
-
-**Recommendation:** Never store seed phrases in source code. Treat exposure as critical until disproven.
-
-**Migration Path:** Seed phrase in source → Secure offline storage
-
-**Estimated Effort:** Immediate
-
----
-
-### Copilot Finding #13
-
-**File:** /Users/user/reactive-smart-contract-demos/lib/openzeppelin-contracts/lib/forge-std/src/Vm.sol
-
-**Line:** 159
-
-**Type:** Seed Phrase
-
-**Severity:** HIGH
-
-**Risk:** Possible wallet seed phrase reference detected.
-
-**Business Impact:** Seed phrase exposure can result in total wallet compromise.
-
-**Recommendation:** Never store seed phrases in source code. Treat exposure as critical until disproven.
-
-**Migration Path:** Seed phrase in source → Secure offline storage
-
-**Estimated Effort:** Immediate
-
----
-
-### Copilot Finding #14
-
-**File:** /Users/user/reactive-smart-contract-demos/lib/openzeppelin-contracts/lib/forge-std/src/Vm.sol
-
-**Line:** 161
-
-**Type:** Seed Phrase
-
-**Severity:** HIGH
-
-**Risk:** Possible wallet seed phrase reference detected.
-
-**Business Impact:** Seed phrase exposure can result in total wallet compromise.
-
-**Recommendation:** Never store seed phrases in source code. Treat exposure as critical until disproven.
-
-**Migration Path:** Seed phrase in source → Secure offline storage
-
-**Estimated Effort:** Immediate
-
----
-
-### Copilot Finding #15
-
-**File:** /Users/user/reactive-smart-contract-demos/lib/openzeppelin-contracts/lib/forge-std/test/StdCheats.t.sol
-
-**Line:** 160
-
-**Type:** Ethereum Private Key
-
-**Severity:** HIGH
-
-**Risk:** Potential Ethereum private key detected.
-
-**Business Impact:** If valid, this can lead to complete wallet compromise and asset loss.
-
-**Recommendation:** Treat the key as compromised. Move funds to a new wallet and remove it from the repository.
-
-**Migration Path:** Hardcoded wallet key → Hardware wallet, vault, or environment secret
-
-**Estimated Effort:** Immediate
-
----
-
-### Copilot Finding #16
-
-**File:** /Users/user/reactive-smart-contract-demos/lib/openzeppelin-contracts/lib/forge-std/test/StdCheats.t.sol
-
-**Line:** 158
-
-**Type:** Seed Phrase
-
-**Severity:** HIGH
-
-**Risk:** Possible wallet seed phrase reference detected.
-
-**Business Impact:** Seed phrase exposure can result in total wallet compromise.
-
-**Recommendation:** Never store seed phrases in source code. Treat exposure as critical until disproven.
-
-**Migration Path:** Seed phrase in source → Secure offline storage
-
-**Estimated Effort:** Immediate
-
----
-
-### Copilot Finding #17
-
-**File:** /Users/user/reactive-smart-contract-demos/lib/reactive-lib/lib/forge-std/src/StdCheats.sol
-
-**Line:** 562
-
-**Type:** Seed Phrase
-
-**Severity:** HIGH
-
-**Risk:** Possible wallet seed phrase reference detected.
-
-**Business Impact:** Seed phrase exposure can result in total wallet compromise.
-
-**Recommendation:** Never store seed phrases in source code. Treat exposure as critical until disproven.
-
-**Migration Path:** Seed phrase in source → Secure offline storage
-
-**Estimated Effort:** Immediate
-
----
-
-### Copilot Finding #18
-
-**File:** /Users/user/reactive-smart-contract-demos/lib/reactive-lib/lib/forge-std/src/StdCheats.sol
-
-**Line:** 567
-
-**Type:** Seed Phrase
-
-**Severity:** HIGH
-
-**Risk:** Possible wallet seed phrase reference detected.
-
-**Business Impact:** Seed phrase exposure can result in total wallet compromise.
-
-**Recommendation:** Never store seed phrases in source code. Treat exposure as critical until disproven.
-
-**Migration Path:** Seed phrase in source → Secure offline storage
-
-**Estimated Effort:** Immediate
-
----
-
-### Copilot Finding #19
-
-**File:** /Users/user/reactive-smart-contract-demos/lib/reactive-lib/lib/forge-std/src/Vm.sol
-
-**Line:** 280
-
-**Type:** Seed Phrase
-
-**Severity:** HIGH
-
-**Risk:** Possible wallet seed phrase reference detected.
-
-**Business Impact:** Seed phrase exposure can result in total wallet compromise.
-
-**Recommendation:** Never store seed phrases in source code. Treat exposure as critical until disproven.
-
-**Migration Path:** Seed phrase in source → Secure offline storage
-
-**Estimated Effort:** Immediate
-
----
-
-### Copilot Finding #20
-
-**File:** /Users/user/reactive-smart-contract-demos/lib/reactive-lib/lib/forge-std/src/Vm.sol
-
-**Line:** 284
-
-**Type:** Seed Phrase
-
-**Severity:** HIGH
-
-**Risk:** Possible wallet seed phrase reference detected.
-
-**Business Impact:** Seed phrase exposure can result in total wallet compromise.
-
-**Recommendation:** Never store seed phrases in source code. Treat exposure as critical until disproven.
-
-**Migration Path:** Seed phrase in source → Secure offline storage
-
-**Estimated Effort:** Immediate
-
----
-
-### Copilot Finding #21
-
-**File:** /Users/user/reactive-smart-contract-demos/lib/reactive-lib/lib/forge-std/src/Vm.sol
-
-**Line:** 291
-
-**Type:** Seed Phrase
-
-**Severity:** HIGH
-
-**Risk:** Possible wallet seed phrase reference detected.
-
-**Business Impact:** Seed phrase exposure can result in total wallet compromise.
-
-**Recommendation:** Never store seed phrases in source code. Treat exposure as critical until disproven.
-
-**Migration Path:** Seed phrase in source → Secure offline storage
-
-**Estimated Effort:** Immediate
-
----
-
-### Copilot Finding #22
-
-**File:** /Users/user/reactive-smart-contract-demos/lib/reactive-lib/lib/forge-std/src/Vm.sol
-
-**Line:** 298
-
-**Type:** Seed Phrase
-
-**Severity:** HIGH
-
-**Risk:** Possible wallet seed phrase reference detected.
-
-**Business Impact:** Seed phrase exposure can result in total wallet compromise.
-
-**Recommendation:** Never store seed phrases in source code. Treat exposure as critical until disproven.
-
-**Migration Path:** Seed phrase in source → Secure offline storage
-
-**Estimated Effort:** Immediate
-
----
-
-### Copilot Finding #23
-
-**File:** /Users/user/reactive-smart-contract-demos/lib/reactive-lib/lib/forge-std/src/Vm.sol
-
-**Line:** 312
-
-**Type:** Seed Phrase
-
-**Severity:** HIGH
-
-**Risk:** Possible wallet seed phrase reference detected.
-
-**Business Impact:** Seed phrase exposure can result in total wallet compromise.
-
-**Recommendation:** Never store seed phrases in source code. Treat exposure as critical until disproven.
-
-**Migration Path:** Seed phrase in source → Secure offline storage
-
-**Estimated Effort:** Immediate
-
----
-
-### Copilot Finding #24
-
-**File:** /Users/user/reactive-smart-contract-demos/lib/reactive-lib/lib/forge-std/test/StdCheats.t.sol
-
-**Line:** 235
-
-**Type:** Ethereum Private Key
-
-**Severity:** HIGH
-
-**Risk:** Potential Ethereum private key detected.
-
-**Business Impact:** If valid, this can lead to complete wallet compromise and asset loss.
-
-**Recommendation:** Treat the key as compromised. Move funds to a new wallet and remove it from the repository.
-
-**Migration Path:** Hardcoded wallet key → Hardware wallet, vault, or environment secret
-
-**Estimated Effort:** Immediate
-
----
-
-### Copilot Finding #25
-
-**File:** /Users/user/reactive-smart-contract-demos/lib/reactive-lib/lib/forge-std/test/StdCheats.t.sol
-
-**Line:** 233
-
-**Type:** Seed Phrase
-
-**Severity:** HIGH
-
-**Risk:** Possible wallet seed phrase reference detected.
-
-**Business Impact:** Seed phrase exposure can result in total wallet compromise.
-
-**Recommendation:** Never store seed phrases in source code. Treat exposure as critical until disproven.
-
-**Migration Path:** Seed phrase in source → Secure offline storage
 
 **Estimated Effort:** Immediate
 

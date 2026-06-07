@@ -47,17 +47,9 @@ export function smartContractAuditEngine(files = []) {
         "Validate call success values and protect external calls against reentrancy."
     },
     {
-      type: "Unchecked Transfer",
-      regex: /\.transfer\s*\(|\.send\s*\(/g,
-      severity: "MEDIUM",
-      category: "Value Transfer Risk",
-      recommendation:
-        "Review ETH transfer logic. Prefer safer withdrawal patterns where appropriate."
-    },
-    {
       type: "Missing Access Control Signal",
       regex: /\bfunction\s+\w+\s*\([^)]*\)\s*(public|external)/g,
-      severity: "MEDIUM",
+      severity: "INFO",
       category: "Access Control Review",
       recommendation:
         "Review public/external functions for required access control, validation, and rate limits."
@@ -65,58 +57,18 @@ export function smartContractAuditEngine(files = []) {
     {
       type: "Owner/Admin Control",
       regex: /\bonlyOwner\b|\bDEFAULT_ADMIN_ROLE\b|\bOwnable\b|\bAccessControl\b/g,
-      severity: "MEDIUM",
-      category: "Centralization Risk",
+      severity: "INFO",
+      category: "Centralization Review",
       recommendation:
-        "Review owner/admin privileges. Consider multisig, timelock, and least-privilege role design."
+        "Review admin privileges. Consider multisig, timelock, and least-privilege role design."
     },
     {
       type: "Upgradeable Contract",
       regex: /\bUUPSUpgradeable\b|\bInitializable\b|\bupgradeTo\b|\bupgradeToAndCall\b|\bTransparentUpgradeableProxy\b|\bimplementation\b|\bproxy\b/g,
-      severity: "HIGH",
+      severity: "MEDIUM",
       category: "Upgradeability Risk",
       recommendation:
         "Ensure upgrade authorization, initializer safety, storage layout compatibility, and admin controls."
-    },
-    {
-      type: "Unchecked Math Block",
-      regex: /\bunchecked\s*\{/g,
-      severity: "MEDIUM",
-      category: "Arithmetic Review",
-      recommendation:
-        "Review unchecked math blocks to ensure overflow/underflow cannot create exploitable behavior."
-    },
-    {
-      type: "Block Timestamp Dependency",
-      regex: /\bblock\.timestamp\b|\bnow\b/g,
-      severity: "MEDIUM",
-      category: "Time Manipulation Risk",
-      recommendation:
-        "Avoid relying on block timestamps for critical randomness, settlement, or authorization logic."
-    },
-    {
-      type: "Weak Randomness",
-      regex: /\bblockhash\b|\bprevrandao\b|\bdifficulty\b|\bkeccak256\s*\([^)]*block/g,
-      severity: "HIGH",
-      category: "Randomness Risk",
-      recommendation:
-        "Do not use predictable block values for secure randomness. Use a trusted randomness oracle when needed."
-    },
-    {
-      type: "Hardcoded Address",
-      regex: /0x[a-fA-F0-9]{40}/g,
-      severity: "MEDIUM",
-      category: "Configuration Risk",
-      recommendation:
-        "Verify hardcoded addresses are intentional, documented, and network-specific."
-    },
-    {
-      type: "External Token Approval",
-      regex: /\bapprove\s*\(|\bsetApprovalForAll\s*\(/g,
-      severity: "MEDIUM",
-      category: "Token Approval Risk",
-      recommendation:
-        "Review approval flows for excessive allowances, approval reset issues, and user safety."
     },
     {
       type: "Oracle Usage",
@@ -133,6 +85,14 @@ export function smartContractAuditEngine(files = []) {
       category: "Signature Risk",
       recommendation:
         "Review permit and EIP-712 signature handling for replay protection, domain separation, and nonce safety."
+    },
+    {
+      type: "Hardcoded Address",
+      regex: /0x[a-fA-F0-9]{40}/g,
+      severity: "INFO",
+      category: "Configuration Review",
+      recommendation:
+        "Verify hardcoded addresses are intentional, documented, and network-specific."
     }
   ];
 
@@ -160,11 +120,7 @@ export function smartContractAuditEngine(files = []) {
       lines.forEach((line, index) => {
         const matches = line.match(rule.regex);
 
-        if (!matches) {
-          return;
-        }
-
-        if (isCommentOnlyLine(line)) {
+        if (!matches || isCommentOnlyLine(line)) {
           return;
         }
 
@@ -206,28 +162,23 @@ export function smartContractAuditEngine(files = []) {
     }
   }
 
-  const criticalFindings = auditFindings.filter(
-    finding => finding.severity === "CRITICAL"
-  ).length;
+  const criticalFindings = countSeverity(auditFindings, "CRITICAL");
+  const highFindings = countSeverity(auditFindings, "HIGH");
+  const mediumFindings = countSeverity(auditFindings, "MEDIUM");
+  const infoFindings = countSeverity(auditFindings, "INFO");
 
-  const highFindings = auditFindings.filter(
-    finding => finding.severity === "HIGH"
-  ).length;
-
-  const mediumFindings = auditFindings.filter(
-    finding => finding.severity === "MEDIUM"
-  ).length;
-
-  const auditScore = Math.min(
+  const auditRiskScore = Math.min(
     100,
     criticalFindings * 40 +
       highFindings * 15 +
       mediumFindings * 5
   );
 
+  const auditSecurityScore = Math.max(0, 100 - auditRiskScore);
+
   return {
     engine: "Smart Contract Audit Engine",
-    scannerVersion: "1.9.2",
+    scannerVersion: "2.0.0",
     auditedContracts: files.filter(
       file =>
         classifyFile(file.name ?? "") === "SMART_CONTRACT" &&
@@ -235,24 +186,34 @@ export function smartContractAuditEngine(files = []) {
     ).length,
     skippedNonSmartContractFiles,
     skippedNonProductionFiles,
-    auditScore,
+    auditRiskScore,
+    auditSecurityScore,
     auditRiskLevel:
-      auditScore >= 90
+      auditRiskScore >= 90
         ? "CRITICAL"
-        : auditScore >= 70
+        : auditRiskScore >= 70
         ? "HIGH"
-        : auditScore >= 40
+        : auditRiskScore >= 40
         ? "MEDIUM"
         : "LOW",
     criticalFindings,
     highFindings,
     mediumFindings,
+    infoFindings,
     totalAuditFindings: auditFindings.length,
     auditFindings
   };
 }
 
+function countSeverity(findings = [], severity = "") {
+  return findings.filter(finding => finding.severity === severity).length;
+}
+
 function adjustAuditSeverity(severity, smartContractContext = {}, confidence = 50) {
+  if (severity === "INFO") {
+    return "INFO";
+  }
+
   if (confidence < 50 && severity === "CRITICAL") {
     return "HIGH";
   }
@@ -269,10 +230,6 @@ function adjustAuditSeverity(severity, smartContractContext = {}, confidence = 5
     return "HIGH";
   }
 
-  if (smartContractContext.exploitability === "LOW" && severity === "HIGH") {
-    return "MEDIUM";
-  }
-
   return severity;
 }
 
@@ -282,13 +239,8 @@ function calculateAuditConfidence(line = "", fileName = "", rule = {}, smartCont
 
   let confidence = 65;
 
-  if (rule.severity === "CRITICAL") {
-    confidence += 15;
-  }
-
-  if (smartContractContext.exploitability === "CRITICAL") {
-    confidence += 15;
-  }
+  if (rule.severity === "CRITICAL") confidence += 15;
+  if (smartContractContext.exploitability === "CRITICAL") confidence += 15;
 
   if (
     normalizedLine.includes("onlyowner") ||
