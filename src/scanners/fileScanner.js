@@ -14,7 +14,30 @@ const SUPPORTED_EXTENSIONS = [
   ".env",
   ".pem",
   ".yaml",
-  ".yml"
+  ".yml",
+  ".toml",
+  ".config",
+  ".conf",
+  ".ini",
+  ".sh",
+  ".md",
+  ".txt",
+  ".lock"
+];
+
+const IMPORTANT_FILENAMES = [
+  ".env",
+  ".env.local",
+  ".env.production",
+  ".env.development",
+  "Dockerfile",
+  "docker-compose.yml",
+  "package.json",
+  "package-lock.json",
+  "foundry.toml",
+  "hardhat.config.js",
+  "truffle-config.js",
+  "remappings.txt"
 ];
 
 const IGNORED_FOLDERS = [
@@ -24,18 +47,11 @@ const IGNORED_FOLDERS = [
   "build",
   ".next",
   "coverage",
-  "lib",
-  "vendor",
   "out",
   "cache"
 ];
 
 const IGNORED_FILE_PATTERNS = [
-  ".test.",
-  ".spec.",
-  "test/",
-  "tests/",
-  "__tests__/",
   ".min.js"
 ];
 
@@ -44,6 +60,16 @@ function shouldIgnoreFile(filePath) {
 
   return IGNORED_FILE_PATTERNS.some(pattern =>
     normalizedPath.includes(pattern)
+  );
+}
+
+function shouldScanFile(filePath) {
+  const fileName = path.basename(filePath);
+  const extension = path.extname(fileName);
+
+  return (
+    SUPPORTED_EXTENSIONS.includes(extension) ||
+    IMPORTANT_FILENAMES.includes(fileName)
   );
 }
 
@@ -69,25 +95,27 @@ export function fileScanner(targetDirectory = ".") {
         continue;
       }
 
-      const extension = path.extname(entry.name);
-
-      if (!SUPPORTED_EXTENSIONS.includes(extension)) {
+      if (!shouldScanFile(fullPath)) {
         continue;
       }
 
-      const content = fs.readFileSync(fullPath, "utf8");
+      try {
+        const content = fs.readFileSync(fullPath, "utf8");
 
-      files.push({
-        name: fullPath,
-        content
-      });
+        files.push({
+          name: fullPath,
+          content
+        });
+      } catch {
+        // Skip unreadable or binary files safely.
+      }
     }
   }
 
   scanDirectory(targetDirectory);
 
   return {
-    scanner: "File Scanner",
+    scanner: "Deep File Scanner",
     targetDirectory,
     scannedFiles: files.length,
     files
