@@ -101,7 +101,7 @@ export const QUANTUM_RULES = [
   {
     id: "ENV_SECRET",
     type: "Environment Secret",
-    regex: /(SECRET|TOKEN|API_KEY|PRIVATE_KEY)\s*=\s*["']?[^"'\n]{8,}/gi,
+    regex: /(SECRET|TOKEN|API_KEY)\s*=\s*["']?[^"'\n]{8,}/gi,
     severity: "HIGH",
     category: "Secret Exposure",
     description: "Potential secret value detected.",
@@ -110,7 +110,7 @@ export const QUANTUM_RULES = [
   {
     id: "ETH_PRIVATE_KEY",
     type: "Ethereum Private Key",
-    regex: /0x[a-fA-F0-9]{64}/g,
+    regex: /\b(ETH_PRIVATE_KEY|PRIVATE_KEY|WALLET_PRIVATE_KEY|DEPLOYER_PRIVATE_KEY|SIGNER_PRIVATE_KEY|privateKey|walletKey|deployerKey|signerKey)\b\s*[:=]\s*["']?(0x)?[a-fA-F0-9]{64}["']?/g,
     severity: "CRITICAL",
     category: "Wallet Secret Exposure",
     description: "Potential Ethereum private key detected.",
