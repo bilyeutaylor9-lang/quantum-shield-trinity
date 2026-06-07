@@ -7,6 +7,8 @@ export { quantumAttackSimulationEngine } from "./engines/quantumAttackSimulation
 export { securityAuditLoopEngine } from "./engines/securityAuditLoopEngine.js";
 export { jsonExportEngine } from "./engines/jsonExportEngine.js";
 export { executiveReportEngine } from "./engines/executiveReportEngine.js";
+export { dependencyRiskEngine } from "./engines/dependencyRiskEngine.js";
+export { securityScoreEngine } from "./engines/securityScoreEngine.js";
 export { createQuantumRiskProfile } from "./models/quantumRiskProfile.js";
 
 import { walletRiskEngine } from "./engines/walletRiskEngine.js";
@@ -18,13 +20,16 @@ import { quantumAttackSimulationEngine } from "./engines/quantumAttackSimulation
 import { securityAuditLoopEngine } from "./engines/securityAuditLoopEngine.js";
 import { jsonExportEngine } from "./engines/jsonExportEngine.js";
 import { executiveReportEngine } from "./engines/executiveReportEngine.js";
-import { createQuantumRiskProfile } from "./models/quantumRiskProfile.js";
+import { dependencyRiskEngine } from "./engines/dependencyRiskEngine.js";
 import { securityScoreEngine } from "./engines/securityScoreEngine.js";
+import { createQuantumRiskProfile } from "./models/quantumRiskProfile.js";
 
-export function quantumShieldTrinity(wallet, codeSample = "") {
+export function quantumShieldTrinity(wallet, codeSample = "", packageJson = {}) {
   const walletReport = walletRiskEngine(wallet);
 
   const inventoryReport = cryptoInventoryEngine(codeSample);
+
+  const dependencyRiskReport = dependencyRiskEngine(packageJson);
 
   const migrationReport = migrationShieldEngine(
     walletReport,
@@ -48,12 +53,14 @@ export function quantumShieldTrinity(wallet, codeSample = "") {
     walletReport,
     inventoryReport,
     migrationReport,
-    forecastReport
+    forecastReport,
+    dependencyRiskReport
   });
 
   const securityScoreReport = securityScoreEngine({
     walletReport,
     inventoryReport,
+    dependencyRiskReport,
     migrationReport,
     forecastReport,
     simulationReport,
@@ -64,6 +71,7 @@ export function quantumShieldTrinity(wallet, codeSample = "") {
     systemState: {
       walletReport,
       inventoryReport,
+      dependencyRiskReport,
       migrationReport,
       forecastReport,
       simulationReport,
@@ -75,6 +83,7 @@ export function quantumShieldTrinity(wallet, codeSample = "") {
   const riskProfile = createQuantumRiskProfile({
     walletReport,
     inventoryReport,
+    dependencyRiskReport,
     migrationReport,
     assessmentReport,
     forecastReport,
@@ -85,11 +94,12 @@ export function quantumShieldTrinity(wallet, codeSample = "") {
 
   const baseReport = {
     platform: "Quantum Shield Trinity",
-    version: "0.9.0",
+    version: "1.0.0",
     riskProfile,
     auditReport,
     assessmentReport,
     securityScoreReport,
+    dependencyRiskReport,
     walletReport,
     inventoryReport,
     migrationReport,
