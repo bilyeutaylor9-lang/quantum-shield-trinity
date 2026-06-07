@@ -1,28 +1,28 @@
+import { calculateRiskScore } from "../utils/riskScore.js";
+
 export function walletRiskEngine(wallet) {
-  let score = 10;
-
-  const exposedPublicKey = false;
   const transactionCount = 0;
+  const reusedAddress = false;
+  const signedMessages = 0;
 
-  if (transactionCount > 0) {
-    score += 20;
-  }
+  const score = calculateRiskScore({
+    transactionCount,
+    reusedAddress,
+    signedMessages
+  });
 
   return {
     engine: "Wallet Quantum Risk Engine",
     wallet,
-    exposedPublicKey,
     transactionCount,
+    reusedAddress,
+    signedMessages,
+    score,
     riskLevel:
       score > 75
         ? "HIGH"
         : score > 40
         ? "MEDIUM"
-        : "LOW",
-    score,
-    recommendation:
-      score > 75
-        ? "Immediate review recommended."
-        : "Monitor wallet activity."
+        : "LOW"
   };
 }
