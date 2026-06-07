@@ -6,6 +6,7 @@ export { quantumExposureForecastEngine } from "./engines/quantumExposureForecast
 export { quantumAttackSimulationEngine } from "./engines/quantumAttackSimulationEngine.js";
 export { securityAuditLoopEngine } from "./engines/securityAuditLoopEngine.js";
 export { jsonExportEngine } from "./engines/jsonExportEngine.js";
+export { executiveReportEngine } from "./engines/executiveReportEngine.js";
 export { createQuantumRiskProfile } from "./models/quantumRiskProfile.js";
 
 import { walletRiskEngine } from "./engines/walletRiskEngine.js";
@@ -16,6 +17,7 @@ import { quantumExposureForecastEngine } from "./engines/quantumExposureForecast
 import { quantumAttackSimulationEngine } from "./engines/quantumAttackSimulationEngine.js";
 import { securityAuditLoopEngine } from "./engines/securityAuditLoopEngine.js";
 import { jsonExportEngine } from "./engines/jsonExportEngine.js";
+import { executiveReportEngine } from "./engines/executiveReportEngine.js";
 import { createQuantumRiskProfile } from "./models/quantumRiskProfile.js";
 
 export function quantumShieldTrinity(wallet, codeSample = "") {
@@ -71,7 +73,7 @@ export function quantumShieldTrinity(wallet, codeSample = "") {
 
   const baseReport = {
     platform: "Quantum Shield Trinity",
-    version: "0.7.0",
+    version: "0.8.0",
     riskProfile,
     auditReport,
     assessmentReport,
@@ -82,10 +84,16 @@ export function quantumShieldTrinity(wallet, codeSample = "") {
     simulationReport
   };
 
-  const exportReport = jsonExportEngine(baseReport);
+  const executiveReport = executiveReportEngine(baseReport);
+
+  const exportReport = jsonExportEngine({
+    ...baseReport,
+    executiveReport
+  });
 
   return {
     ...baseReport,
+    executiveReport,
     exportReport
   };
 }
