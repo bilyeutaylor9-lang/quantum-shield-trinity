@@ -9,6 +9,11 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
 jobs:
   scan:
     runs-on: ubuntu-latest
@@ -26,10 +31,22 @@ jobs:
         run: npm install
 
       - name: Run Quantum Shield Trinity scan
-        run: npm run scan -- . > quantum-shield-report.txt
+        run: |
+          npm run scan -- . > quantum-shield-report.txt
+          node -e "import('./src/index.js').then(m => { const fs = require('fs'); const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8')); const report = m.quantumShieldTrinity('0x0000000000000000000000000000000000000000', fs.readFileSync('README.md', 'utf8'), pkg, { writeReports: true }); console.log(JSON.stringify(report.securityScoreReport, null, 2)); })"
 
-      - name: Upload scan report
+      - name: Upload scan artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: quantum-shield-report
-          path: quantum-shield-report.txt
+          name: quantum-shield-trinity-reports
+          path: |
+            quantum-shield-report.txt
+            report.html
+            report.json
+            executive-report.json
+            report.sarif
+
+      - name: Upload SARIF to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: report.sarif
