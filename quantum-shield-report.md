@@ -370,9 +370,9 @@
 
 ## Smart Contract Audit
 
-**Audit Risk Level:** CRITICAL
+**Audit Risk Level:** LOW
 
-**Audit Score:** 90/100
+**Audit Score:** 0/100
 
 **Audited Contracts:** 10
 
@@ -382,7 +382,7 @@
 
 **High Audit Findings:** 0
 
-**Medium Audit Findings:** 18
+**Medium Audit Findings:** 0
 
 ### Smart Contract Finding #1
 
@@ -392,7 +392,7 @@
 
 **Type:** Missing Access Control Signal
 
-**Severity:** MEDIUM
+**Severity:** INFO
 
 **Category:** Access Control Review
 
@@ -416,9 +416,9 @@
 
 **Type:** Hardcoded Address
 
-**Severity:** MEDIUM
+**Severity:** INFO
 
-**Category:** Configuration Risk
+**Category:** Configuration Review
 
 **Recommendation:** Verify hardcoded addresses are intentional, documented, and network-specific.
 
@@ -434,25 +434,25 @@
 
 ### Smart Contract Finding #3
 
-**File:** /Users/user/reactive-smart-contract-demos/src/ai-sentinel-cross-chain/aisentinelcallback.sol
+**File:** /Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverL1.sol
 
-**Line:** 17
+**Line:** 23
 
-**Type:** Block Timestamp Dependency
+**Type:** Owner/Admin Control
 
-**Severity:** MEDIUM
+**Severity:** INFO
 
-**Category:** Time Manipulation Risk
+**Category:** Centralization Review
 
-**Recommendation:** Avoid relying on block timestamps for critical randomness, settlement, or authorization logic.
+**Recommendation:** Review admin privileges. Consider multisig, timelock, and least-privilege role design.
 
-**Context Type:** General Smart Contract Context
+**Context Type:** Admin / Permission Risk
 
-**Exploitability:** LOW
+**Exploitability:** MEDIUM
 
-**Review Priority:** 7
+**Review Priority:** 3
 
-**Context Note:** No special smart contract context detected beyond the matched rule.
+**Context Note:** This line may involve privileged permissions, role control, or centralization risk.
 
 ---
 
@@ -460,15 +460,15 @@
 
 **File:** /Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverL1.sol
 
-**Line:** 23
+**Line:** 30
 
 **Type:** Owner/Admin Control
 
-**Severity:** MEDIUM
+**Severity:** INFO
 
-**Category:** Centralization Risk
+**Category:** Centralization Review
 
-**Recommendation:** Review owner/admin privileges. Consider multisig, timelock, and least-privilege role design.
+**Recommendation:** Review admin privileges. Consider multisig, timelock, and least-privilege role design.
 
 **Context Type:** Admin / Permission Risk
 
@@ -482,37 +482,13 @@
 
 ### Smart Contract Finding #5
 
-**File:** /Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverL1.sol
-
-**Line:** 30
-
-**Type:** Owner/Admin Control
-
-**Severity:** MEDIUM
-
-**Category:** Centralization Risk
-
-**Recommendation:** Review owner/admin privileges. Consider multisig, timelock, and least-privilege role design.
-
-**Context Type:** Admin / Permission Risk
-
-**Exploitability:** MEDIUM
-
-**Review Priority:** 3
-
-**Context Note:** This line may involve privileged permissions, role control, or centralization risk.
-
----
-
-### Smart Contract Finding #6
-
 **File:** /Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol
 
 **Line:** 67
 
 **Type:** Missing Access Control Signal
 
-**Severity:** MEDIUM
+**Severity:** INFO
 
 **Category:** Access Control Review
 
@@ -528,7 +504,7 @@
 
 ---
 
-### Smart Contract Finding #7
+### Smart Contract Finding #6
 
 **File:** /Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol
 
@@ -536,9 +512,9 @@
 
 **Type:** Hardcoded Address
 
-**Severity:** MEDIUM
+**Severity:** INFO
 
-**Category:** Configuration Risk
+**Category:** Configuration Review
 
 **Recommendation:** Verify hardcoded addresses are intentional, documented, and network-specific.
 
@@ -552,7 +528,7 @@
 
 ---
 
-### Smart Contract Finding #8
+### Smart Contract Finding #7
 
 **File:** /Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol
 
@@ -560,9 +536,9 @@
 
 **Type:** Hardcoded Address
 
-**Severity:** MEDIUM
+**Severity:** INFO
 
-**Category:** Configuration Risk
+**Category:** Configuration Review
 
 **Recommendation:** Verify hardcoded addresses are intentional, documented, and network-specific.
 
@@ -576,7 +552,7 @@
 
 ---
 
-### Smart Contract Finding #9
+### Smart Contract Finding #8
 
 **File:** /Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipL1.sol
 
@@ -584,11 +560,35 @@
 
 **Type:** Owner/Admin Control
 
-**Severity:** MEDIUM
+**Severity:** INFO
 
-**Category:** Centralization Risk
+**Category:** Centralization Review
 
-**Recommendation:** Review owner/admin privileges. Consider multisig, timelock, and least-privilege role design.
+**Recommendation:** Review admin privileges. Consider multisig, timelock, and least-privilege role design.
+
+**Context Type:** Admin / Permission Risk
+
+**Exploitability:** MEDIUM
+
+**Review Priority:** 3
+
+**Context Note:** This line may involve privileged permissions, role control, or centralization risk.
+
+---
+
+### Smart Contract Finding #9
+
+**File:** /Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipL1.sol
+
+**Line:** 33
+
+**Type:** Owner/Admin Control
+
+**Severity:** INFO
+
+**Category:** Centralization Review
+
+**Recommendation:** Review admin privileges. Consider multisig, timelock, and least-privilege role design.
 
 **Context Type:** Admin / Permission Risk
 
@@ -602,37 +602,13 @@
 
 ### Smart Contract Finding #10
 
-**File:** /Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipL1.sol
-
-**Line:** 33
-
-**Type:** Owner/Admin Control
-
-**Severity:** MEDIUM
-
-**Category:** Centralization Risk
-
-**Recommendation:** Review owner/admin privileges. Consider multisig, timelock, and least-privilege role design.
-
-**Context Type:** Admin / Permission Risk
-
-**Exploitability:** MEDIUM
-
-**Review Priority:** 3
-
-**Context Note:** This line may involve privileged permissions, role control, or centralization risk.
-
----
-
-### Smart Contract Finding #11
-
 **File:** /Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol
 
 **Line:** 64
 
 **Type:** Missing Access Control Signal
 
-**Severity:** MEDIUM
+**Severity:** INFO
 
 **Category:** Access Control Review
 
@@ -648,7 +624,7 @@
 
 ---
 
-### Smart Contract Finding #12
+### Smart Contract Finding #11
 
 **File:** /Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol
 
@@ -656,9 +632,9 @@
 
 **Type:** Hardcoded Address
 
-**Severity:** MEDIUM
+**Severity:** INFO
 
-**Category:** Configuration Risk
+**Category:** Configuration Review
 
 **Recommendation:** Verify hardcoded addresses are intentional, documented, and network-specific.
 
@@ -672,7 +648,7 @@
 
 ---
 
-### Smart Contract Finding #13
+### Smart Contract Finding #12
 
 **File:** /Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol
 
@@ -680,9 +656,9 @@
 
 **Type:** Hardcoded Address
 
-**Severity:** MEDIUM
+**Severity:** INFO
 
-**Category:** Configuration Risk
+**Category:** Configuration Review
 
 **Recommendation:** Verify hardcoded addresses are intentional, documented, and network-specific.
 
@@ -696,7 +672,7 @@
 
 ---
 
-### Smart Contract Finding #14
+### Smart Contract Finding #13
 
 **File:** /Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoL1.sol
 
@@ -704,11 +680,35 @@
 
 **Type:** Owner/Admin Control
 
-**Severity:** MEDIUM
+**Severity:** INFO
 
-**Category:** Centralization Risk
+**Category:** Centralization Review
 
-**Recommendation:** Review owner/admin privileges. Consider multisig, timelock, and least-privilege role design.
+**Recommendation:** Review admin privileges. Consider multisig, timelock, and least-privilege role design.
+
+**Context Type:** Admin / Permission Risk
+
+**Exploitability:** MEDIUM
+
+**Review Priority:** 3
+
+**Context Note:** This line may involve privileged permissions, role control, or centralization risk.
+
+---
+
+### Smart Contract Finding #14
+
+**File:** /Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoL1.sol
+
+**Line:** 34
+
+**Type:** Owner/Admin Control
+
+**Severity:** INFO
+
+**Category:** Centralization Review
+
+**Recommendation:** Review admin privileges. Consider multisig, timelock, and least-privilege role design.
 
 **Context Type:** Admin / Permission Risk
 
@@ -722,25 +722,25 @@
 
 ### Smart Contract Finding #15
 
-**File:** /Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoL1.sol
+**File:** /Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoReactive.sol
 
-**Line:** 34
+**Line:** 74
 
-**Type:** Owner/Admin Control
+**Type:** Missing Access Control Signal
 
-**Severity:** MEDIUM
+**Severity:** INFO
 
-**Category:** Centralization Risk
+**Category:** Access Control Review
 
-**Recommendation:** Review owner/admin privileges. Consider multisig, timelock, and least-privilege role design.
+**Recommendation:** Review public/external functions for required access control, validation, and rate limits.
 
-**Context Type:** Admin / Permission Risk
+**Context Type:** Legacy Contract Area
 
 **Exploitability:** MEDIUM
 
-**Review Priority:** 3
+**Review Priority:** 5
 
-**Context Note:** This line may involve privileged permissions, role control, or centralization risk.
+**Context Note:** This file appears to be legacy code. Legacy areas often need extra migration and security review.
 
 ---
 
@@ -748,15 +748,15 @@
 
 **File:** /Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoReactive.sol
 
-**Line:** 74
+**Line:** 27
 
-**Type:** Missing Access Control Signal
+**Type:** Hardcoded Address
 
-**Severity:** MEDIUM
+**Severity:** INFO
 
-**Category:** Access Control Review
+**Category:** Configuration Review
 
-**Recommendation:** Review public/external functions for required access control, validation, and rate limits.
+**Recommendation:** Verify hardcoded addresses are intentional, documented, and network-specific.
 
 **Context Type:** Legacy Contract Area
 
@@ -772,37 +772,13 @@
 
 **File:** /Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoReactive.sol
 
-**Line:** 27
-
-**Type:** Hardcoded Address
-
-**Severity:** MEDIUM
-
-**Category:** Configuration Risk
-
-**Recommendation:** Verify hardcoded addresses are intentional, documented, and network-specific.
-
-**Context Type:** Legacy Contract Area
-
-**Exploitability:** MEDIUM
-
-**Review Priority:** 5
-
-**Context Note:** This file appears to be legacy code. Legacy areas often need extra migration and security review.
-
----
-
-### Smart Contract Finding #18
-
-**File:** /Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoReactive.sol
-
 **Line:** 28
 
 **Type:** Hardcoded Address
 
-**Severity:** MEDIUM
+**Severity:** INFO
 
-**Category:** Configuration Risk
+**Category:** Configuration Review
 
 **Recommendation:** Verify hardcoded addresses are intentional, documented, and network-specific.
 

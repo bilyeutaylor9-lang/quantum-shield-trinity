@@ -1,0 +1,1379 @@
+
+> quantum-shield-trinity@1.1.0 scan
+> node src/cli.js /Users/user/reactive-smart-contract-demos
+
+Quantum Shield Trinity
+----------------------
+Scanning directory: /Users/user/reactive-smart-contract-demos
+
+Executive Summary
+-----------------
+Risk Level: CRITICAL
+Score: 100/100
+Scanned Files: 771
+Critical Findings: 6
+High Findings: 0
+Medium Findings: 0
+
+Dependency Intelligence
+-----------------------
+Dependency Risk Level: HIGH
+Dependency Files Scanned: 19
+High Risk Dependencies: 3
+Medium Risk Dependencies: 2
+
+Attack Surface Intelligence
+---------------------------
+Attack Surface Risk Level: HIGH
+Attack Surface Score: 80/100
+Total Attack Findings: 16
+Critical Attack Paths: 0
+High Attack Paths: 0
+Medium Attack Paths: 16
+
+Smart Contract Audit
+--------------------
+Audit Risk Level: LOW
+Audit Score: undefined/100
+Audited Contracts: 10
+Critical Audit Findings: 0
+High Audit Findings: 0
+Medium Audit Findings: 0
+
+Exploit Simulation
+------------------
+Simulation Risk Level: MEDIUM
+Simulation Score: 45/100
+Total Simulations: 1
+Critical Simulations: 1
+High Simulations: 0
+
+Top Exploit Simulations
+-----------------------
+1. Private Key Compromise Path
+   Impact: CRITICAL
+   Exploitability: HIGH
+   Affected Area: Wallet / Secrets / Deployment Credentials
+   First Attack Step: Attacker gains access to repository or leaked source archive.
+
+Top Smart Contract Findings
+---------------------------
+1. Missing Access Control Signal (INFO)
+   File: /Users/user/reactive-smart-contract-demos/script/DeployAISentinel.s.sol
+   Line: 12
+   Recommendation: Review public/external functions for required access control, validation, and rate limits.
+
+2. Hardcoded Address (INFO)
+   File: /Users/user/reactive-smart-contract-demos/script/DeployAISentinel.s.sol
+   Line: 15
+   Recommendation: Verify hardcoded addresses are intentional, documented, and network-specific.
+
+3. Owner/Admin Control (INFO)
+   File: /Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverL1.sol
+   Line: 23
+   Recommendation: Review admin privileges. Consider multisig, timelock, and least-privilege role design.
+
+4. Owner/Admin Control (INFO)
+   File: /Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverL1.sol
+   Line: 30
+   Recommendation: Review admin privileges. Consider multisig, timelock, and least-privilege role design.
+
+5. Missing Access Control Signal (INFO)
+   File: /Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol
+   Line: 67
+   Recommendation: Review public/external functions for required access control, validation, and rate limits.
+
+6. Hardcoded Address (INFO)
+   File: /Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol
+   Line: 19
+   Recommendation: Verify hardcoded addresses are intentional, documented, and network-specific.
+
+7. Hardcoded Address (INFO)
+   File: /Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol
+   Line: 20
+   Recommendation: Verify hardcoded addresses are intentional, documented, and network-specific.
+
+8. Owner/Admin Control (INFO)
+   File: /Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipL1.sol
+   Line: 25
+   Recommendation: Review admin privileges. Consider multisig, timelock, and least-privilege role design.
+
+9. Owner/Admin Control (INFO)
+   File: /Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipL1.sol
+   Line: 33
+   Recommendation: Review admin privileges. Consider multisig, timelock, and least-privilege role design.
+
+10. Missing Access Control Signal (INFO)
+   File: /Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol
+   Line: 64
+   Recommendation: Review public/external functions for required access control, validation, and rate limits.
+
+Top Attack Surface Findings
+---------------------------
+1. Hardcoded Address Risk (MEDIUM)
+   File: /Users/user/reactive-smart-contract-demos/dashboard/contracts.js
+   Line: 4
+   Recommendation: Verify hardcoded addresses are intentional, documented, and network-specific.
+
+2. Hardcoded Address Risk (MEDIUM)
+   File: /Users/user/reactive-smart-contract-demos/dashboard/contracts.js
+   Line: 5
+   Recommendation: Verify hardcoded addresses are intentional, documented, and network-specific.
+
+3. Hardcoded Address Risk (MEDIUM)
+   File: /Users/user/reactive-smart-contract-demos/dashboard/contracts.js
+   Line: 6
+   Recommendation: Verify hardcoded addresses are intentional, documented, and network-specific.
+
+4. Hardcoded Address Risk (MEDIUM)
+   File: /Users/user/reactive-smart-contract-demos/script/DeployAISentinel.s.sol
+   Line: 15
+   Recommendation: Verify hardcoded addresses are intentional, documented, and network-specific.
+
+5. Admin Centralization Risk (MEDIUM)
+   File: /Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverL1.sol
+   Line: 23
+   Recommendation: Review admin privileges. Consider multisig, timelocks, and role separation.
+
+6. Admin Centralization Risk (MEDIUM)
+   File: /Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverL1.sol
+   Line: 30
+   Recommendation: Review admin privileges. Consider multisig, timelocks, and role separation.
+
+7. Hardcoded Address Risk (MEDIUM)
+   File: /Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol
+   Line: 19
+   Recommendation: Verify hardcoded addresses are intentional, documented, and network-specific.
+
+8. Hardcoded Address Risk (MEDIUM)
+   File: /Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol
+   Line: 20
+   Recommendation: Verify hardcoded addresses are intentional, documented, and network-specific.
+
+9. Admin Centralization Risk (MEDIUM)
+   File: /Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipL1.sol
+   Line: 25
+   Recommendation: Review admin privileges. Consider multisig, timelocks, and role separation.
+
+10. Admin Centralization Risk (MEDIUM)
+   File: /Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipL1.sol
+   Line: 33
+   Recommendation: Review admin privileges. Consider multisig, timelocks, and role separation.
+
+Dependency Findings
+-------------------
+1. elliptic (HIGH)
+   File: /Users/user/reactive-smart-contract-demos/lib/openzeppelin-contracts/package-lock.json
+   Risk: Elliptic curve cryptography dependency detected. This may indicate ECDSA/secp256k1 usage.
+   Recommendation: Inventory signing flows and prepare a quantum migration roadmap.
+
+2. crypto-js (MEDIUM)
+   File: /Users/user/reactive-smart-contract-demos/lib/openzeppelin-contracts/package-lock.json
+   Risk: Crypto utility dependency detected. Review usage for SHA1, MD5, or legacy cryptography.
+   Recommendation: Audit hashing and encryption usage.
+
+3. web3 (MEDIUM)
+   File: /Users/user/reactive-smart-contract-demos/lib/openzeppelin-contracts/package.json
+   Risk: Web3 dependency detected. Review wallet and signing flows for crypto-agility.
+   Recommendation: Prepare signing abstractions and wallet security guidance.
+
+4. elliptic (HIGH)
+   File: /Users/user/reactive-smart-contract-demos/lib/v2-core/yarn.lock
+   Risk: Elliptic curve cryptography dependency detected. This may indicate ECDSA/secp256k1 usage.
+   Recommendation: Inventory signing flows and prepare a quantum migration roadmap.
+
+5. elliptic (HIGH)
+   File: /Users/user/reactive-smart-contract-demos/lib/v2-periphery/yarn.lock
+   Risk: Elliptic curve cryptography dependency detected. This may indicate ECDSA/secp256k1 usage.
+   Recommendation: Inventory signing flows and prepare a quantum migration roadmap.
+
+Top Recommendations
+-------------------
+1. Ethereum Private Key (CRITICAL)
+   File: /Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol
+   Line: 19
+   Recommendation: Treat the key as compromised. Move funds to a new wallet and remove it from the repository.
+   Migration Path: Hardcoded wallet key → Hardware wallet, vault, or environment secret
+
+2. Ethereum Private Key (CRITICAL)
+   File: /Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol
+   Line: 20
+   Recommendation: Treat the key as compromised. Move funds to a new wallet and remove it from the repository.
+   Migration Path: Hardcoded wallet key → Hardware wallet, vault, or environment secret
+
+3. Ethereum Private Key (CRITICAL)
+   File: /Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol
+   Line: 16
+   Recommendation: Treat the key as compromised. Move funds to a new wallet and remove it from the repository.
+   Migration Path: Hardcoded wallet key → Hardware wallet, vault, or environment secret
+
+4. Ethereum Private Key (CRITICAL)
+   File: /Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol
+   Line: 17
+   Recommendation: Treat the key as compromised. Move funds to a new wallet and remove it from the repository.
+   Migration Path: Hardcoded wallet key → Hardware wallet, vault, or environment secret
+
+5. Ethereum Private Key (CRITICAL)
+   File: /Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoReactive.sol
+   Line: 27
+   Recommendation: Treat the key as compromised. Move funds to a new wallet and remove it from the repository.
+   Migration Path: Hardcoded wallet key → Hardware wallet, vault, or environment secret
+
+Report Generated
+----------------
+Markdown Report: quantum-shield-report.md
+
+Full JSON Report
+----------------
+{
+  "engine": "Repository Scanner Engine",
+  "scannerVersion": "1.5.1",
+  "rulesUsed": 17,
+  "scannedFiles": 771,
+  "skippedNonProductionFiles": 742,
+  "findings": [
+    {
+      "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol",
+      "line": 19,
+      "ruleId": "ETH_PRIVATE_KEY",
+      "type": "Ethereum Private Key",
+      "severity": "CRITICAL",
+      "originalSeverity": "CRITICAL",
+      "category": "Wallet Secret Exposure",
+      "description": "Potential Ethereum private key detected.",
+      "recommendation": "Treat as compromised, move funds, and rotate wallet credentials.",
+      "confidence": 90,
+      "occurrences": 1,
+      "context": {
+        "before": "uint256 private constant SEPOLIA_CHAIN_ID = 11155111;",
+        "match": "uint256 private constant ERC20_TRANSFER_TOPIC_0 = 0x***MASKED_PRIVATE_KEY***;",
+        "after": "uint256 private constant L1_RQ_TOPIC_0 = 0x9a26a1f9def08abe958f09f08b27ca5d3dcc90dc0bd84ac65a66e096560f3071;"
+      },
+      "rootCause": {
+        "source": "Hardcoded Credential",
+        "reason": "Private key appears to be stored directly in source code",
+        "attackSurface": "Repository Access",
+        "exploitability": "CRITICAL",
+        "likelihood": "HIGH",
+        "impact": "Complete wallet compromise",
+        "remediationPriority": 1
+      }
+    },
+    {
+      "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol",
+      "line": 20,
+      "ruleId": "ETH_PRIVATE_KEY",
+      "type": "Ethereum Private Key",
+      "severity": "CRITICAL",
+      "originalSeverity": "CRITICAL",
+      "category": "Wallet Secret Exposure",
+      "description": "Potential Ethereum private key detected.",
+      "recommendation": "Treat as compromised, move funds, and rotate wallet credentials.",
+      "confidence": 90,
+      "occurrences": 1,
+      "context": {
+        "before": "uint256 private constant ERC20_TRANSFER_TOPIC_0 = 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef;",
+        "match": "uint256 private constant L1_RQ_TOPIC_0 = 0x***MASKED_PRIVATE_KEY***;",
+        "after": "uint64 private constant CALLBACK_GAS_LIMIT = 1000000;"
+      },
+      "rootCause": {
+        "source": "Hardcoded Credential",
+        "reason": "Private key appears to be stored directly in source code",
+        "attackSurface": "Repository Access",
+        "exploitability": "CRITICAL",
+        "likelihood": "HIGH",
+        "impact": "Complete wallet compromise",
+        "remediationPriority": 1
+      }
+    },
+    {
+      "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol",
+      "line": 16,
+      "ruleId": "ETH_PRIVATE_KEY",
+      "type": "Ethereum Private Key",
+      "severity": "CRITICAL",
+      "originalSeverity": "CRITICAL",
+      "category": "Wallet Secret Exposure",
+      "description": "Potential Ethereum private key detected.",
+      "recommendation": "Treat as compromised, move funds, and rotate wallet credentials.",
+      "confidence": 90,
+      "occurrences": 1,
+      "context": {
+        "before": "uint256 private constant SEPOLIA_CHAIN_ID = 11155111;",
+        "match": "uint256 private constant ERC721_TRANSFER_TOPIC_0 = 0x***MASKED_PRIVATE_KEY***;",
+        "after": "uint256 private constant L1_RQ_TOPIC_0 = 0xe31c60e37ab1301f69f01b436a1d13486e6c16cc22c888a08c0e64a39230b6ac;"
+      },
+      "rootCause": {
+        "source": "Hardcoded Credential",
+        "reason": "Private key appears to be stored directly in source code",
+        "attackSurface": "Repository Access",
+        "exploitability": "CRITICAL",
+        "likelihood": "HIGH",
+        "impact": "Complete wallet compromise",
+        "remediationPriority": 1
+      }
+    },
+    {
+      "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol",
+      "line": 17,
+      "ruleId": "ETH_PRIVATE_KEY",
+      "type": "Ethereum Private Key",
+      "severity": "CRITICAL",
+      "originalSeverity": "CRITICAL",
+      "category": "Wallet Secret Exposure",
+      "description": "Potential Ethereum private key detected.",
+      "recommendation": "Treat as compromised, move funds, and rotate wallet credentials.",
+      "confidence": 90,
+      "occurrences": 1,
+      "context": {
+        "before": "uint256 private constant ERC721_TRANSFER_TOPIC_0 = 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef;",
+        "match": "uint256 private constant L1_RQ_TOPIC_0 = 0x***MASKED_PRIVATE_KEY***;",
+        "after": "uint64 private constant CALLBACK_GAS_LIMIT = 1000000;"
+      },
+      "rootCause": {
+        "source": "Hardcoded Credential",
+        "reason": "Private key appears to be stored directly in source code",
+        "attackSurface": "Repository Access",
+        "exploitability": "CRITICAL",
+        "likelihood": "HIGH",
+        "impact": "Complete wallet compromise",
+        "remediationPriority": 1
+      }
+    },
+    {
+      "file": "/Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoReactive.sol",
+      "line": 27,
+      "ruleId": "ETH_PRIVATE_KEY",
+      "type": "Ethereum Private Key",
+      "severity": "CRITICAL",
+      "originalSeverity": "CRITICAL",
+      "category": "Wallet Secret Exposure",
+      "description": "Potential Ethereum private key detected.",
+      "recommendation": "Treat as compromised, move funds, and rotate wallet credentials.",
+      "confidence": 90,
+      "occurrences": 1,
+      "context": {
+        "before": "uint256 private constant SEPOLIA_CHAIN_ID = 11155111;",
+        "match": "uint256 private constant UNISWAP_V2_SYNC_TOPIC_0 = 0x***MASKED_PRIVATE_KEY***;",
+        "after": "uint256 private constant REQUEST_RESYNC_TOPIC_0 = 0xef3ee55037493e03bbb6926db7e59fe91b2af41184a35b32a106eac1557081ea;"
+      },
+      "rootCause": {
+        "source": "Hardcoded Credential",
+        "reason": "Private key appears to be stored directly in source code",
+        "attackSurface": "Repository Access",
+        "exploitability": "CRITICAL",
+        "likelihood": "HIGH",
+        "impact": "Complete wallet compromise",
+        "remediationPriority": 1
+      }
+    },
+    {
+      "file": "/Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoReactive.sol",
+      "line": 28,
+      "ruleId": "ETH_PRIVATE_KEY",
+      "type": "Ethereum Private Key",
+      "severity": "CRITICAL",
+      "originalSeverity": "CRITICAL",
+      "category": "Wallet Secret Exposure",
+      "description": "Potential Ethereum private key detected.",
+      "recommendation": "Treat as compromised, move funds, and rotate wallet credentials.",
+      "confidence": 90,
+      "occurrences": 1,
+      "context": {
+        "before": "uint256 private constant UNISWAP_V2_SYNC_TOPIC_0 = 0x1c411e9a96e071241c2f21f7726b17ae89e3cab4c78be50e062b03a9fffbbad1;",
+        "match": "uint256 private constant REQUEST_RESYNC_TOPIC_0 = 0x***MASKED_PRIVATE_KEY***;",
+        "after": "uint64 private constant CALLBACK_GAS_LIMIT = 1000000;"
+      },
+      "rootCause": {
+        "source": "Hardcoded Credential",
+        "reason": "Private key appears to be stored directly in source code",
+        "attackSurface": "Repository Access",
+        "exploitability": "CRITICAL",
+        "likelihood": "HIGH",
+        "impact": "Complete wallet compromise",
+        "remediationPriority": 1
+      }
+    }
+  ],
+  "copilotGuidance": [
+    {
+      "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol",
+      "line": 19,
+      "type": "Ethereum Private Key",
+      "severity": "CRITICAL",
+      "category": "Wallet Secret Exposure",
+      "confidence": 90,
+      "occurrences": 1,
+      "risk": "Potential Ethereum private key detected.",
+      "businessImpact": "If valid, this can lead to complete wallet compromise and asset loss.",
+      "recommendation": "Treat the key as compromised. Move funds to a new wallet and remove it from the repository.",
+      "migrationPath": "Hardcoded wallet key → Hardware wallet, vault, or environment secret",
+      "estimatedEffort": "Immediate",
+      "exampleFix": "Use a secure wallet provider or environment variable instead of hardcoding private keys.",
+      "developerNote": "Some 0x64-character values may be false positives. Verify carefully."
+    },
+    {
+      "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol",
+      "line": 20,
+      "type": "Ethereum Private Key",
+      "severity": "CRITICAL",
+      "category": "Wallet Secret Exposure",
+      "confidence": 90,
+      "occurrences": 1,
+      "risk": "Potential Ethereum private key detected.",
+      "businessImpact": "If valid, this can lead to complete wallet compromise and asset loss.",
+      "recommendation": "Treat the key as compromised. Move funds to a new wallet and remove it from the repository.",
+      "migrationPath": "Hardcoded wallet key → Hardware wallet, vault, or environment secret",
+      "estimatedEffort": "Immediate",
+      "exampleFix": "Use a secure wallet provider or environment variable instead of hardcoding private keys.",
+      "developerNote": "Some 0x64-character values may be false positives. Verify carefully."
+    },
+    {
+      "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol",
+      "line": 16,
+      "type": "Ethereum Private Key",
+      "severity": "CRITICAL",
+      "category": "Wallet Secret Exposure",
+      "confidence": 90,
+      "occurrences": 1,
+      "risk": "Potential Ethereum private key detected.",
+      "businessImpact": "If valid, this can lead to complete wallet compromise and asset loss.",
+      "recommendation": "Treat the key as compromised. Move funds to a new wallet and remove it from the repository.",
+      "migrationPath": "Hardcoded wallet key → Hardware wallet, vault, or environment secret",
+      "estimatedEffort": "Immediate",
+      "exampleFix": "Use a secure wallet provider or environment variable instead of hardcoding private keys.",
+      "developerNote": "Some 0x64-character values may be false positives. Verify carefully."
+    },
+    {
+      "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol",
+      "line": 17,
+      "type": "Ethereum Private Key",
+      "severity": "CRITICAL",
+      "category": "Wallet Secret Exposure",
+      "confidence": 90,
+      "occurrences": 1,
+      "risk": "Potential Ethereum private key detected.",
+      "businessImpact": "If valid, this can lead to complete wallet compromise and asset loss.",
+      "recommendation": "Treat the key as compromised. Move funds to a new wallet and remove it from the repository.",
+      "migrationPath": "Hardcoded wallet key → Hardware wallet, vault, or environment secret",
+      "estimatedEffort": "Immediate",
+      "exampleFix": "Use a secure wallet provider or environment variable instead of hardcoding private keys.",
+      "developerNote": "Some 0x64-character values may be false positives. Verify carefully."
+    },
+    {
+      "file": "/Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoReactive.sol",
+      "line": 27,
+      "type": "Ethereum Private Key",
+      "severity": "CRITICAL",
+      "category": "Wallet Secret Exposure",
+      "confidence": 90,
+      "occurrences": 1,
+      "risk": "Potential Ethereum private key detected.",
+      "businessImpact": "If valid, this can lead to complete wallet compromise and asset loss.",
+      "recommendation": "Treat the key as compromised. Move funds to a new wallet and remove it from the repository.",
+      "migrationPath": "Hardcoded wallet key → Hardware wallet, vault, or environment secret",
+      "estimatedEffort": "Immediate",
+      "exampleFix": "Use a secure wallet provider or environment variable instead of hardcoding private keys.",
+      "developerNote": "Some 0x64-character values may be false positives. Verify carefully."
+    },
+    {
+      "file": "/Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoReactive.sol",
+      "line": 28,
+      "type": "Ethereum Private Key",
+      "severity": "CRITICAL",
+      "category": "Wallet Secret Exposure",
+      "confidence": 90,
+      "occurrences": 1,
+      "risk": "Potential Ethereum private key detected.",
+      "businessImpact": "If valid, this can lead to complete wallet compromise and asset loss.",
+      "recommendation": "Treat the key as compromised. Move funds to a new wallet and remove it from the repository.",
+      "migrationPath": "Hardcoded wallet key → Hardware wallet, vault, or environment secret",
+      "estimatedEffort": "Immediate",
+      "exampleFix": "Use a secure wallet provider or environment variable instead of hardcoding private keys.",
+      "developerNote": "Some 0x64-character values may be false positives. Verify carefully."
+    }
+  ],
+  "criticalFindings": 6,
+  "highFindings": 0,
+  "mediumFindings": 0,
+  "lowFindings": 0,
+  "score": 100,
+  "securityScore": 0,
+  "securityGrade": "F",
+  "repositoryRiskLevel": "CRITICAL",
+  "summary": {
+    "totalFindings": 6,
+    "criticalPercentage": 100,
+    "highPercentage": 0,
+    "mediumPercentage": 0
+  },
+  "dependencyReport": {
+    "engine": "Dependency Intelligence Engine",
+    "scannerVersion": "1.6.0",
+    "scannedDependencyFiles": 19,
+    "dependencyFindings": [
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/lib/openzeppelin-contracts/package-lock.json",
+        "dependency": "elliptic",
+        "severity": "HIGH",
+        "category": "Lockfile Dependency Signal",
+        "risk": "Elliptic curve cryptography dependency detected. This may indicate ECDSA/secp256k1 usage.",
+        "recommendation": "Inventory signing flows and prepare a quantum migration roadmap."
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/lib/openzeppelin-contracts/package-lock.json",
+        "dependency": "crypto-js",
+        "severity": "MEDIUM",
+        "category": "Lockfile Dependency Signal",
+        "risk": "Crypto utility dependency detected. Review usage for SHA1, MD5, or legacy cryptography.",
+        "recommendation": "Audit hashing and encryption usage."
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/lib/openzeppelin-contracts/package.json",
+        "dependency": "web3",
+        "version": "^1.3.0",
+        "severity": "MEDIUM",
+        "category": "Blockchain Dependency",
+        "risk": "Web3 dependency detected. Review wallet and signing flows for crypto-agility.",
+        "recommendation": "Prepare signing abstractions and wallet security guidance."
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/lib/v2-core/yarn.lock",
+        "dependency": "elliptic",
+        "severity": "HIGH",
+        "category": "Lockfile Dependency Signal",
+        "risk": "Elliptic curve cryptography dependency detected. This may indicate ECDSA/secp256k1 usage.",
+        "recommendation": "Inventory signing flows and prepare a quantum migration roadmap."
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/lib/v2-periphery/yarn.lock",
+        "dependency": "elliptic",
+        "severity": "HIGH",
+        "category": "Lockfile Dependency Signal",
+        "risk": "Elliptic curve cryptography dependency detected. This may indicate ECDSA/secp256k1 usage.",
+        "recommendation": "Inventory signing flows and prepare a quantum migration roadmap."
+      }
+    ],
+    "highRiskDependencies": 3,
+    "mediumRiskDependencies": 2,
+    "dependencyRiskLevel": "HIGH"
+  },
+  "attackSurfaceReport": {
+    "engine": "Attack Surface Intelligence Engine",
+    "scannerVersion": "1.7.1",
+    "skippedNonProductionFiles": 742,
+    "skippedDocumentationFiles": 13,
+    "attackSurfaceScore": 80,
+    "attackSurfaceRiskLevel": "HIGH",
+    "totalAttackFindings": 16,
+    "criticalAttackPaths": 0,
+    "highAttackPaths": 0,
+    "mediumAttackPaths": 16,
+    "attackFindings": [
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/dashboard/contracts.js",
+        "line": 4,
+        "fileType": "OTHER",
+        "type": "Hardcoded Address Risk",
+        "severity": "MEDIUM",
+        "category": "Hardcoded Blockchain Address",
+        "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific.",
+        "occurrences": 1,
+        "context": {
+          "match": "hyperlaneOrigin: \"0x0000000000000000000000000000000000000000\","
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/dashboard/contracts.js",
+        "line": 5,
+        "fileType": "OTHER",
+        "type": "Hardcoded Address Risk",
+        "severity": "MEDIUM",
+        "category": "Hardcoded Blockchain Address",
+        "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific.",
+        "occurrences": 1,
+        "context": {
+          "match": "outcomeTracker: \"0x0000000000000000000000000000000000000000\","
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/dashboard/contracts.js",
+        "line": 6,
+        "fileType": "OTHER",
+        "type": "Hardcoded Address Risk",
+        "severity": "MEDIUM",
+        "category": "Hardcoded Blockchain Address",
+        "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific.",
+        "occurrences": 1,
+        "context": {
+          "match": "strategyOptimizer: \"0x0000000000000000000000000000000000000000\","
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/script/DeployAISentinel.s.sol",
+        "line": 15,
+        "fileType": "SMART_CONTRACT",
+        "type": "Hardcoded Address Risk",
+        "severity": "MEDIUM",
+        "category": "Hardcoded Blockchain Address",
+        "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific.",
+        "occurrences": 1,
+        "context": {
+          "match": "address mockMailbox = vm.envOr(\"MOCK_MAILBOX\", address(0x1000000000000000000000000000000000000001));"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverL1.sol",
+        "line": 23,
+        "fileType": "SMART_CONTRACT",
+        "type": "Admin Centralization Risk",
+        "severity": "MEDIUM",
+        "category": "Admin Control Risk",
+        "recommendation": "Review admin privileges. Consider multisig, timelocks, and role separation.",
+        "occurrences": 1,
+        "context": {
+          "match": "modifier onlyOwner() {"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverL1.sol",
+        "line": 30,
+        "fileType": "SMART_CONTRACT",
+        "type": "Admin Centralization Risk",
+        "severity": "MEDIUM",
+        "category": "Admin Control Risk",
+        "recommendation": "Review admin privileges. Consider multisig, timelocks, and role separation.",
+        "occurrences": 1,
+        "context": {
+          "match": ") external onlyOwner {"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol",
+        "line": 19,
+        "fileType": "SMART_CONTRACT",
+        "type": "Hardcoded Address Risk",
+        "severity": "MEDIUM",
+        "category": "Hardcoded Blockchain Address",
+        "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific.",
+        "occurrences": 1,
+        "context": {
+          "match": "uint256 private constant ERC20_TRANSFER_TOPIC_0 = 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef;"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol",
+        "line": 20,
+        "fileType": "SMART_CONTRACT",
+        "type": "Hardcoded Address Risk",
+        "severity": "MEDIUM",
+        "category": "Hardcoded Blockchain Address",
+        "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific.",
+        "occurrences": 1,
+        "context": {
+          "match": "uint256 private constant L1_RQ_TOPIC_0 = 0x9a26a1f9def08abe958f09f08b27ca5d3dcc90dc0bd84ac65a66e096560f3071;"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipL1.sol",
+        "line": 25,
+        "fileType": "SMART_CONTRACT",
+        "type": "Admin Centralization Risk",
+        "severity": "MEDIUM",
+        "category": "Admin Control Risk",
+        "recommendation": "Review admin privileges. Consider multisig, timelocks, and role separation.",
+        "occurrences": 1,
+        "context": {
+          "match": "modifier onlyOwner() {"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipL1.sol",
+        "line": 33,
+        "fileType": "SMART_CONTRACT",
+        "type": "Admin Centralization Risk",
+        "severity": "MEDIUM",
+        "category": "Admin Control Risk",
+        "recommendation": "Review admin privileges. Consider multisig, timelocks, and role separation.",
+        "occurrences": 1,
+        "context": {
+          "match": ") external onlyOwner {"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol",
+        "line": 16,
+        "fileType": "SMART_CONTRACT",
+        "type": "Hardcoded Address Risk",
+        "severity": "MEDIUM",
+        "category": "Hardcoded Blockchain Address",
+        "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific.",
+        "occurrences": 1,
+        "context": {
+          "match": "uint256 private constant ERC721_TRANSFER_TOPIC_0 = 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef;"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol",
+        "line": 17,
+        "fileType": "SMART_CONTRACT",
+        "type": "Hardcoded Address Risk",
+        "severity": "MEDIUM",
+        "category": "Hardcoded Blockchain Address",
+        "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific.",
+        "occurrences": 1,
+        "context": {
+          "match": "uint256 private constant L1_RQ_TOPIC_0 = 0xe31c60e37ab1301f69f01b436a1d13486e6c16cc22c888a08c0e64a39230b6ac;"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoL1.sol",
+        "line": 26,
+        "fileType": "SMART_CONTRACT",
+        "type": "Admin Centralization Risk",
+        "severity": "MEDIUM",
+        "category": "Admin Control Risk",
+        "recommendation": "Review admin privileges. Consider multisig, timelocks, and role separation.",
+        "occurrences": 1,
+        "context": {
+          "match": "modifier onlyOwner() {"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoL1.sol",
+        "line": 34,
+        "fileType": "SMART_CONTRACT",
+        "type": "Admin Centralization Risk",
+        "severity": "MEDIUM",
+        "category": "Admin Control Risk",
+        "recommendation": "Review admin privileges. Consider multisig, timelocks, and role separation.",
+        "occurrences": 1,
+        "context": {
+          "match": ") external onlyOwner {"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoReactive.sol",
+        "line": 27,
+        "fileType": "SMART_CONTRACT",
+        "type": "Hardcoded Address Risk",
+        "severity": "MEDIUM",
+        "category": "Hardcoded Blockchain Address",
+        "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific.",
+        "occurrences": 1,
+        "context": {
+          "match": "uint256 private constant UNISWAP_V2_SYNC_TOPIC_0 = 0x1c411e9a96e071241c2f21f7726b17ae89e3cab4c78be50e062b03a9fffbbad1;"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoReactive.sol",
+        "line": 28,
+        "fileType": "SMART_CONTRACT",
+        "type": "Hardcoded Address Risk",
+        "severity": "MEDIUM",
+        "category": "Hardcoded Blockchain Address",
+        "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific.",
+        "occurrences": 1,
+        "context": {
+          "match": "uint256 private constant REQUEST_RESYNC_TOPIC_0 = 0xef3ee55037493e03bbb6926db7e59fe91b2af41184a35b32a106eac1557081ea;"
+        }
+      }
+    ]
+  },
+  "smartContractAuditReport": {
+    "engine": "Smart Contract Audit Engine",
+    "scannerVersion": "2.0.0",
+    "auditedContracts": 10,
+    "skippedNonSmartContractFiles": 450,
+    "skippedNonProductionFiles": 311,
+    "auditRiskScore": 0,
+    "auditSecurityScore": 100,
+    "auditRiskLevel": "LOW",
+    "criticalFindings": 0,
+    "highFindings": 0,
+    "mediumFindings": 0,
+    "infoFindings": 17,
+    "totalAuditFindings": 17,
+    "auditFindings": [
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/script/DeployAISentinel.s.sol",
+        "line": 12,
+        "fileType": "SMART_CONTRACT",
+        "type": "Missing Access Control Signal",
+        "severity": "INFO",
+        "originalSeverity": "INFO",
+        "category": "Access Control Review",
+        "recommendation": "Review public/external functions for required access control, validation, and rate limits.",
+        "confidence": 75,
+        "occurrences": 1,
+        "smartContractContext": {
+          "contextType": "General Smart Contract Context",
+          "riskWeight": 40,
+          "exploitability": "LOW",
+          "reviewPriority": 7,
+          "note": "No special smart contract context detected beyond the matched rule."
+        },
+        "context": {
+          "match": "function run() external {"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/script/DeployAISentinel.s.sol",
+        "line": 15,
+        "fileType": "SMART_CONTRACT",
+        "type": "Hardcoded Address",
+        "severity": "INFO",
+        "originalSeverity": "INFO",
+        "category": "Configuration Review",
+        "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific.",
+        "confidence": 40,
+        "occurrences": 1,
+        "smartContractContext": {
+          "contextType": "General Smart Contract Context",
+          "riskWeight": 40,
+          "exploitability": "LOW",
+          "reviewPriority": 7,
+          "note": "No special smart contract context detected beyond the matched rule."
+        },
+        "context": {
+          "match": "address mockMailbox = vm.envOr(\"MOCK_MAILBOX\", address(0x1000000000000000000000000000000000000001));"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverL1.sol",
+        "line": 23,
+        "fileType": "SMART_CONTRACT",
+        "type": "Owner/Admin Control",
+        "severity": "INFO",
+        "originalSeverity": "INFO",
+        "category": "Centralization Review",
+        "recommendation": "Review admin privileges. Consider multisig, timelock, and least-privilege role design.",
+        "confidence": 85,
+        "occurrences": 1,
+        "smartContractContext": {
+          "contextType": "Admin / Permission Risk",
+          "riskWeight": 70,
+          "exploitability": "MEDIUM",
+          "reviewPriority": 3,
+          "note": "This line may involve privileged permissions, role control, or centralization risk."
+        },
+        "context": {
+          "match": "modifier onlyOwner() {"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverL1.sol",
+        "line": 30,
+        "fileType": "SMART_CONTRACT",
+        "type": "Owner/Admin Control",
+        "severity": "INFO",
+        "originalSeverity": "INFO",
+        "category": "Centralization Review",
+        "recommendation": "Review admin privileges. Consider multisig, timelock, and least-privilege role design.",
+        "confidence": 85,
+        "occurrences": 1,
+        "smartContractContext": {
+          "contextType": "Admin / Permission Risk",
+          "riskWeight": 70,
+          "exploitability": "MEDIUM",
+          "reviewPriority": 3,
+          "note": "This line may involve privileged permissions, role control, or centralization risk."
+        },
+        "context": {
+          "match": ") external onlyOwner {"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol",
+        "line": 67,
+        "fileType": "SMART_CONTRACT",
+        "type": "Missing Access Control Signal",
+        "severity": "INFO",
+        "originalSeverity": "INFO",
+        "category": "Access Control Review",
+        "recommendation": "Review public/external functions for required access control, validation, and rate limits.",
+        "confidence": 85,
+        "occurrences": 1,
+        "smartContractContext": {
+          "contextType": "Legacy Contract Area",
+          "riskWeight": 55,
+          "exploitability": "MEDIUM",
+          "reviewPriority": 5,
+          "note": "This file appears to be legacy code. Legacy areas often need extra migration and security review."
+        },
+        "context": {
+          "match": "function react(LogRecord calldata log) external vmOnly {"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol",
+        "line": 19,
+        "fileType": "SMART_CONTRACT",
+        "type": "Hardcoded Address",
+        "severity": "INFO",
+        "originalSeverity": "INFO",
+        "category": "Configuration Review",
+        "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific.",
+        "confidence": 75,
+        "occurrences": 1,
+        "smartContractContext": {
+          "contextType": "Token Standard Reference",
+          "riskWeight": 25,
+          "exploitability": "LOW",
+          "reviewPriority": 6,
+          "note": "This appears to reference a common token standard and is usually informational."
+        },
+        "context": {
+          "match": "uint256 private constant ERC20_TRANSFER_TOPIC_0 = 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef;"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol",
+        "line": 20,
+        "fileType": "SMART_CONTRACT",
+        "type": "Hardcoded Address",
+        "severity": "INFO",
+        "originalSeverity": "INFO",
+        "category": "Configuration Review",
+        "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific.",
+        "confidence": 75,
+        "occurrences": 1,
+        "smartContractContext": {
+          "contextType": "Legacy Contract Area",
+          "riskWeight": 55,
+          "exploitability": "MEDIUM",
+          "reviewPriority": 5,
+          "note": "This file appears to be legacy code. Legacy areas often need extra migration and security review."
+        },
+        "context": {
+          "match": "uint256 private constant L1_RQ_TOPIC_0 = 0x9a26a1f9def08abe958f09f08b27ca5d3dcc90dc0bd84ac65a66e096560f3071;"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipL1.sol",
+        "line": 25,
+        "fileType": "SMART_CONTRACT",
+        "type": "Owner/Admin Control",
+        "severity": "INFO",
+        "originalSeverity": "INFO",
+        "category": "Centralization Review",
+        "recommendation": "Review admin privileges. Consider multisig, timelock, and least-privilege role design.",
+        "confidence": 85,
+        "occurrences": 1,
+        "smartContractContext": {
+          "contextType": "Admin / Permission Risk",
+          "riskWeight": 70,
+          "exploitability": "MEDIUM",
+          "reviewPriority": 3,
+          "note": "This line may involve privileged permissions, role control, or centralization risk."
+        },
+        "context": {
+          "match": "modifier onlyOwner() {"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipL1.sol",
+        "line": 33,
+        "fileType": "SMART_CONTRACT",
+        "type": "Owner/Admin Control",
+        "severity": "INFO",
+        "originalSeverity": "INFO",
+        "category": "Centralization Review",
+        "recommendation": "Review admin privileges. Consider multisig, timelock, and least-privilege role design.",
+        "confidence": 85,
+        "occurrences": 1,
+        "smartContractContext": {
+          "contextType": "Admin / Permission Risk",
+          "riskWeight": 70,
+          "exploitability": "MEDIUM",
+          "reviewPriority": 3,
+          "note": "This line may involve privileged permissions, role control, or centralization risk."
+        },
+        "context": {
+          "match": ") external onlyOwner {"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol",
+        "line": 64,
+        "fileType": "SMART_CONTRACT",
+        "type": "Missing Access Control Signal",
+        "severity": "INFO",
+        "originalSeverity": "INFO",
+        "category": "Access Control Review",
+        "recommendation": "Review public/external functions for required access control, validation, and rate limits.",
+        "confidence": 85,
+        "occurrences": 1,
+        "smartContractContext": {
+          "contextType": "Legacy Contract Area",
+          "riskWeight": 55,
+          "exploitability": "MEDIUM",
+          "reviewPriority": 5,
+          "note": "This file appears to be legacy code. Legacy areas often need extra migration and security review."
+        },
+        "context": {
+          "match": "function react(LogRecord calldata log) external vmOnly {"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol",
+        "line": 16,
+        "fileType": "SMART_CONTRACT",
+        "type": "Hardcoded Address",
+        "severity": "INFO",
+        "originalSeverity": "INFO",
+        "category": "Configuration Review",
+        "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific.",
+        "confidence": 75,
+        "occurrences": 1,
+        "smartContractContext": {
+          "contextType": "Token Standard Reference",
+          "riskWeight": 25,
+          "exploitability": "LOW",
+          "reviewPriority": 6,
+          "note": "This appears to reference a common token standard and is usually informational."
+        },
+        "context": {
+          "match": "uint256 private constant ERC721_TRANSFER_TOPIC_0 = 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef;"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol",
+        "line": 17,
+        "fileType": "SMART_CONTRACT",
+        "type": "Hardcoded Address",
+        "severity": "INFO",
+        "originalSeverity": "INFO",
+        "category": "Configuration Review",
+        "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific.",
+        "confidence": 75,
+        "occurrences": 1,
+        "smartContractContext": {
+          "contextType": "Legacy Contract Area",
+          "riskWeight": 55,
+          "exploitability": "MEDIUM",
+          "reviewPriority": 5,
+          "note": "This file appears to be legacy code. Legacy areas often need extra migration and security review."
+        },
+        "context": {
+          "match": "uint256 private constant L1_RQ_TOPIC_0 = 0xe31c60e37ab1301f69f01b436a1d13486e6c16cc22c888a08c0e64a39230b6ac;"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoL1.sol",
+        "line": 26,
+        "fileType": "SMART_CONTRACT",
+        "type": "Owner/Admin Control",
+        "severity": "INFO",
+        "originalSeverity": "INFO",
+        "category": "Centralization Review",
+        "recommendation": "Review admin privileges. Consider multisig, timelock, and least-privilege role design.",
+        "confidence": 85,
+        "occurrences": 1,
+        "smartContractContext": {
+          "contextType": "Admin / Permission Risk",
+          "riskWeight": 70,
+          "exploitability": "MEDIUM",
+          "reviewPriority": 3,
+          "note": "This line may involve privileged permissions, role control, or centralization risk."
+        },
+        "context": {
+          "match": "modifier onlyOwner() {"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoL1.sol",
+        "line": 34,
+        "fileType": "SMART_CONTRACT",
+        "type": "Owner/Admin Control",
+        "severity": "INFO",
+        "originalSeverity": "INFO",
+        "category": "Centralization Review",
+        "recommendation": "Review admin privileges. Consider multisig, timelock, and least-privilege role design.",
+        "confidence": 85,
+        "occurrences": 1,
+        "smartContractContext": {
+          "contextType": "Admin / Permission Risk",
+          "riskWeight": 70,
+          "exploitability": "MEDIUM",
+          "reviewPriority": 3,
+          "note": "This line may involve privileged permissions, role control, or centralization risk."
+        },
+        "context": {
+          "match": ") external onlyOwner {"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoReactive.sol",
+        "line": 74,
+        "fileType": "SMART_CONTRACT",
+        "type": "Missing Access Control Signal",
+        "severity": "INFO",
+        "originalSeverity": "INFO",
+        "category": "Access Control Review",
+        "recommendation": "Review public/external functions for required access control, validation, and rate limits.",
+        "confidence": 85,
+        "occurrences": 1,
+        "smartContractContext": {
+          "contextType": "Legacy Contract Area",
+          "riskWeight": 55,
+          "exploitability": "MEDIUM",
+          "reviewPriority": 5,
+          "note": "This file appears to be legacy code. Legacy areas often need extra migration and security review."
+        },
+        "context": {
+          "match": "function react(LogRecord calldata log) external vmOnly {"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoReactive.sol",
+        "line": 27,
+        "fileType": "SMART_CONTRACT",
+        "type": "Hardcoded Address",
+        "severity": "INFO",
+        "originalSeverity": "INFO",
+        "category": "Configuration Review",
+        "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific.",
+        "confidence": 75,
+        "occurrences": 1,
+        "smartContractContext": {
+          "contextType": "Legacy Contract Area",
+          "riskWeight": 55,
+          "exploitability": "MEDIUM",
+          "reviewPriority": 5,
+          "note": "This file appears to be legacy code. Legacy areas often need extra migration and security review."
+        },
+        "context": {
+          "match": "uint256 private constant UNISWAP_V2_SYNC_TOPIC_0 = 0x1c411e9a96e071241c2f21f7726b17ae89e3cab4c78be50e062b03a9fffbbad1;"
+        }
+      },
+      {
+        "file": "/Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoReactive.sol",
+        "line": 28,
+        "fileType": "SMART_CONTRACT",
+        "type": "Hardcoded Address",
+        "severity": "INFO",
+        "originalSeverity": "INFO",
+        "category": "Configuration Review",
+        "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific.",
+        "confidence": 75,
+        "occurrences": 1,
+        "smartContractContext": {
+          "contextType": "Legacy Contract Area",
+          "riskWeight": 55,
+          "exploitability": "MEDIUM",
+          "reviewPriority": 5,
+          "note": "This file appears to be legacy code. Legacy areas often need extra migration and security review."
+        },
+        "context": {
+          "match": "uint256 private constant REQUEST_RESYNC_TOPIC_0 = 0xef3ee55037493e03bbb6926db7e59fe91b2af41184a35b32a106eac1557081ea;"
+        }
+      }
+    ]
+  },
+  "exploitSimulationReport": {
+    "engine": "Exploit Simulation Engine",
+    "scannerVersion": "2.0.0",
+    "totalSimulations": 1,
+    "criticalSimulations": 1,
+    "highSimulations": 0,
+    "simulationScore": 45,
+    "simulationRiskLevel": "MEDIUM",
+    "simulations": [
+      {
+        "simulationName": "Private Key Compromise Path",
+        "estimatedImpact": "CRITICAL",
+        "exploitability": "HIGH",
+        "affectedArea": "Wallet / Secrets / Deployment Credentials",
+        "attackPath": [
+          "Attacker gains access to repository or leaked source archive.",
+          "Attacker identifies hardcoded private key or wallet credential.",
+          "Attacker imports the key into a wallet or signing tool.",
+          "Attacker signs unauthorized transactions or deploys malicious changes.",
+          "Funds, contracts, or privileged operations may be compromised."
+        ],
+        "likelyBusinessImpact": "Loss of funds, unauthorized contract control, reputation damage, and emergency key rotation.",
+        "recommendedControls": [
+          "Remove private keys from source code immediately.",
+          "Rotate all exposed credentials.",
+          "Move secrets into a vault or environment-managed secret store.",
+          "Review git history for previous exposure.",
+          "Use hardware wallets, multisig, or secure signing infrastructure."
+        ],
+        "relatedFindings": [
+          {
+            "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol",
+            "line": 19,
+            "ruleId": "ETH_PRIVATE_KEY",
+            "type": "Ethereum Private Key",
+            "severity": "CRITICAL",
+            "originalSeverity": "CRITICAL",
+            "category": "Wallet Secret Exposure",
+            "description": "Potential Ethereum private key detected.",
+            "recommendation": "Treat as compromised, move funds, and rotate wallet credentials.",
+            "confidence": 90,
+            "occurrences": 1,
+            "context": {
+              "before": "uint256 private constant SEPOLIA_CHAIN_ID = 11155111;",
+              "match": "uint256 private constant ERC20_TRANSFER_TOPIC_0 = 0x***MASKED_PRIVATE_KEY***;",
+              "after": "uint256 private constant L1_RQ_TOPIC_0 = 0x9a26a1f9def08abe958f09f08b27ca5d3dcc90dc0bd84ac65a66e096560f3071;"
+            },
+            "rootCause": {
+              "source": "Hardcoded Credential",
+              "reason": "Private key appears to be stored directly in source code",
+              "attackSurface": "Repository Access",
+              "exploitability": "CRITICAL",
+              "likelihood": "HIGH",
+              "impact": "Complete wallet compromise",
+              "remediationPriority": 1
+            }
+          },
+          {
+            "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol",
+            "line": 20,
+            "ruleId": "ETH_PRIVATE_KEY",
+            "type": "Ethereum Private Key",
+            "severity": "CRITICAL",
+            "originalSeverity": "CRITICAL",
+            "category": "Wallet Secret Exposure",
+            "description": "Potential Ethereum private key detected.",
+            "recommendation": "Treat as compromised, move funds, and rotate wallet credentials.",
+            "confidence": 90,
+            "occurrences": 1,
+            "context": {
+              "before": "uint256 private constant ERC20_TRANSFER_TOPIC_0 = 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef;",
+              "match": "uint256 private constant L1_RQ_TOPIC_0 = 0x***MASKED_PRIVATE_KEY***;",
+              "after": "uint64 private constant CALLBACK_GAS_LIMIT = 1000000;"
+            },
+            "rootCause": {
+              "source": "Hardcoded Credential",
+              "reason": "Private key appears to be stored directly in source code",
+              "attackSurface": "Repository Access",
+              "exploitability": "CRITICAL",
+              "likelihood": "HIGH",
+              "impact": "Complete wallet compromise",
+              "remediationPriority": 1
+            }
+          },
+          {
+            "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol",
+            "line": 16,
+            "ruleId": "ETH_PRIVATE_KEY",
+            "type": "Ethereum Private Key",
+            "severity": "CRITICAL",
+            "originalSeverity": "CRITICAL",
+            "category": "Wallet Secret Exposure",
+            "description": "Potential Ethereum private key detected.",
+            "recommendation": "Treat as compromised, move funds, and rotate wallet credentials.",
+            "confidence": 90,
+            "occurrences": 1,
+            "context": {
+              "before": "uint256 private constant SEPOLIA_CHAIN_ID = 11155111;",
+              "match": "uint256 private constant ERC721_TRANSFER_TOPIC_0 = 0x***MASKED_PRIVATE_KEY***;",
+              "after": "uint256 private constant L1_RQ_TOPIC_0 = 0xe31c60e37ab1301f69f01b436a1d13486e6c16cc22c888a08c0e64a39230b6ac;"
+            },
+            "rootCause": {
+              "source": "Hardcoded Credential",
+              "reason": "Private key appears to be stored directly in source code",
+              "attackSurface": "Repository Access",
+              "exploitability": "CRITICAL",
+              "likelihood": "HIGH",
+              "impact": "Complete wallet compromise",
+              "remediationPriority": 1
+            }
+          },
+          {
+            "file": "/Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol",
+            "line": 17,
+            "ruleId": "ETH_PRIVATE_KEY",
+            "type": "Ethereum Private Key",
+            "severity": "CRITICAL",
+            "originalSeverity": "CRITICAL",
+            "category": "Wallet Secret Exposure",
+            "description": "Potential Ethereum private key detected.",
+            "recommendation": "Treat as compromised, move funds, and rotate wallet credentials.",
+            "confidence": 90,
+            "occurrences": 1,
+            "context": {
+              "before": "uint256 private constant ERC721_TRANSFER_TOPIC_0 = 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef;",
+              "match": "uint256 private constant L1_RQ_TOPIC_0 = 0x***MASKED_PRIVATE_KEY***;",
+              "after": "uint64 private constant CALLBACK_GAS_LIMIT = 1000000;"
+            },
+            "rootCause": {
+              "source": "Hardcoded Credential",
+              "reason": "Private key appears to be stored directly in source code",
+              "attackSurface": "Repository Access",
+              "exploitability": "CRITICAL",
+              "likelihood": "HIGH",
+              "impact": "Complete wallet compromise",
+              "remediationPriority": 1
+            }
+          },
+          {
+            "file": "/Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoReactive.sol",
+            "line": 27,
+            "ruleId": "ETH_PRIVATE_KEY",
+            "type": "Ethereum Private Key",
+            "severity": "CRITICAL",
+            "originalSeverity": "CRITICAL",
+            "category": "Wallet Secret Exposure",
+            "description": "Potential Ethereum private key detected.",
+            "recommendation": "Treat as compromised, move funds, and rotate wallet credentials.",
+            "confidence": 90,
+            "occurrences": 1,
+            "context": {
+              "before": "uint256 private constant SEPOLIA_CHAIN_ID = 11155111;",
+              "match": "uint256 private constant UNISWAP_V2_SYNC_TOPIC_0 = 0x***MASKED_PRIVATE_KEY***;",
+              "after": "uint256 private constant REQUEST_RESYNC_TOPIC_0 = 0xef3ee55037493e03bbb6926db7e59fe91b2af41184a35b32a106eac1557081ea;"
+            },
+            "rootCause": {
+              "source": "Hardcoded Credential",
+              "reason": "Private key appears to be stored directly in source code",
+              "attackSurface": "Repository Access",
+              "exploitability": "CRITICAL",
+              "likelihood": "HIGH",
+              "impact": "Complete wallet compromise",
+              "remediationPriority": 1
+            }
+          },
+          {
+            "file": "/Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoReactive.sol",
+            "line": 28,
+            "ruleId": "ETH_PRIVATE_KEY",
+            "type": "Ethereum Private Key",
+            "severity": "CRITICAL",
+            "originalSeverity": "CRITICAL",
+            "category": "Wallet Secret Exposure",
+            "description": "Potential Ethereum private key detected.",
+            "recommendation": "Treat as compromised, move funds, and rotate wallet credentials.",
+            "confidence": 90,
+            "occurrences": 1,
+            "context": {
+              "before": "uint256 private constant UNISWAP_V2_SYNC_TOPIC_0 = 0x1c411e9a96e071241c2f21f7726b17ae89e3cab4c78be50e062b03a9fffbbad1;",
+              "match": "uint256 private constant REQUEST_RESYNC_TOPIC_0 = 0x***MASKED_PRIVATE_KEY***;",
+              "after": "uint64 private constant CALLBACK_GAS_LIMIT = 1000000;"
+            },
+            "rootCause": {
+              "source": "Hardcoded Credential",
+              "reason": "Private key appears to be stored directly in source code",
+              "attackSurface": "Repository Access",
+              "exploitability": "CRITICAL",
+              "likelihood": "HIGH",
+              "impact": "Complete wallet compromise",
+              "remediationPriority": 1
+            }
+          },
+          {
+            "file": "/Users/user/reactive-smart-contract-demos/lib/openzeppelin-contracts/package.json",
+            "dependency": "web3",
+            "version": "^1.3.0",
+            "severity": "MEDIUM",
+            "category": "Blockchain Dependency",
+            "risk": "Web3 dependency detected. Review wallet and signing flows for crypto-agility.",
+            "recommendation": "Prepare signing abstractions and wallet security guidance."
+          }
+        ]
+      }
+    ]
+  }
+}
