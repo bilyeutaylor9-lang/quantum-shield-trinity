@@ -27,3 +27,17 @@ Generates migration recommendations and security guidance.
 - Dashboard
 - AI Security Intelligence Engine
 - Multi-Chain Quantum Scanner
+## Quick Start
+
+```bash
+node src/examples/demo.js
+```
+
+Example Output:
+
+```json
+{
+  "platform": "Quantum Shield Trinity",
+  "version": "0.1.0"
+}
+```
