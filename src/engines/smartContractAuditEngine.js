@@ -169,12 +169,22 @@ export function smartContractAuditEngine(files = []) {
         }
 
         const smartContractContext = smartContractContextEngine(line, fileName);
-        const confidence = calculateAuditConfidence(line, fileName, rule, smartContractContext);
-        const severity = adjustAuditSeverity(rule.severity, smartContractContext, confidence);
+        const confidence = calculateAuditConfidence(
+          line,
+          fileName,
+          rule,
+          smartContractContext
+        );
 
         if (confidence < 40) {
           return;
         }
+
+        const severity = adjustAuditSeverity(
+          rule.severity,
+          smartContractContext,
+          confidence
+        );
 
         auditFindings.push({
           file: fileName,
@@ -217,7 +227,7 @@ export function smartContractAuditEngine(files = []) {
 
   return {
     engine: "Smart Contract Audit Engine",
-    scannerVersion: "1.9.1",
+    scannerVersion: "1.9.2",
     auditedContracts: files.filter(
       file =>
         classifyFile(file.name ?? "") === "SMART_CONTRACT" &&
