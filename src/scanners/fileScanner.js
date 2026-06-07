@@ -11,7 +11,10 @@ const SUPPORTED_EXTENSIONS = [
   ".py",
   ".go",
   ".rs",
-  ".env"
+  ".env",
+  ".pem",
+  ".yaml",
+  ".yml"
 ];
 
 const IGNORED_FOLDERS = [
@@ -20,8 +23,29 @@ const IGNORED_FOLDERS = [
   "dist",
   "build",
   ".next",
-  "coverage"
+  "coverage",
+  "lib",
+  "vendor",
+  "out",
+  "cache"
 ];
+
+const IGNORED_FILE_PATTERNS = [
+  ".test.",
+  ".spec.",
+  "test/",
+  "tests/",
+  "__tests__/",
+  ".min.js"
+];
+
+function shouldIgnoreFile(filePath) {
+  const normalizedPath = filePath.replaceAll("\\", "/").toLowerCase();
+
+  return IGNORED_FILE_PATTERNS.some(pattern =>
+    normalizedPath.includes(pattern)
+  );
+}
 
 export function fileScanner(targetDirectory = ".") {
   const files = [];
@@ -38,6 +62,10 @@ export function fileScanner(targetDirectory = ".") {
         if (!IGNORED_FOLDERS.includes(entry.name)) {
           scanDirectory(fullPath);
         }
+        continue;
+      }
+
+      if (shouldIgnoreFile(fullPath)) {
         continue;
       }
 
