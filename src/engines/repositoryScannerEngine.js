@@ -28,8 +28,33 @@ export function repositoryScannerEngine(files = []) {
       severity: "CRITICAL"
     },
     {
+      type: "Private Key Block",
+      regex: /BEGIN.*PRIVATE KEY/g,
+      severity: "CRITICAL"
+    },
+    {
+      type: "OpenAI Key",
+      regex: /sk-[A-Za-z0-9]{20,}/g,
+      severity: "CRITICAL"
+    },
+    {
+      type: "AWS Access Key",
+      regex: /AKIA[0-9A-Z]{16}/g,
+      severity: "CRITICAL"
+    },
+    {
+      type: "GitHub Token",
+      regex: /ghp_[A-Za-z0-9]{20,}/g,
+      severity: "CRITICAL"
+    },
+    {
       type: "API Key",
       regex: /api[_-]?key/gi,
+      severity: "HIGH"
+    },
+    {
+      type: "JWT Secret",
+      regex: /jwt.*secret/gi,
       severity: "HIGH"
     }
   ];
@@ -64,11 +89,15 @@ export function repositoryScannerEngine(files = []) {
     finding => finding.severity === "HIGH"
   ).length;
 
+  const mediumFindings = findings.filter(
+    finding => finding.severity === "MEDIUM"
+  ).length;
+
   const score = Math.min(
     100,
     criticalFindings * 40 +
       highFindings * 15 +
-      findings.length * 5
+      mediumFindings * 8
   );
 
   return {
@@ -77,6 +106,7 @@ export function repositoryScannerEngine(files = []) {
     findings,
     criticalFindings,
     highFindings,
+    mediumFindings,
     score,
     repositoryRiskLevel:
       score >= 90
