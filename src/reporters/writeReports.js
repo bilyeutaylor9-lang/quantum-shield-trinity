@@ -3,13 +3,10 @@ import fs from "fs";
 export function writeReports({
   htmlReport = "",
   exportReport = {},
-  executiveReport = {}
+  executiveReport = {},
+  sarifReport = {}
 } = {}) {
-  fs.writeFileSync(
-    "report.html",
-    htmlReport,
-    "utf8"
-  );
+  fs.writeFileSync("report.html", htmlReport, "utf8");
 
   fs.writeFileSync(
     "report.json",
@@ -23,11 +20,19 @@ export function writeReports({
     "utf8"
   );
 
+  fs.writeFileSync(
+    "report.sarif",
+    JSON.stringify(sarifReport, null, 2),
+    "utf8"
+  );
+
   return {
     generatedFiles: [
       "report.html",
       "report.json",
-      "executive-report.json"
-    ]
+      "executive-report.json",
+      "report.sarif"
+    ],
+    generatedAt: new Date().toISOString()
   };
 }
