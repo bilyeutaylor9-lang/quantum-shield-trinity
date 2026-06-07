@@ -17,26 +17,14 @@ export function isProductionFile(fileName = "") {
     "/node_modules/",
     "/forge-std/",
     "/openzeppelin/",
-    "/reactive-lib/",
-    "/.github/"
+    "/src/engines/",
+    "/src/rules/",
+    "/src/reporters/",
+    "/src/utils/",
+    "readme.md"
   ];
 
-  const excludedFilePatterns = [
-    ".t.sol",
-    ".test.sol",
-    ".spec.sol",
-    "test.sol",
-    "mock.sol",
-    "fixture.sol"
-  ];
-
-  const isExcludedPath = excludedPathParts.some(part =>
-    normalized.includes(part)
+  return !excludedPathParts.some(path =>
+    normalized.includes(path)
   );
-
-  const isExcludedFile = excludedFilePatterns.some(pattern =>
-    normalized.endsWith(pattern) || normalized.includes(pattern)
-  );
-
-  return !isExcludedPath && !isExcludedFile;
 }
