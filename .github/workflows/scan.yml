@@ -12,6 +12,7 @@ on:
 permissions:
   contents: read
   actions: read
+  security-events: write
 
 jobs:
   scan:
@@ -38,3 +39,12 @@ jobs:
           name: quantum-shield-trinity-reports
           path: |
             quantum-shield-report.txt
+            report.html
+            report.json
+            executive-report.json
+            report.sarif
+
+      - name: Upload SARIF to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: report.sarif
