@@ -5,6 +5,7 @@ export { securityAssessmentEngine } from "./engines/securityAssessmentEngine.js"
 export { quantumExposureForecastEngine } from "./engines/quantumExposureForecastEngine.js";
 export { quantumAttackSimulationEngine } from "./engines/quantumAttackSimulationEngine.js";
 export { securityAuditLoopEngine } from "./engines/securityAuditLoopEngine.js";
+export { jsonExportEngine } from "./engines/jsonExportEngine.js";
 export { createQuantumRiskProfile } from "./models/quantumRiskProfile.js";
 
 import { walletRiskEngine } from "./engines/walletRiskEngine.js";
@@ -14,6 +15,7 @@ import { securityAssessmentEngine } from "./engines/securityAssessmentEngine.js"
 import { quantumExposureForecastEngine } from "./engines/quantumExposureForecastEngine.js";
 import { quantumAttackSimulationEngine } from "./engines/quantumAttackSimulationEngine.js";
 import { securityAuditLoopEngine } from "./engines/securityAuditLoopEngine.js";
+import { jsonExportEngine } from "./engines/jsonExportEngine.js";
 import { createQuantumRiskProfile } from "./models/quantumRiskProfile.js";
 
 export function quantumShieldTrinity(wallet, codeSample = "") {
@@ -46,22 +48,30 @@ export function quantumShieldTrinity(wallet, codeSample = "") {
     forecastReport
   });
 
+  const auditReport = securityAuditLoopEngine({
+    systemState: {
+      walletReport,
+      inventoryReport,
+      migrationReport,
+      forecastReport,
+      simulationReport,
+      assessmentReport
+    }
+  });
+
   const riskProfile = createQuantumRiskProfile({
     walletReport,
     inventoryReport,
     migrationReport,
     assessmentReport,
     forecastReport,
-    simulationReport
+    simulationReport,
+    auditReport
   });
 
-  const auditReport = securityAuditLoopEngine({
-    systemState: riskProfile
-  });
-
-  return {
+  const baseReport = {
     platform: "Quantum Shield Trinity",
-    version: "0.6.0",
+    version: "0.7.0",
     riskProfile,
     auditReport,
     assessmentReport,
@@ -70,5 +80,12 @@ export function quantumShieldTrinity(wallet, codeSample = "") {
     migrationReport,
     forecastReport,
     simulationReport
+  };
+
+  const exportReport = jsonExportEngine(baseReport);
+
+  return {
+    ...baseReport,
+    exportReport
   };
 }
