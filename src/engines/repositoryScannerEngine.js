@@ -1,5 +1,6 @@
 import { QUANTUM_RULES } from "../data/quantumRules.js";
 import { securityCopilotEngine } from "./securityCopilotEngine.js";
+import { rootCauseEngine } from "./rootCauseEngine.js";
 
 export function repositoryScannerEngine(files = []) {
   const findings = [];
@@ -14,7 +15,12 @@ export function repositoryScannerEngine(files = []) {
         const matches = line.match(rule.regex);
 
         if (matches) {
-          const confidence = calculateConfidence(rule, line, fileName);
+          const confidence = calculateConfidence(
+            rule,
+            line,
+            fileName
+          );
+
           const severity = adjustSeverity(
             rule.severity,
             confidence,
@@ -25,6 +31,11 @@ export function repositoryScannerEngine(files = []) {
           if (confidence < 45) {
             return;
           }
+
+          const rootCause = rootCauseEngine({
+            type: rule.type,
+            severity
+          });
 
           findings.push({
             file: fileName,
@@ -38,7 +49,8 @@ export function repositoryScannerEngine(files = []) {
             recommendation: rule.recommendation,
             confidence,
             occurrences: matches.length,
-            context: getLineContext(lines, index)
+            context: getLineContext(lines, index),
+            rootCause
           });
         }
       });
@@ -83,7 +95,7 @@ export function repositoryScannerEngine(files = []) {
 
   return {
     engine: "Repository Scanner Engine",
-    scannerVersion: "1.3.1",
+    scannerVersion: "1.5.0",
     rulesUsed: QUANTUM_RULES.length,
     scannedFiles: files.length,
     findings,
@@ -181,21 +193,11 @@ function calculateConfidence(rule = {}, line = "", fileName = "") {
     confidence -= 25;
   }
 
-  if (
-    normalizedLine.includes("import") ||
-    normalizedLine.includes("interface") ||
-    normalizedLine.includes("contract ") ||
-    normalizedLine.includes("library ")
-  ) {
-    confidence -= 10;
-  }
-
   return Math.max(5, Math.min(100, confidence));
 }
 
 function adjustSeverity(severity, confidence, fileName = "", line = "") {
   const normalizedFile = fileName.toLowerCase();
-  const normalizedLine = line.toLowerCase();
 
   if (confidence < 35) {
     return "LOW";
@@ -213,16 +215,6 @@ function adjustSeverity(severity, confidence, fileName = "", line = "") {
     if (severity === "CRITICAL") return "HIGH";
     if (severity === "HIGH") return "MEDIUM";
     if (severity === "MEDIUM") return "LOW";
-  }
-
-  if (
-    normalizedLine.includes("example") ||
-    normalizedLine.includes("placeholder") ||
-    normalizedLine.includes("mock") ||
-    normalizedLine.includes("fake")
-  ) {
-    if (severity === "CRITICAL") return "MEDIUM";
-    if (severity === "HIGH") return "LOW";
   }
 
   return severity;
