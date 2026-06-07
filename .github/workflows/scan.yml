@@ -26,4 +26,10 @@ jobs:
         run: npm install
 
       - name: Run Quantum Shield Trinity scan
-        run: npm run scan -- .
+        run: npm run scan -- . > quantum-shield-report.txt
+
+      - name: Upload scan report
+        uses: actions/upload-artifact@v4
+        with:
+          name: quantum-shield-report
+          path: quantum-shield-report.txt
