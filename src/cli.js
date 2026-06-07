@@ -2,6 +2,7 @@ import { fileScanner } from "./scanners/fileScanner.js";
 import { repositoryScannerEngine } from "./engines/repositoryScannerEngine.js";
 import { dependencyIntelligenceEngine } from "./engines/dependencyIntelligenceEngine.js";
 import { attackSurfaceEngine } from "./engines/attackSurfaceEngine.js";
+import { smartContractAuditEngine } from "./engines/smartContractAuditEngine.js";
 import { summaryFormatter } from "./utils/summaryFormatter.js";
 import { markdownReportGenerator } from "./reporters/markdownReportGenerator.js";
 
@@ -18,9 +19,11 @@ const report = repositoryScannerEngine(scanResult.files);
 
 const dependencyReport = dependencyIntelligenceEngine(scanResult.files);
 const attackSurfaceReport = attackSurfaceEngine(scanResult.files);
+const smartContractAuditReport = smartContractAuditEngine(scanResult.files);
 
 report.dependencyReport = dependencyReport;
 report.attackSurfaceReport = attackSurfaceReport;
+report.smartContractAuditReport = smartContractAuditReport;
 
 const summary = summaryFormatter(report);
 
@@ -53,6 +56,29 @@ console.log(`Critical Attack Paths: ${attackSurfaceReport.criticalAttackPaths}`)
 console.log(`High Attack Paths: ${attackSurfaceReport.highAttackPaths}`);
 console.log(`Medium Attack Paths: ${attackSurfaceReport.mediumAttackPaths}`);
 console.log("");
+
+console.log("Smart Contract Audit");
+console.log("--------------------");
+console.log(`Audit Risk Level: ${smartContractAuditReport.auditRiskLevel}`);
+console.log(`Audit Score: ${smartContractAuditReport.auditScore}/100`);
+console.log(`Audited Contracts: ${smartContractAuditReport.auditedContracts}`);
+console.log(`Critical Audit Findings: ${smartContractAuditReport.criticalFindings}`);
+console.log(`High Audit Findings: ${smartContractAuditReport.highFindings}`);
+console.log(`Medium Audit Findings: ${smartContractAuditReport.mediumFindings}`);
+console.log("");
+
+if (smartContractAuditReport.auditFindings.length > 0) {
+  console.log("Top Smart Contract Findings");
+  console.log("---------------------------");
+
+  smartContractAuditReport.auditFindings.slice(0, 10).forEach((item, index) => {
+    console.log(`${index + 1}. ${item.type} (${item.severity})`);
+    console.log(`   File: ${item.file}`);
+    console.log(`   Line: ${item.line}`);
+    console.log(`   Recommendation: ${item.recommendation}`);
+    console.log("");
+  });
+}
 
 if (attackSurfaceReport.attackFindings.length > 0) {
   console.log("Top Attack Surface Findings");
