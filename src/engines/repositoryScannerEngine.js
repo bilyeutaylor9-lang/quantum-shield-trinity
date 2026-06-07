@@ -15,9 +15,14 @@ export function repositoryScannerEngine(files = []) {
 
         if (matches) {
           const confidence = calculateConfidence(rule, line, fileName);
-          const severity = adjustSeverity(rule.severity, confidence, fileName, line);
+          const severity = adjustSeverity(
+            rule.severity,
+            confidence,
+            fileName,
+            line
+          );
 
-          if (confidence < 25) {
+          if (confidence < 45) {
             return;
           }
 
@@ -60,15 +65,25 @@ export function repositoryScannerEngine(files = []) {
 
   const score = Math.min(
     100,
-    criticalFindings * 35 +
-      highFindings * 12 +
-      mediumFindings * 5 +
-      lowFindings * 1
+    criticalFindings * 50 +
+      highFindings * 15 +
+      mediumFindings * 3
   );
+
+  const repositoryRiskLevel =
+    criticalFindings >= 5
+      ? "CRITICAL"
+      : criticalFindings >= 1
+      ? "HIGH"
+      : highFindings >= 10
+      ? "HIGH"
+      : mediumFindings >= 20
+      ? "MEDIUM"
+      : "LOW";
 
   return {
     engine: "Repository Scanner Engine",
-    scannerVersion: "1.3.0",
+    scannerVersion: "1.3.1",
     rulesUsed: QUANTUM_RULES.length,
     scannedFiles: files.length,
     findings,
@@ -78,14 +93,28 @@ export function repositoryScannerEngine(files = []) {
     mediumFindings,
     lowFindings,
     score,
-    repositoryRiskLevel:
-      score >= 90
-        ? "CRITICAL"
-        : score >= 70
-        ? "HIGH"
-        : score >= 40
-        ? "MEDIUM"
-        : "LOW"
+    securityScore: Math.max(0, 100 - score),
+    securityGrade: calculateSecurityGrade(score),
+    repositoryRiskLevel,
+    summary: {
+      totalFindings:
+        criticalFindings +
+        highFindings +
+        mediumFindings +
+        lowFindings,
+      criticalPercentage:
+        findings.length > 0
+          ? Math.round((criticalFindings / findings.length) * 100)
+          : 0,
+      highPercentage:
+        findings.length > 0
+          ? Math.round((highFindings / findings.length) * 100)
+          : 0,
+      mediumPercentage:
+        findings.length > 0
+          ? Math.round((mediumFindings / findings.length) * 100)
+          : 0
+    }
   };
 }
 
@@ -197,6 +226,15 @@ function adjustSeverity(severity, confidence, fileName = "", line = "") {
   }
 
   return severity;
+}
+
+function calculateSecurityGrade(score) {
+  if (score >= 95) return "F";
+  if (score >= 80) return "D";
+  if (score >= 60) return "C";
+  if (score >= 40) return "B";
+  if (score >= 20) return "A";
+  return "A+";
 }
 
 function isLikelyTestOrDependencyFile(fileName = "") {
