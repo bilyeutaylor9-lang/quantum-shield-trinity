@@ -1,17 +1,19 @@
 {
   "name": "quantum-shield-trinity",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Quantum risk intelligence platform for wallet security, cryptographic discovery, migration planning, audit verification, and reporting.",
   "type": "module",
   "main": "src/index.js",
-
+  "bin": {
+    "quantum-shield": "src/cli.js"
+  },
   "scripts": {
     "demo": "node src/examples/demo.js",
     "repo-demo": "node src/examples/repositoryDemo.js",
     "file-scan": "node src/examples/fileScanDemo.js",
-    "rule-scan": "node src/examples/ruleScanDemo.js"
+    "rule-scan": "node src/examples/ruleScanDemo.js",
+    "scan": "node src/cli.js"
   },
-
   "keywords": [
     "quantum-security",
     "post-quantum",
@@ -20,7 +22,6 @@
     "security-audit",
     "risk-assessment"
   ],
-
   "author": "Taylor Bilyeu",
   "license": "MIT"
 }
