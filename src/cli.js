@@ -1,6 +1,7 @@
 import { fileScanner } from "./scanners/fileScanner.js";
 import { repositoryScannerEngine } from "./engines/repositoryScannerEngine.js";
 import { summaryFormatter } from "./utils/summaryFormatter.js";
+import { markdownReportGenerator } from "./reporters/markdownReportGenerator.js";
 
 const targetDirectory = process.argv[2] ?? "src";
 
@@ -14,6 +15,8 @@ const scanResult = fileScanner(targetDirectory);
 const report = repositoryScannerEngine(scanResult.files);
 
 const summary = summaryFormatter(report);
+
+const markdownReport = markdownReportGenerator(report);
 
 console.log("Executive Summary");
 console.log("-----------------");
@@ -41,6 +44,11 @@ if (summary.topRecommendations.length > 0) {
   console.log("No major findings detected.");
   console.log("");
 }
+
+console.log("Report Generated");
+console.log("----------------");
+console.log(`Markdown Report: ${markdownReport.outputPath}`);
+console.log("");
 
 console.log("Full JSON Report");
 console.log("----------------");
