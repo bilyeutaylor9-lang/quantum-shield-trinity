@@ -1,3 +1,6 @@
+import { classifyFile } from "../utils/fileClassifier.js";
+import { isProductionFile } from "../utils/isProductionFile.js";
+
 export function attackSurfaceEngine(files = []) {
   const attackFindings = [];
 
@@ -84,8 +87,23 @@ export function attackSurfaceEngine(files = []) {
     }
   ];
 
+  let skippedNonProductionFiles = 0;
+  let skippedDocumentationFiles = 0;
+
   for (const file of files) {
     const fileName = file.name ?? "Unknown File";
+    const fileType = classifyFile(fileName);
+
+    if (!isProductionFile(fileName)) {
+      skippedNonProductionFiles += 1;
+      continue;
+    }
+
+    if (fileType === "DOCUMENTATION") {
+      skippedDocumentationFiles += 1;
+      continue;
+    }
+
     const content = file.content ?? "";
     const lines = content.split("\n");
 
@@ -93,20 +111,27 @@ export function attackSurfaceEngine(files = []) {
       lines.forEach((line, index) => {
         const matches = line.match(rule.regex);
 
-        if (matches) {
-          attackFindings.push({
-            file: fileName,
-            line: index + 1,
-            type: rule.type,
-            severity: rule.severity,
-            category: rule.category,
-            recommendation: rule.recommendation,
-            occurrences: matches.length,
-            context: {
-              match: line.trim()
-            }
-          });
+        if (!matches) {
+          return;
         }
+
+        if (isCommentOnlyLine(line)) {
+          return;
+        }
+
+        attackFindings.push({
+          file: fileName,
+          line: index + 1,
+          fileType,
+          type: rule.type,
+          severity: rule.severity,
+          category: rule.category,
+          recommendation: rule.recommendation,
+          occurrences: matches.length,
+          context: {
+            match: line.trim()
+          }
+        });
       });
     }
   }
@@ -132,7 +157,9 @@ export function attackSurfaceEngine(files = []) {
 
   return {
     engine: "Attack Surface Intelligence Engine",
-    scannerVersion: "1.7.0",
+    scannerVersion: "1.7.1",
+    skippedNonProductionFiles,
+    skippedDocumentationFiles,
     attackSurfaceScore,
     attackSurfaceRiskLevel:
       attackSurfaceScore >= 90
@@ -148,4 +175,15 @@ export function attackSurfaceEngine(files = []) {
     mediumAttackPaths,
     attackFindings
   };
+}
+
+function isCommentOnlyLine(line = "") {
+  const trimmed = line.trim();
+
+  return (
+    trimmed.startsWith("//") ||
+    trimmed.startsWith("*") ||
+    trimmed.startsWith("/*") ||
+    trimmed.startsWith("*/")
+  );
 }
