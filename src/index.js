@@ -8,17 +8,25 @@ import { migrationShieldEngine } from "./engines/migrationShieldEngine.js";
 
 export function quantumShieldTrinity(wallet, codeSample = "") {
   const walletReport = walletRiskEngine(wallet);
-  const inventoryReport = cryptoInventoryEngine(codeSample);
-  const migrationReport = migrationShieldEngine();
+
+  const inventoryReport =
+    cryptoInventoryEngine(codeSample);
+
+  const migrationReport =
+    migrationShieldEngine(
+      walletReport,
+      inventoryReport
+    );
 
   const totalScore = Math.min(
     100,
-    walletReport.score + inventoryReport.score
+    walletReport.score +
+      inventoryReport.score
   );
 
   return {
     platform: "Quantum Shield Trinity",
-    version: "0.2.0",
+    version: "0.3.0",
     totalScore,
     walletReport,
     inventoryReport,
