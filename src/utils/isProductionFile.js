@@ -1,7 +1,9 @@
 export function isProductionFile(fileName = "") {
-  const normalized = fileName.toLowerCase();
+  const normalized = fileName
+    .replaceAll("\\", "/")
+    .toLowerCase();
 
-  const excludedPaths = [
+  const excludedPathParts = [
     "/test/",
     "/tests/",
     "/mock/",
@@ -16,8 +18,25 @@ export function isProductionFile(fileName = "") {
     "/forge-std/",
     "/openzeppelin/",
     "/reactive-lib/",
-    ".github/"
+    "/.github/"
   ];
 
-  return !excludedPaths.some(path => normalized.includes(path));
+  const excludedFilePatterns = [
+    ".t.sol",
+    ".test.sol",
+    ".spec.sol",
+    "test.sol",
+    "mock.sol",
+    "fixture.sol"
+  ];
+
+  const isExcludedPath = excludedPathParts.some(part =>
+    normalized.includes(part)
+  );
+
+  const isExcludedFile = excludedFilePatterns.some(pattern =>
+    normalized.endsWith(pattern) || normalized.includes(pattern)
+  );
+
+  return !isExcludedPath && !isExcludedFile;
 }
