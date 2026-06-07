@@ -14,16 +14,24 @@ export function repositoryScannerEngine(files = []) {
         const matches = line.match(rule.regex);
 
         if (matches) {
+          const confidence = calculateConfidence(rule, line, fileName);
+          const severity = adjustSeverity(rule.severity, confidence, fileName, line);
+
+          if (confidence < 25) {
+            return;
+          }
+
           findings.push({
             file: fileName,
             line: index + 1,
             ruleId: rule.id,
             type: rule.type,
-            severity: rule.severity,
+            severity,
+            originalSeverity: rule.severity,
             category: rule.category,
             description: rule.description,
             recommendation: rule.recommendation,
-            confidence: calculateConfidence(rule, line, fileName),
+            confidence,
             occurrences: matches.length,
             context: getLineContext(lines, index)
           });
@@ -46,16 +54,21 @@ export function repositoryScannerEngine(files = []) {
     finding => finding.severity === "MEDIUM"
   ).length;
 
+  const lowFindings = findings.filter(
+    finding => finding.severity === "LOW"
+  ).length;
+
   const score = Math.min(
     100,
-    criticalFindings * 40 +
-      highFindings * 15 +
-      mediumFindings * 8
+    criticalFindings * 35 +
+      highFindings * 12 +
+      mediumFindings * 5 +
+      lowFindings * 1
   );
 
   return {
     engine: "Repository Scanner Engine",
-    scannerVersion: "1.2.5",
+    scannerVersion: "1.3.0",
     rulesUsed: QUANTUM_RULES.length,
     scannedFiles: files.length,
     findings,
@@ -63,6 +76,7 @@ export function repositoryScannerEngine(files = []) {
     criticalFindings,
     highFindings,
     mediumFindings,
+    lowFindings,
     score,
     repositoryRiskLevel:
       score >= 90
@@ -123,23 +137,80 @@ function calculateConfidence(rule = {}, line = "", fileName = "") {
     confidence += 10;
   }
 
-  if (
-    normalizedFile.includes("test") ||
-    normalizedFile.includes("mock") ||
-    normalizedFile.includes("example") ||
-    normalizedFile.includes("demo")
-  ) {
-    confidence -= 25;
+  if (isLikelyTestOrDependencyFile(normalizedFile)) {
+    confidence -= 35;
   }
 
   if (
     normalizedLine.includes("placeholder") ||
     normalizedLine.includes("example") ||
     normalizedLine.includes("dummy") ||
-    normalizedLine.includes("fake")
+    normalizedLine.includes("fake") ||
+    normalizedLine.includes("mock") ||
+    normalizedLine.includes("test")
   ) {
-    confidence -= 20;
+    confidence -= 25;
+  }
+
+  if (
+    normalizedLine.includes("import") ||
+    normalizedLine.includes("interface") ||
+    normalizedLine.includes("contract ") ||
+    normalizedLine.includes("library ")
+  ) {
+    confidence -= 10;
   }
 
   return Math.max(5, Math.min(100, confidence));
+}
+
+function adjustSeverity(severity, confidence, fileName = "", line = "") {
+  const normalizedFile = fileName.toLowerCase();
+  const normalizedLine = line.toLowerCase();
+
+  if (confidence < 35) {
+    return "LOW";
+  }
+
+  if (confidence < 55 && severity === "CRITICAL") {
+    return "MEDIUM";
+  }
+
+  if (confidence < 55 && severity === "HIGH") {
+    return "LOW";
+  }
+
+  if (isLikelyTestOrDependencyFile(normalizedFile)) {
+    if (severity === "CRITICAL") return "HIGH";
+    if (severity === "HIGH") return "MEDIUM";
+    if (severity === "MEDIUM") return "LOW";
+  }
+
+  if (
+    normalizedLine.includes("example") ||
+    normalizedLine.includes("placeholder") ||
+    normalizedLine.includes("mock") ||
+    normalizedLine.includes("fake")
+  ) {
+    if (severity === "CRITICAL") return "MEDIUM";
+    if (severity === "HIGH") return "LOW";
+  }
+
+  return severity;
+}
+
+function isLikelyTestOrDependencyFile(fileName = "") {
+  return (
+    fileName.includes("/test/") ||
+    fileName.includes("/tests/") ||
+    fileName.includes("__tests__") ||
+    fileName.includes("/mock/") ||
+    fileName.includes("/mocks/") ||
+    fileName.includes("/example/") ||
+    fileName.includes("/examples/") ||
+    fileName.includes("/demo/") ||
+    fileName.includes("/demos/") ||
+    fileName.includes("/lib/") ||
+    fileName.includes("/vendor/")
+  );
 }
