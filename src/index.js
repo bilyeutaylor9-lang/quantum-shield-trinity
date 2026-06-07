@@ -11,6 +11,7 @@ export { dependencyRiskEngine } from "./engines/dependencyRiskEngine.js";
 export { securityScoreEngine } from "./engines/securityScoreEngine.js";
 export { htmlReportGenerator } from "./reporters/htmlReportGenerator.js";
 export { writeReports } from "./reporters/writeReports.js";
+export { sarifReportGenerator } from "./reporters/sarifReportGenerator.js";
 export { createQuantumRiskProfile } from "./models/quantumRiskProfile.js";
 
 import { walletRiskEngine } from "./engines/walletRiskEngine.js";
@@ -26,6 +27,7 @@ import { dependencyRiskEngine } from "./engines/dependencyRiskEngine.js";
 import { securityScoreEngine } from "./engines/securityScoreEngine.js";
 import { htmlReportGenerator } from "./reporters/htmlReportGenerator.js";
 import { writeReports } from "./reporters/writeReports.js";
+import { sarifReportGenerator } from "./reporters/sarifReportGenerator.js";
 import { createQuantumRiskProfile } from "./models/quantumRiskProfile.js";
 
 export function quantumShieldTrinity(
@@ -103,7 +105,7 @@ export function quantumShieldTrinity(
 
   const baseReport = {
     platform: "Quantum Shield Trinity",
-    version: "1.2.0",
+    version: "1.3.0",
     riskProfile,
     auditReport,
     assessmentReport,
@@ -123,16 +125,23 @@ export function quantumShieldTrinity(
     executiveReport
   });
 
+  const sarifReport = sarifReportGenerator({
+    ...baseReport,
+    executiveReport
+  });
+
   const exportReport = jsonExportEngine({
     ...baseReport,
     executiveReport,
-    htmlReport
+    htmlReport,
+    sarifReport
   });
 
   const finalReport = {
     ...baseReport,
     executiveReport,
     htmlReport,
+    sarifReport,
     exportReport
   };
 
@@ -140,7 +149,8 @@ export function quantumShieldTrinity(
     finalReport.generatedReportFiles = writeReports({
       htmlReport,
       exportReport,
-      executiveReport
+      executiveReport,
+      sarifReport
     });
   }
 
