@@ -1,4 +1,5 @@
 import { classifyFile } from "../utils/fileClassifier.js";
+import { smartContractContextEngine } from "./smartContractContextEngine.js";
 
 export function smartContractAuditEngine(files = []) {
   const auditFindings = [];
@@ -145,15 +146,19 @@ export function smartContractAuditEngine(files = []) {
           return;
         }
 
+        const smartContractContext = smartContractContextEngine(line, fileName);
+
         auditFindings.push({
           file: fileName,
           line: index + 1,
           fileType,
           type: rule.type,
-          severity: rule.severity,
+          severity: adjustAuditSeverity(rule.severity, smartContractContext),
+          originalSeverity: rule.severity,
           category: rule.category,
           recommendation: rule.recommendation,
           occurrences: matches.length,
+          smartContractContext,
           context: {
             match: line.trim()
           }
@@ -176,14 +181,14 @@ export function smartContractAuditEngine(files = []) {
 
   const auditScore = Math.min(
     100,
-    criticalFindings * 35 +
+    criticalFindings * 40 +
       highFindings * 15 +
       mediumFindings * 5
   );
 
   return {
     engine: "Smart Contract Audit Engine",
-    scannerVersion: "1.8.1",
+    scannerVersion: "1.9.0",
     auditedContracts: files.filter(file =>
       classifyFile(file.name ?? "") === "SMART_CONTRACT"
     ).length,
@@ -205,4 +210,20 @@ export function smartContractAuditEngine(files = []) {
     totalAuditFindings: auditFindings.length,
     auditFindings
   };
+}
+
+function adjustAuditSeverity(severity, smartContractContext = {}) {
+  if (smartContractContext.exploitability === "CRITICAL") {
+    return "CRITICAL";
+  }
+
+  if (smartContractContext.exploitability === "HIGH" && severity === "MEDIUM") {
+    return "HIGH";
+  }
+
+  if (smartContractContext.exploitability === "LOW" && severity === "HIGH") {
+    return "MEDIUM";
+  }
+
+  return severity;
 }
