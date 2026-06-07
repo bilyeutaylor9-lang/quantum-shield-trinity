@@ -1,12 +1,21 @@
 import { QUANTUM_RULES } from "../data/quantumRules.js";
 import { securityCopilotEngine } from "./securityCopilotEngine.js";
 import { rootCauseEngine } from "./rootCauseEngine.js";
+import { isProductionFile } from "../utils/isProductionFile.js";
 
 export function repositoryScannerEngine(files = []) {
   const findings = [];
 
+  let skippedNonProductionFiles = 0;
+
   for (const file of files) {
     const fileName = file.name ?? "Unknown File";
+
+    if (!isProductionFile(fileName)) {
+      skippedNonProductionFiles += 1;
+      continue;
+    }
+
     const content = file.content ?? "";
     const lines = content.split("\n");
 
@@ -14,45 +23,37 @@ export function repositoryScannerEngine(files = []) {
       lines.forEach((line, index) => {
         const matches = line.match(rule.regex);
 
-        if (matches) {
-          const confidence = calculateConfidence(
-            rule,
-            line,
-            fileName
-          );
-
-          const severity = adjustSeverity(
-            rule.severity,
-            confidence,
-            fileName,
-            line
-          );
-
-          if (confidence < 45) {
-            return;
-          }
-
-          const rootCause = rootCauseEngine({
-            type: rule.type,
-            severity
-          });
-
-          findings.push({
-            file: fileName,
-            line: index + 1,
-            ruleId: rule.id,
-            type: rule.type,
-            severity,
-            originalSeverity: rule.severity,
-            category: rule.category,
-            description: rule.description,
-            recommendation: rule.recommendation,
-            confidence,
-            occurrences: matches.length,
-            context: getLineContext(lines, index),
-            rootCause
-          });
+        if (!matches) {
+          return;
         }
+
+        const confidence = calculateConfidence(rule, line, fileName);
+        const severity = adjustSeverity(rule.severity, confidence, fileName, line);
+
+        if (confidence < 45) {
+          return;
+        }
+
+        const rootCause = rootCauseEngine({
+          type: rule.type,
+          severity
+        });
+
+        findings.push({
+          file: fileName,
+          line: index + 1,
+          ruleId: rule.id,
+          type: rule.type,
+          severity,
+          originalSeverity: rule.severity,
+          category: rule.category,
+          description: rule.description,
+          recommendation: rule.recommendation,
+          confidence,
+          occurrences: matches.length,
+          context: getLineContext(lines, index),
+          rootCause
+        });
       });
     }
   }
@@ -95,9 +96,10 @@ export function repositoryScannerEngine(files = []) {
 
   return {
     engine: "Repository Scanner Engine",
-    scannerVersion: "1.5.0",
+    scannerVersion: "1.5.1",
     rulesUsed: QUANTUM_RULES.length,
     scannedFiles: files.length,
+    skippedNonProductionFiles,
     findings,
     copilotGuidance,
     criticalFindings,
@@ -178,10 +180,6 @@ function calculateConfidence(rule = {}, line = "", fileName = "") {
     confidence += 10;
   }
 
-  if (isLikelyTestOrDependencyFile(normalizedFile)) {
-    confidence -= 35;
-  }
-
   if (
     normalizedLine.includes("placeholder") ||
     normalizedLine.includes("example") ||
@@ -193,11 +191,20 @@ function calculateConfidence(rule = {}, line = "", fileName = "") {
     confidence -= 25;
   }
 
+  if (
+    normalizedLine.includes("import") ||
+    normalizedLine.includes("interface") ||
+    normalizedLine.includes("contract ") ||
+    normalizedLine.includes("library ")
+  ) {
+    confidence -= 10;
+  }
+
   return Math.max(5, Math.min(100, confidence));
 }
 
 function adjustSeverity(severity, confidence, fileName = "", line = "") {
-  const normalizedFile = fileName.toLowerCase();
+  const normalizedLine = line.toLowerCase();
 
   if (confidence < 35) {
     return "LOW";
@@ -211,10 +218,14 @@ function adjustSeverity(severity, confidence, fileName = "", line = "") {
     return "LOW";
   }
 
-  if (isLikelyTestOrDependencyFile(normalizedFile)) {
-    if (severity === "CRITICAL") return "HIGH";
-    if (severity === "HIGH") return "MEDIUM";
-    if (severity === "MEDIUM") return "LOW";
+  if (
+    normalizedLine.includes("example") ||
+    normalizedLine.includes("placeholder") ||
+    normalizedLine.includes("mock") ||
+    normalizedLine.includes("fake")
+  ) {
+    if (severity === "CRITICAL") return "MEDIUM";
+    if (severity === "HIGH") return "LOW";
   }
 
   return severity;
@@ -227,20 +238,4 @@ function calculateSecurityGrade(score) {
   if (score >= 40) return "B";
   if (score >= 20) return "A";
   return "A+";
-}
-
-function isLikelyTestOrDependencyFile(fileName = "") {
-  return (
-    fileName.includes("/test/") ||
-    fileName.includes("/tests/") ||
-    fileName.includes("__tests__") ||
-    fileName.includes("/mock/") ||
-    fileName.includes("/mocks/") ||
-    fileName.includes("/example/") ||
-    fileName.includes("/examples/") ||
-    fileName.includes("/demo/") ||
-    fileName.includes("/demos/") ||
-    fileName.includes("/lib/") ||
-    fileName.includes("/vendor/")
-  );
 }
