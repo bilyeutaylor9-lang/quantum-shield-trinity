@@ -1,5 +1,6 @@
 import { fileScanner } from "./scanners/fileScanner.js";
 import { repositoryScannerEngine } from "./engines/repositoryScannerEngine.js";
+import { dependencyIntelligenceEngine } from "./engines/dependencyIntelligenceEngine.js";
 import { summaryFormatter } from "./utils/summaryFormatter.js";
 import { markdownReportGenerator } from "./reporters/markdownReportGenerator.js";
 
@@ -14,6 +15,10 @@ const scanResult = fileScanner(targetDirectory);
 
 const report = repositoryScannerEngine(scanResult.files);
 
+const dependencyReport = dependencyIntelligenceEngine(scanResult.files);
+
+report.dependencyReport = dependencyReport;
+
 const summary = summaryFormatter(report);
 
 const markdownReport = markdownReportGenerator(report);
@@ -27,6 +32,27 @@ console.log(`Critical Findings: ${summary.criticalFindings}`);
 console.log(`High Findings: ${summary.highFindings}`);
 console.log(`Medium Findings: ${summary.mediumFindings}`);
 console.log("");
+
+console.log("Dependency Intelligence");
+console.log("-----------------------");
+console.log(`Dependency Risk Level: ${dependencyReport.dependencyRiskLevel}`);
+console.log(`Dependency Files Scanned: ${dependencyReport.scannedDependencyFiles}`);
+console.log(`High Risk Dependencies: ${dependencyReport.highRiskDependencies}`);
+console.log(`Medium Risk Dependencies: ${dependencyReport.mediumRiskDependencies}`);
+console.log("");
+
+if (dependencyReport.dependencyFindings.length > 0) {
+  console.log("Dependency Findings");
+  console.log("-------------------");
+
+  dependencyReport.dependencyFindings.slice(0, 10).forEach((item, index) => {
+    console.log(`${index + 1}. ${item.dependency} (${item.severity})`);
+    console.log(`   File: ${item.file}`);
+    console.log(`   Risk: ${item.risk}`);
+    console.log(`   Recommendation: ${item.recommendation}`);
+    console.log("");
+  });
+}
 
 if (summary.topRecommendations.length > 0) {
   console.log("Top Recommendations");
