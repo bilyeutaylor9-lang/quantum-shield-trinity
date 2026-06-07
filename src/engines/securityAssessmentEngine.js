@@ -1,22 +1,29 @@
+import { getRiskLevel } from "../models/riskLevels.js";
+
 export function securityAssessmentEngine({
   walletReport = {},
   inventoryReport = {},
-  migrationReport = {}
+  migrationReport = {},
+  forecastReport = {}
 }) {
+  const walletScore = walletReport.score ?? 0;
+  const inventoryScore = inventoryReport.score ?? 0;
+  const forecastScore = forecastReport.score ?? 0;
+
   const totalScore = Math.min(
     100,
-    (walletReport.score ?? 0) + (inventoryReport.score ?? 0)
+    Math.round((walletScore + inventoryScore + forecastScore) / 3)
   );
 
   const criticalFindings = [];
 
-  if ((walletReport.score ?? 0) > 75) {
-    criticalFindings.push("High wallet exposure risk detected.");
+  if (walletScore >= 70) {
+    criticalFindings.push("Elevated wallet exposure detected.");
   }
 
   if ((inventoryReport.findings ?? 0) > 0) {
     criticalFindings.push(
-      `${inventoryReport.findings} cryptographic risk finding(s) detected.`
+      `${inventoryReport.findings} cryptographic finding(s) detected.`
     );
   }
 
@@ -24,35 +31,32 @@ export function securityAssessmentEngine({
     criticalFindings.push("Migration readiness gaps detected.");
   }
 
-  const priorityLevel =
-    totalScore > 80
-      ? "CRITICAL"
-      : totalScore > 60
-      ? "HIGH"
-      : totalScore > 30
-      ? "MEDIUM"
-      : "LOW";
+  if (forecastReport.qDayExposure === "HIGH") {
+    criticalFindings.push("High Q-Day exposure forecast detected.");
+  }
+
+  const riskLevel = getRiskLevel(totalScore);
 
   return {
     engine: "Security Assessment Engine",
-    institutionalReport: true,
+    reportType: "Institutional Quantum Risk Assessment",
     totalScore,
-    priorityLevel,
+    riskLevel,
     criticalFindings,
     executiveSummary:
-      priorityLevel === "CRITICAL"
-        ? "Immediate security review recommended. Quantum-related exposure and migration gaps are present."
-        : priorityLevel === "HIGH"
-        ? "Elevated risk detected. Security teams should prioritize remediation planning."
-        : priorityLevel === "MEDIUM"
-        ? "Moderate risk detected. Continue monitoring and migration preparation."
-        : "Lower current exposure. Maintain crypto-agility and periodic reviews.",
+      riskLevel === "CRITICAL"
+        ? "Critical quantum-related exposure detected. Immediate remediation planning is recommended."
+        : riskLevel === "HIGH"
+        ? "High quantum-related exposure detected. Security teams should prioritize remediation."
+        : riskLevel === "MEDIUM"
+        ? "Moderate quantum-related exposure detected. Continue monitoring and migration preparation."
+        : "Lower current quantum-related exposure detected. Maintain crypto-agility and periodic review.",
     recommendedNextSteps: [
       "Review wallet exposure and signing activity.",
       "Inventory cryptographic dependencies.",
       "Prioritize vulnerable algorithms for migration.",
       "Create a crypto-agility roadmap.",
-      "Schedule recurring security assessments."
+      "Schedule recurring quantum risk assessments."
     ]
   };
 }
