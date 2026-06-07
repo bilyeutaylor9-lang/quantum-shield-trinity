@@ -1,6 +1,7 @@
 import { fileScanner } from "./scanners/fileScanner.js";
 import { repositoryScannerEngine } from "./engines/repositoryScannerEngine.js";
 import { dependencyIntelligenceEngine } from "./engines/dependencyIntelligenceEngine.js";
+import { attackSurfaceEngine } from "./engines/attackSurfaceEngine.js";
 import { summaryFormatter } from "./utils/summaryFormatter.js";
 import { markdownReportGenerator } from "./reporters/markdownReportGenerator.js";
 
@@ -16,8 +17,10 @@ const scanResult = fileScanner(targetDirectory);
 const report = repositoryScannerEngine(scanResult.files);
 
 const dependencyReport = dependencyIntelligenceEngine(scanResult.files);
+const attackSurfaceReport = attackSurfaceEngine(scanResult.files);
 
 report.dependencyReport = dependencyReport;
+report.attackSurfaceReport = attackSurfaceReport;
 
 const summary = summaryFormatter(report);
 
@@ -40,6 +43,29 @@ console.log(`Dependency Files Scanned: ${dependencyReport.scannedDependencyFiles
 console.log(`High Risk Dependencies: ${dependencyReport.highRiskDependencies}`);
 console.log(`Medium Risk Dependencies: ${dependencyReport.mediumRiskDependencies}`);
 console.log("");
+
+console.log("Attack Surface Intelligence");
+console.log("---------------------------");
+console.log(`Attack Surface Risk Level: ${attackSurfaceReport.attackSurfaceRiskLevel}`);
+console.log(`Attack Surface Score: ${attackSurfaceReport.attackSurfaceScore}/100`);
+console.log(`Total Attack Findings: ${attackSurfaceReport.totalAttackFindings}`);
+console.log(`Critical Attack Paths: ${attackSurfaceReport.criticalAttackPaths}`);
+console.log(`High Attack Paths: ${attackSurfaceReport.highAttackPaths}`);
+console.log(`Medium Attack Paths: ${attackSurfaceReport.mediumAttackPaths}`);
+console.log("");
+
+if (attackSurfaceReport.attackFindings.length > 0) {
+  console.log("Top Attack Surface Findings");
+  console.log("---------------------------");
+
+  attackSurfaceReport.attackFindings.slice(0, 10).forEach((item, index) => {
+    console.log(`${index + 1}. ${item.type} (${item.severity})`);
+    console.log(`   File: ${item.file}`);
+    console.log(`   Line: ${item.line}`);
+    console.log(`   Recommendation: ${item.recommendation}`);
+    console.log("");
+  });
+}
 
 if (dependencyReport.dependencyFindings.length > 0) {
   console.log("Dependency Findings");
