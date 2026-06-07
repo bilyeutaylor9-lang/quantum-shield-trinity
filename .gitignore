@@ -1,0 +1,7 @@
+node_modules/
+.env
+.env.*
+report.txt
+report.json
+quantum-shield-report.md
+.DS_Store
