@@ -1,79 +1,27 @@
+import { QUANTUM_RULES } from "../data/quantumRules.js";
+
 export function repositoryScannerEngine(files = []) {
   const findings = [];
-
-  const patterns = [
-    {
-      type: "RSA",
-      regex: /\bRSA\b/g,
-      severity: "HIGH"
-    },
-    {
-      type: "ECDSA",
-      regex: /\bECDSA\b/g,
-      severity: "HIGH"
-    },
-    {
-      type: "ECDH",
-      regex: /\bECDH\b/g,
-      severity: "HIGH"
-    },
-    {
-      type: "SHA1",
-      regex: /\bSHA1\b/g,
-      severity: "MEDIUM"
-    },
-    {
-      type: "Private Key",
-      regex: /PRIVATE KEY/g,
-      severity: "CRITICAL"
-    },
-    {
-      type: "Private Key Block",
-      regex: /BEGIN.*PRIVATE KEY/g,
-      severity: "CRITICAL"
-    },
-    {
-      type: "OpenAI Key",
-      regex: /sk-[A-Za-z0-9]{20,}/g,
-      severity: "CRITICAL"
-    },
-    {
-      type: "AWS Access Key",
-      regex: /AKIA[0-9A-Z]{16}/g,
-      severity: "CRITICAL"
-    },
-    {
-      type: "GitHub Token",
-      regex: /ghp_[A-Za-z0-9]{20,}/g,
-      severity: "CRITICAL"
-    },
-    {
-      type: "API Key",
-      regex: /api[_-]?key/gi,
-      severity: "HIGH"
-    },
-    {
-      type: "JWT Secret",
-      regex: /jwt.*secret/gi,
-      severity: "HIGH"
-    }
-  ];
 
   for (const file of files) {
     const fileName = file.name ?? "Unknown File";
     const content = file.content ?? "";
     const lines = content.split("\n");
 
-    for (const pattern of patterns) {
+    for (const rule of QUANTUM_RULES) {
       lines.forEach((line, index) => {
-        const matches = line.match(pattern.regex);
+        const matches = line.match(rule.regex);
 
         if (matches) {
           findings.push({
             file: fileName,
             line: index + 1,
-            type: pattern.type,
-            severity: pattern.severity,
+            ruleId: rule.id,
+            type: rule.type,
+            severity: rule.severity,
+            category: rule.category,
+            description: rule.description,
+            recommendation: rule.recommendation,
             occurrences: matches.length
           });
         }
@@ -102,6 +50,7 @@ export function repositoryScannerEngine(files = []) {
 
   return {
     engine: "Repository Scanner Engine",
+    rulesUsed: QUANTUM_RULES.length,
     scannedFiles: files.length,
     findings,
     criticalFindings,
