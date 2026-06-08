@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   actions: read
   security-events: write
 
@@ -32,6 +32,21 @@ jobs:
 
       - name: Run Quantum Shield Trinity scan
         run: npm run scan -- . > quantum-shield-report.txt
+
+      - name: Publish latest HTML report to docs
+        if: github.event_name != 'pull_request'
+        run: |
+          mkdir -p docs/results
+          cp report.html docs/results/index.html
+
+      - name: Commit latest public report
+        if: github.event_name != 'pull_request'
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add docs/results/index.html
+          git commit -m "Publish latest scan report" || echo "No report changes to commit"
+          git push
 
       - name: Upload scan artifacts
         uses: actions/upload-artifact@v4
