@@ -9,6 +9,7 @@ import { remediationEngine } from "./engines/remediationEngine.js";
 import { quantumReadinessEngine } from "./engines/quantumReadinessEngine.js";
 import { autoFixEngine } from "./engines/autoFixEngine.js";
 import { attackPathGeneratorEngine } from "./engines/attackPathGeneratorEngine.js";
+import { complianceMappingEngine } from "./engines/complianceMappingEngine.js";
 import { htmlReportGenerator } from "./reporters/htmlReportGenerator.js";
 import { sarifReportGenerator } from "./reporters/sarifReportGenerator.js";
 import { summaryFormatter } from "./utils/summaryFormatter.js";
@@ -58,6 +59,9 @@ report.autoFixReport = autoFixReport;
 const attackPathReport = attackPathGeneratorEngine(report);
 report.attackPathReport = attackPathReport;
 
+const complianceMappingReport = complianceMappingEngine(report);
+report.complianceMappingReport = complianceMappingReport;
+
 const summary = summaryFormatter(report);
 
 const markdownReport = markdownReportGenerator(report);
@@ -72,7 +76,7 @@ const htmlReport = htmlReportGenerator({
 
 const sarifReport = sarifReportGenerator({
   ...report,
-  version: "1.7.0"
+  version: "1.8.0"
 });
 
 fs.writeFileSync("report.json", JSON.stringify(report, null, 2), "utf8");
@@ -82,14 +86,15 @@ fs.writeFileSync(
   JSON.stringify(
     {
       platform: "Quantum Shield Trinity",
-      version: "1.7.0",
+      version: "1.8.0",
       summary,
       markdownReport,
       securityScoreReport,
       remediationReport,
       quantumReadinessReport,
       autoFixReport,
-      attackPathReport
+      attackPathReport,
+      complianceMappingReport
     },
     null,
     2
@@ -211,6 +216,20 @@ attackPathReport.attackPaths.slice(0, 5).forEach((item, index) => {
   console.log(`   Impact: ${item.potentialImpact}`);
   console.log(`   Likelihood: ${item.likelihood}`);
   console.log(`   Defense: ${item.recommendedDefense}`);
+  console.log("");
+});
+
+console.log("CWE / OWASP Mapping");
+console.log("-------------------");
+console.log(`Mapped Findings: ${complianceMappingReport.totalMappedFindings}`);
+console.log("");
+
+complianceMappingReport.mappedFindings.slice(0, 5).forEach((item, index) => {
+  console.log(`${index + 1}. ${item.type} (${item.severity})`);
+  console.log(`   CWE: ${item.cwe}`);
+  console.log(`   OWASP Smart Contract: ${item.owaspSmartContractTop10}`);
+  console.log(`   OWASP Web: ${item.owaspWebTop10}`);
+  console.log(`   Control: ${item.recommendedControl}`);
   console.log("");
 });
 
