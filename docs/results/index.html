@@ -36,11 +36,13 @@
       gap: 16px;
       margin-bottom: 24px;
     }
-    .card {
+    .card,
+    .section {
       background: #111827;
       border: 1px solid #334155;
       border-radius: 16px;
-      padding: 20px;
+      padding: 22px;
+      margin-bottom: 20px;
     }
     .label {
       color: #94a3b8;
@@ -57,25 +59,12 @@
     .risk-medium { color: #f59e0b; }
     .risk-high { color: #fb7185; }
     .risk-critical { color: #ef4444; }
-    .section {
-      background: #111827;
-      border: 1px solid #334155;
-      border-radius: 16px;
-      padding: 22px;
-      margin-bottom: 20px;
-    }
     h2 {
       margin-top: 0;
       color: #f8fafc;
     }
-    pre {
-      white-space: pre-wrap;
-      background: #020617;
-      border: 1px solid #1e293b;
-      border-radius: 12px;
-      padding: 16px;
-      overflow-x: auto;
-      color: #cbd5e1;
+    h3 {
+      color: #93c5fd;
     }
     table {
       width: 100%;
@@ -91,6 +80,16 @@
     th {
       color: #93c5fd;
     }
+    .button {
+      display: inline-block;
+      padding: 14px 20px;
+      background: #2563eb;
+      color: #ffffff;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: bold;
+      margin-top: 12px;
+    }
     .footer {
       color: #64748b;
       font-size: 13px;
@@ -99,11 +98,14 @@
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <div class="header">
       <h1>Quantum Shield Trinity</h1>
-      <div class="subtitle">Executive security, quantum exposure, wallet, dependency, and migration risk report.</div>
+      <div class="subtitle">
+        Security intelligence for smart contracts, dependencies, attack surfaces, and quantum exposure.
+      </div>
     </div>
 
     <div class="grid">
@@ -111,14 +113,17 @@
         <div class="label">Security Score</div>
         <div class="value">0/100</div>
       </div>
+
       <div class="card">
         <div class="label">Risk Level</div>
         <div class="value risk-critical">CRITICAL</div>
       </div>
+
       <div class="card">
         <div class="label">Grade</div>
         <div class="value">F</div>
       </div>
+
       <div class="card">
         <div class="label">Version</div>
         <div class="value">N/A</div>
@@ -126,73 +131,160 @@
     </div>
 
     <div class="section">
-      <h2>Top Priority</h2>
+      <h2>Executive Summary</h2>
+
+      <table>
+        <tr>
+          <th>Metric</th>
+          <th>Result</th>
+        </tr>
+        <tr>
+          <td>Files Scanned</td>
+          <td>45</td>
+        </tr>
+        <tr>
+          <td>Critical Findings</td>
+          <td class="risk-critical">48</td>
+        </tr>
+        <tr>
+          <td>High Findings</td>
+          <td class="risk-high">194</td>
+        </tr>
+        <tr>
+          <td>Medium Findings</td>
+          <td class="risk-medium">84</td>
+        </tr>
+        <tr>
+          <td>Low Findings</td>
+          <td class="risk-low">0</td>
+        </tr>
+      </table>
+
+      <h3>Top Priority</h3>
       <p>Immediately address critical findings before deployment.</p>
     </div>
 
     <div class="section">
-      <h2>Executive Summary</h2>
-      <pre>{
-  &quot;summary&quot;: {
-    &quot;title&quot;: &quot;Quantum Shield Trinity Scan Summary&quot;,
-    &quot;repositoryRiskLevel&quot;: &quot;CRITICAL&quot;,
-    &quot;score&quot;: 0,
-    &quot;grade&quot;: &quot;F&quot;,
-    &quot;scannedFiles&quot;: 45,
-    &quot;criticalFindings&quot;: 48,
-    &quot;highFindings&quot;: 194,
-    &quot;mediumFindings&quot;: 84,
-    &quot;lowFindings&quot;: 0,
-    &quot;topPriority&quot;: &quot;Immediately address critical findings before deployment.&quot;,
-    &quot;topRecommendations&quot;: [
-      {
-        &quot;file&quot;: &quot;src/data/quantumRules.js&quot;,
-        &quot;line&quot;: 3,
-        &quot;type&quot;: &quot;RSA&quot;,
-        &quot;severity&quot;: &quot;HIGH&quot;,
-        &quot;recommendation&quot;: &quot;Inventory all RSA usage and determine whether it is used for encryption, signing, TLS, or certificates.&quot;,
-        &quot;migrationPath&quot;: &quot;RSA → ML-KEM for key establishment, ML-DSA or SLH-DSA for signatures&quot;
-      },
-      {
-        &quot;file&quot;: &quot;src/data/quantumRules.js&quot;,
-        &quot;line&quot;: 4,
-        &quot;type&quot;: &quot;RSA&quot;,
-        &quot;severity&quot;: &quot;HIGH&quot;,
-        &quot;recommendation&quot;: &quot;Inventory all RSA usage and determine whether it is used for encryption, signing, TLS, or certificates.&quot;,
-        &quot;migrationPath&quot;: &quot;RSA → ML-KEM for key establishment, ML-DSA or SLH-DSA for signatures&quot;
-      },
-      {
-        &quot;file&quot;: &quot;src/data/quantumRules.js&quot;,
-        &quot;line&quot;: 5,
-        &quot;type&quot;: &quot;RSA&quot;,
-        &quot;severity&quot;: &quot;HIGH&quot;,
-        &quot;recommendation&quot;: &quot;Inventory all RSA usage and determine whether it is used for encryption, signing, TLS, or certificates.&quot;,
-        &quot;migrationPath&quot;: &quot;RSA → ML-KEM for key establishment, ML-DSA or SLH-DSA for signatures&quot;
-      },
-      {
-        &quot;file&quot;: &quot;src/data/quantumRules.js&quot;,
-        &quot;line&quot;: 8,
-        &quot;type&quot;: &quot;RSA&quot;,
-        &quot;severity&quot;: &quot;HIGH&quot;,
-        &quot;recommendation&quot;: &quot;Inventory all RSA usage and determine whether it is used for encryption, signing, TLS, or certificates.&quot;,
-        &quot;migrationPath&quot;: &quot;RSA → ML-KEM for key establishment, ML-DSA or SLH-DSA for signatures&quot;
-      },
-      {
-        &quot;file&quot;: &quot;src/data/quantumRules.js&quot;,
-        &quot;line&quot;: 9,
-        &quot;type&quot;: &quot;RSA&quot;,
-        &quot;severity&quot;: &quot;HIGH&quot;,
-        &quot;recommendation&quot;: &quot;Inventory all RSA usage and determine whether it is used for encryption, signing, TLS, or certificates.&quot;,
-        &quot;migrationPath&quot;: &quot;RSA → ML-KEM for key establishment, ML-DSA or SLH-DSA for signatures&quot;
-      }
-    ]
-  },
-  &quot;markdownReport&quot;: {
-    &quot;reporter&quot;: &quot;Markdown Report Generator&quot;,
-    &quot;outputPath&quot;: &quot;quantum-shield-report.md&quot;,
-    &quot;generatedAt&quot;: &quot;2026-06-08T01:32:07.159Z&quot;
-  }
-}</pre>
+      <h2>Smart Contract Audit</h2>
+      <table>
+    <thead>
+      <tr>
+        <th>Severity</th>
+        <th>Finding</th>
+        <th>File</th>
+        <th>Line</th>
+        <th>Recommendation</th>
+      </tr>
+    </thead>
+    <tbody><tr>
+        <td>CRITICAL</td>
+        <td>Reentrancy Risk</td>
+        <td>examples/vulnerable-contract.sol</td>
+        <td>19</td>
+        <td>Review external calls for reentrancy. Apply checks-effects-interactions and consider ReentrancyGuard.</td>
+      </tr><tr>
+        <td>HIGH</td>
+        <td>Unchecked External Call</td>
+        <td>examples/vulnerable-contract.sol</td>
+        <td>19</td>
+        <td>Validate call success values and protect external calls against reentrancy.</td>
+      </tr><tr>
+        <td>CRITICAL</td>
+        <td>tx.origin Authorization</td>
+        <td>examples/vulnerable-contract.sol</td>
+        <td>9</td>
+        <td>Do not use tx.origin for authorization. Use msg.sender with proper access control.</td>
+      </tr><tr>
+        <td>CRITICAL</td>
+        <td>tx.origin Authorization</td>
+        <td>examples/vulnerable-contract.sol</td>
+        <td>26</td>
+        <td>Do not use tx.origin for authorization. Use msg.sender with proper access control.</td>
+      </tr><tr>
+        <td>CRITICAL</td>
+        <td>Delegatecall Usage</td>
+        <td>examples/vulnerable-contract.sol</td>
+        <td>32</td>
+        <td>Review delegatecall carefully. Ensure target contracts are trusted and upgrade paths are access-controlled.</td>
+      </tr><tr>
+        <td>CRITICAL</td>
+        <td>Selfdestruct Usage</td>
+        <td>examples/vulnerable-contract.sol</td>
+        <td>27</td>
+        <td>Avoid selfdestruct unless required. Restrict with strict access control and document the risk.</td>
+      </tr><tr>
+        <td>MEDIUM</td>
+        <td>Missing Access Control Review</td>
+        <td>examples/vulnerable-contract.sol</td>
+        <td>12</td>
+        <td>Review public/external functions for required access control, input validation, and rate limits.</td>
+      </tr><tr>
+        <td>MEDIUM</td>
+        <td>Missing Access Control Review</td>
+        <td>examples/vulnerable-contract.sol</td>
+        <td>16</td>
+        <td>Review public/external functions for required access control, input validation, and rate limits.</td>
+      </tr><tr>
+        <td>MEDIUM</td>
+        <td>Missing Access Control Review</td>
+        <td>examples/vulnerable-contract.sol</td>
+        <td>25</td>
+        <td>Review public/external functions for required access control, input validation, and rate limits.</td>
+      </tr><tr>
+        <td>MEDIUM</td>
+        <td>Missing Access Control Review</td>
+        <td>examples/vulnerable-contract.sol</td>
+        <td>30</td>
+        <td>Review public/external functions for required access control, input validation, and rate limits.</td>
+      </tr></tbody>
+  </table>
+    </div>
+
+    <div class="section">
+      <h2>Attack Surface Intelligence</h2>
+      <table>
+    <tbody><tr>
+        <td>Risk Level</td>
+        <td>CRITICAL</td>
+      </tr><tr>
+        <td>Attack Surface Score</td>
+        <td>100/100</td>
+      </tr><tr>
+        <td>Total Attack Findings</td>
+        <td>49</td>
+      </tr><tr>
+        <td>Critical Attack Paths</td>
+        <td>6</td>
+      </tr><tr>
+        <td>High Attack Paths</td>
+        <td>33</td>
+      </tr><tr>
+        <td>Medium Attack Paths</td>
+        <td>10</td>
+      </tr></tbody>
+  </table>
+    </div>
+
+    <div class="section">
+      <h2>Exploit Simulation</h2>
+      <table>
+    <tbody><tr>
+        <td>Simulation Risk Level</td>
+        <td>CRITICAL</td>
+      </tr><tr>
+        <td>Simulation Score</td>
+        <td>100/100</td>
+      </tr><tr>
+        <td>Total Simulations</td>
+        <td>4</td>
+      </tr><tr>
+        <td>Critical Simulations</td>
+        <td>1</td>
+      </tr><tr>
+        <td>High Simulations</td>
+        <td>3</td>
+      </tr></tbody>
+  </table>
     </div>
 
     <div class="section">
@@ -201,18 +293,102 @@
     </div>
 
     <div class="section">
-      <h2>Security Assessment</h2>
-      <pre>{}</pre>
+      <h2>Quantum / Crypto Inventory</h2>
+      <table>
+    <tbody><tr>
+        <td>Inventory Risk</td>
+        <td>N/A</td>
+      </tr><tr>
+        <td>Detected Items</td>
+        <td>0</td>
+      </tr><tr>
+        <td>Quantum Exposure</td>
+        <td>Review Required</td>
+      </tr></tbody>
+  </table>
     </div>
 
     <div class="section">
-      <h2>Wallet Risk</h2>
-      <pre>{}</pre>
-    </div>
+      <h2>Unlock the Full Quantum Shield Trinity Report</h2>
 
-    <div class="section">
-      <h2>Crypto Inventory</h2>
-      <pre>{}</pre>
+      <p>
+        The public dashboard only displays a limited security summary.
+        Upgrade to access the complete security intelligence package.
+      </p>
+
+      <table>
+        <tr>
+          <th>Feature</th>
+          <th>Public</th>
+          <th>Premium</th>
+        </tr>
+        <tr>
+          <td>Security Score</td>
+          <td>✓</td>
+          <td>✓</td>
+        </tr>
+        <tr>
+          <td>Risk Level</td>
+          <td>✓</td>
+          <td>✓</td>
+        </tr>
+        <tr>
+          <td>Top Findings</td>
+          <td>✓</td>
+          <td>✓</td>
+        </tr>
+        <tr>
+          <td>Full HTML Report</td>
+          <td>✗</td>
+          <td>✓</td>
+        </tr>
+        <tr>
+          <td>SARIF Export</td>
+          <td>✗</td>
+          <td>✓</td>
+        </tr>
+        <tr>
+          <td>Executive Report</td>
+          <td>✗</td>
+          <td>✓</td>
+        </tr>
+        <tr>
+          <td>Exploit Simulation Analysis</td>
+          <td>✗</td>
+          <td>✓</td>
+        </tr>
+        <tr>
+          <td>Dependency Intelligence</td>
+          <td>✗</td>
+          <td>✓</td>
+        </tr>
+        <tr>
+          <td>Quantum Migration Guidance</td>
+          <td>✗</td>
+          <td>✓</td>
+        </tr>
+        <tr>
+          <td>AI Remediation Recommendations</td>
+          <td>✗</td>
+          <td>✓</td>
+        </tr>
+      </table>
+
+      <h3>Professional Security Analysis</h3>
+
+      <p>
+        Receive a complete security assessment including remediation guidance,
+        attack-path analysis, smart contract findings, dependency risk analysis,
+        quantum readiness evaluation, SARIF exports, and executive-ready reporting.
+      </p>
+
+      <p><strong>Coming Soon</strong></p>
+
+      <p>Premium Reports • Enterprise Audits • Security Consulting</p>
+
+      <a class="button" href="https://github.com/bilyeutaylor9-lang/quantum-shield-trinity">
+        View Quantum Shield Trinity on GitHub
+      </a>
     </div>
 
     <div class="footer">
