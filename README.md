@@ -8,7 +8,7 @@
 
 View public demo scan results:
 
-https://bilyeutaylor9-lang.github.io/quantum-shield-trinity/scans/
+https://bilyeutaylor9-lang.github.io/quantum-shield-trinity/results
 ## Public Demo Results
 
 View example scan results here:
