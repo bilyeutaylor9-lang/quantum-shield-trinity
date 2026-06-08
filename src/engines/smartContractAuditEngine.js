@@ -15,6 +15,14 @@ export function smartContractAuditEngine(files = []) {
         "Review external calls for reentrancy. Apply checks-effects-interactions and consider ReentrancyGuard."
     },
     {
+      type: "Unchecked External Call",
+      regex: /\.call\s*\{/g,
+      severity: "HIGH",
+      category: "External Call Risk",
+      recommendation:
+        "Validate call success values and protect external calls against reentrancy."
+    },
+    {
       type: "tx.origin Authorization",
       regex: /\btx\.origin\b/g,
       severity: "HIGH",
@@ -39,40 +47,32 @@ export function smartContractAuditEngine(files = []) {
         "Avoid selfdestruct unless required. Restrict with strict access control and document the risk."
     },
     {
-      type: "Unchecked External Call",
-      regex: /\.call\s*\{/g,
-      severity: "HIGH",
-      category: "External Call Risk",
-      recommendation:
-        "Validate call success values and protect external calls against reentrancy."
-    },
-    {
-      type: "Missing Access Control Signal",
-      regex: /\bfunction\s+\w+\s*\([^)]*\)\s*(public|external)/g,
-      severity: "INFO",
+      type: "Missing Access Control Review",
+      regex: /\bfunction\s+\w+\s*\([^)]*\)\s*(public|external)(?![^;{]*\bonlyOwner\b)(?![^;{]*\bonlyRole\b)(?![^;{]*\brequiresAuth\b)/g,
+      severity: "MEDIUM",
       category: "Access Control Review",
       recommendation:
-        "Review public/external functions for required access control, validation, and rate limits."
+        "Review public/external functions for required access control, input validation, and rate limits."
     },
     {
       type: "Owner/Admin Control",
       regex: /\bonlyOwner\b|\bDEFAULT_ADMIN_ROLE\b|\bOwnable\b|\bAccessControl\b/g,
-      severity: "INFO",
+      severity: "MEDIUM",
       category: "Centralization Review",
       recommendation:
         "Review admin privileges. Consider multisig, timelock, and least-privilege role design."
     },
     {
       type: "Upgradeable Contract",
-      regex: /\bUUPSUpgradeable\b|\bInitializable\b|\bupgradeTo\b|\bupgradeToAndCall\b|\bTransparentUpgradeableProxy\b|\bimplementation\b|\bproxy\b/g,
-      severity: "MEDIUM",
+      regex: /\bUUPSUpgradeable\b|\bInitializable\b|\binitializer\b|\bupgradeTo\b|\bupgradeToAndCall\b|\bTransparentUpgradeableProxy\b|\bimplementation\b|\bproxy\b/g,
+      severity: "HIGH",
       category: "Upgradeability Risk",
       recommendation:
         "Ensure upgrade authorization, initializer safety, storage layout compatibility, and admin controls."
     },
     {
       type: "Oracle Usage",
-      regex: /\bAggregatorV3Interface\b|\blatestRoundData\b|\bpriceFeed\b|\boracle\b/g,
+      regex: /\bAggregatorV3Interface\b|\blatestRoundData\b|\bpriceFeed\b|\boracle\b|\bTWAP\b|\bgetPrice\b|\bspotPrice\b/g,
       severity: "MEDIUM",
       category: "Oracle Risk",
       recommendation:
@@ -80,7 +80,7 @@ export function smartContractAuditEngine(files = []) {
     },
     {
       type: "Permit Signature Usage",
-      regex: /\bpermit\s*\(|\bEIP712\b|\bDOMAIN_SEPARATOR\b/g,
+      regex: /\bpermit\s*\(|\bEIP712\b|\bDOMAIN_SEPARATOR\b|\becrecover\b|\bsignature\b|\bnonces\b/g,
       severity: "MEDIUM",
       category: "Signature Risk",
       recommendation:
@@ -89,10 +89,66 @@ export function smartContractAuditEngine(files = []) {
     {
       type: "Hardcoded Address",
       regex: /0x[a-fA-F0-9]{40}/g,
-      severity: "INFO",
+      severity: "MEDIUM",
       category: "Configuration Review",
       recommendation:
-        "Verify hardcoded addresses are intentional, documented, and network-specific."
+        "Verify hardcoded addresses are intentional, documented, network-specific, and configurable."
+    },
+    {
+      type: "Unbounded Loop Risk",
+      regex: /\bfor\s*\(|\bwhile\s*\(/g,
+      severity: "MEDIUM",
+      category: "Gas Risk",
+      recommendation:
+        "Review loops for unbounded iteration and gas exhaustion risk."
+    },
+    {
+      type: "Unsafe ERC20 Transfer Pattern",
+      regex: /\.transfer\s*\(|\.transferFrom\s*\(|\.approve\s*\(/g,
+      severity: "MEDIUM",
+      category: "Token Safety Risk",
+      recommendation:
+        "Review ERC20 transfer, transferFrom, and approve calls. Prefer SafeERC20 wrappers where appropriate."
+    },
+    {
+      type: "Timestamp Dependence",
+      regex: /\bblock\.timestamp\b|\bnow\b/g,
+      severity: "MEDIUM",
+      category: "Time Manipulation Risk",
+      recommendation:
+        "Avoid relying on block timestamps for critical randomness, price, or settlement logic."
+    },
+    {
+      type: "Block Number Dependence",
+      regex: /\bblock\.number\b/g,
+      severity: "LOW",
+      category: "Chain Assumption Risk",
+      recommendation:
+        "Review block number assumptions across chains and execution environments."
+    },
+    {
+      type: "Low-Level Assembly",
+      regex: /\bassembly\b/g,
+      severity: "HIGH",
+      category: "Low-Level Code Risk",
+      recommendation:
+        "Review assembly blocks carefully for memory safety, storage slot correctness, and bypassed Solidity checks."
+    },
+    {
+      type: "Randomness Risk",
+      regex: /\bkeccak256\s*\([^)]*(block\.timestamp|block\.number|blockhash|msg\.sender)/g,
+      severity: "HIGH",
+      category: "Randomness Risk",
+      recommendation:
+        "Do not use block variables or msg.sender as secure randomness. Use a verifiable randomness source."
+    },
+    {
+      type: "Legacy Solidity Version",
+      regex: /pragma\s+solidity\s+(\^?0\.[0-7]\.|>=0\.[0-7]\.|<0\.8)/g,
+      severity: "HIGH",
+      category: "Compiler Risk",
+      recommendation:
+        "Review legacy Solidity compiler usage. Consider upgrading to Solidity 0.8+ with modern safety checks."
     }
   ];
 
@@ -118,11 +174,11 @@ export function smartContractAuditEngine(files = []) {
 
     for (const rule of rules) {
       lines.forEach((line, index) => {
-        const matches = line.match(rule.regex);
+        if (isCommentOnlyLine(line)) return;
 
-        if (!matches || isCommentOnlyLine(line)) {
-          return;
-        }
+        const matches = [...line.matchAll(rule.regex)];
+
+        if (matches.length === 0) return;
 
         const smartContractContext = smartContractContextEngine(line, fileName);
         const confidence = calculateAuditConfidence(
@@ -132,14 +188,14 @@ export function smartContractAuditEngine(files = []) {
           smartContractContext
         );
 
-        if (confidence < 40) {
-          return;
-        }
+        if (confidence < 35) return;
 
         const severity = adjustAuditSeverity(
           rule.severity,
           smartContractContext,
-          confidence
+          confidence,
+          line,
+          fileName
         );
 
         auditFindings.push({
@@ -165,20 +221,22 @@ export function smartContractAuditEngine(files = []) {
   const criticalFindings = countSeverity(auditFindings, "CRITICAL");
   const highFindings = countSeverity(auditFindings, "HIGH");
   const mediumFindings = countSeverity(auditFindings, "MEDIUM");
+  const lowFindings = countSeverity(auditFindings, "LOW");
   const infoFindings = countSeverity(auditFindings, "INFO");
 
   const auditRiskScore = Math.min(
     100,
     criticalFindings * 40 +
       highFindings * 15 +
-      mediumFindings * 5
+      mediumFindings * 5 +
+      lowFindings * 1
   );
 
   const auditSecurityScore = Math.max(0, 100 - auditRiskScore);
 
   return {
     engine: "Smart Contract Audit Engine",
-    scannerVersion: "2.0.0",
+    scannerVersion: "2.1.0",
     auditedContracts: files.filter(
       file =>
         classifyFile(file.name ?? "") === "SMART_CONTRACT" &&
@@ -199,8 +257,10 @@ export function smartContractAuditEngine(files = []) {
     criticalFindings,
     highFindings,
     mediumFindings,
+    lowFindings,
     infoFindings,
     totalAuditFindings: auditFindings.length,
+    topAuditFindings: auditFindings.slice(0, 10),
     auditFindings
   };
 }
@@ -209,18 +269,15 @@ function countSeverity(findings = [], severity = "") {
   return findings.filter(finding => finding.severity === severity).length;
 }
 
-function adjustAuditSeverity(severity, smartContractContext = {}, confidence = 50) {
-  if (severity === "INFO") {
-    return "INFO";
-  }
-
-  if (confidence < 50 && severity === "CRITICAL") {
-    return "HIGH";
-  }
-
-  if (confidence < 50 && severity === "HIGH") {
-    return "MEDIUM";
-  }
+function adjustAuditSeverity(
+  severity,
+  smartContractContext = {},
+  confidence = 50,
+  line = "",
+  fileName = ""
+) {
+  const normalizedLine = line.toLowerCase();
+  const normalizedFile = fileName.toLowerCase();
 
   if (smartContractContext.exploitability === "CRITICAL") {
     return "CRITICAL";
@@ -230,26 +287,58 @@ function adjustAuditSeverity(severity, smartContractContext = {}, confidence = 5
     return "HIGH";
   }
 
+  if (
+    severity === "MEDIUM" &&
+    normalizedFile.includes("/legacy/") &&
+    confidence >= 70
+  ) {
+    return "HIGH";
+  }
+
+  if (
+    severity === "MEDIUM" &&
+    normalizedLine.includes("private constant") &&
+    normalizedLine.includes("0x")
+  ) {
+    return "HIGH";
+  }
+
+  if (confidence < 45 && severity === "CRITICAL") {
+    return "HIGH";
+  }
+
+  if (confidence < 45 && severity === "HIGH") {
+    return "MEDIUM";
+  }
+
   return severity;
 }
 
-function calculateAuditConfidence(line = "", fileName = "", rule = {}, smartContractContext = {}) {
+function calculateAuditConfidence(
+  line = "",
+  fileName = "",
+  rule = {},
+  smartContractContext = {}
+) {
   const normalizedLine = line.toLowerCase();
   const normalizedFile = fileName.toLowerCase();
 
-  let confidence = 65;
+  let confidence = 60;
 
-  if (rule.severity === "CRITICAL") confidence += 15;
+  if (rule.severity === "CRITICAL") confidence += 20;
+  if (rule.severity === "HIGH") confidence += 12;
   if (smartContractContext.exploitability === "CRITICAL") confidence += 15;
+  if (smartContractContext.exploitability === "HIGH") confidence += 10;
+  if (smartContractContext.exploitability === "MEDIUM") confidence += 5;
 
   if (
-    normalizedLine.includes("onlyowner") ||
-    normalizedLine.includes("require(") ||
-    normalizedLine.includes("modifier") ||
     normalizedLine.includes("external") ||
-    normalizedLine.includes("public")
+    normalizedLine.includes("public") ||
+    normalizedLine.includes("payable") ||
+    normalizedLine.includes("require(") ||
+    normalizedLine.includes("modifier")
   ) {
-    confidence += 10;
+    confidence += 8;
   }
 
   if (
@@ -257,9 +346,12 @@ function calculateAuditConfidence(line = "", fileName = "", rule = {}, smartCont
     normalizedFile.includes("vault") ||
     normalizedFile.includes("bridge") ||
     normalizedFile.includes("router") ||
-    normalizedFile.includes("wallet")
+    normalizedFile.includes("wallet") ||
+    normalizedFile.includes("oracle") ||
+    normalizedFile.includes("swap") ||
+    normalizedFile.includes("uniswap")
   ) {
-    confidence += 10;
+    confidence += 12;
   }
 
   if (
@@ -268,7 +360,7 @@ function calculateAuditConfidence(line = "", fileName = "", rule = {}, smartCont
     normalizedLine.includes("example") ||
     normalizedLine.includes("todo")
   ) {
-    confidence -= 25;
+    confidence -= 20;
   }
 
   return Math.max(5, Math.min(100, confidence));
