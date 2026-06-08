@@ -1,219 +1,52 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Quantum Shield Trinity Report</title>
+  <meta charset="UTF-8">
+  <title>Quantum Shield Trinity Public Results</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: #e5e7eb;
-      margin: 0;
-      padding: 32px;
-    }
-    .container {
-      max-width: 1100px;
-      margin: auto;
-    }
-    .header {
-      padding: 28px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, #1e293b, #111827);
-      border: 1px solid #334155;
-      margin-bottom: 24px;
-    }
-    h1 {
-      margin: 0 0 8px;
-      font-size: 34px;
-    }
-    .subtitle {
-      color: #94a3b8;
-      font-size: 16px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-    .card {
-      background: #111827;
-      border: 1px solid #334155;
-      border-radius: 16px;
-      padding: 20px;
-    }
-    .label {
-      color: #94a3b8;
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-    }
-    .value {
-      font-size: 30px;
-      font-weight: bold;
-      margin-top: 8px;
-    }
-    .risk-low { color: #22c55e; }
-    .risk-medium { color: #f59e0b; }
-    .risk-high { color: #fb7185; }
-    .risk-critical { color: #ef4444; }
-    .section {
-      background: #111827;
-      border: 1px solid #334155;
-      border-radius: 16px;
-      padding: 22px;
-      margin-bottom: 20px;
-    }
-    h2 {
-      margin-top: 0;
-      color: #f8fafc;
-    }
-    pre {
-      white-space: pre-wrap;
-      background: #020617;
-      border: 1px solid #1e293b;
-      border-radius: 12px;
-      padding: 16px;
-      overflow-x: auto;
-      color: #cbd5e1;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 12px;
-    }
-    th, td {
-      border-bottom: 1px solid #334155;
-      padding: 10px;
-      text-align: left;
-      vertical-align: top;
-    }
-    th {
-      color: #93c5fd;
-    }
-    .footer {
-      color: #64748b;
-      font-size: 13px;
-      margin-top: 24px;
-      text-align: center;
-    }
+    body { background:#0f172a; color:#e5e7eb; font-family:Arial,sans-serif; padding:32px; }
+    .container { max-width:1100px; margin:auto; }
+    .card { background:#111827; border:1px solid #334155; border-radius:16px; padding:22px; margin-bottom:20px; }
+    h1 { color:#60a5fa; margin-bottom:6px; }
+    .score { font-size:44px; font-weight:bold; color:#22c55e; }
+    .locked { color:#f59e0b; font-weight:bold; }
+    .button { display:inline-block; padding:14px 20px; background:#2563eb; color:white; text-decoration:none; border-radius:10px; font-weight:bold; }
+    table { width:100%; border-collapse:collapse; margin-top:10px; }
+    th,td { border-bottom:1px solid #334155; padding:10px; text-align:left; }
+    th { color:#93c5fd; }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="header">
+    <div class="card">
       <h1>Quantum Shield Trinity</h1>
-      <div class="subtitle">Executive security, quantum exposure, wallet, dependency, and migration risk report.</div>
+      <p>Public security scan summary. Full reports are available with the paid version.</p>
     </div>
 
-    <div class="grid">
-      <div class="card">
-        <div class="label">Security Score</div>
-        <div class="value">100/100</div>
-      </div>
-      <div class="card">
-        <div class="label">Risk Level</div>
-        <div class="value risk-low">LOW</div>
-      </div>
-      <div class="card">
-        <div class="label">Grade</div>
-        <div class="value">A+</div>
-      </div>
-      <div class="card">
-        <div class="label">Version</div>
-        <div class="value">N/A</div>
-      </div>
+    <div class="card">
+      <h2>Latest Public Scan</h2>
+      <div class="score">100 / 100</div>
+      <p><strong>Risk Level:</strong> LOW</p>
+      <p><strong>Public Summary:</strong> No critical public issues shown in this demo view.</p>
     </div>
 
-    <div class="section">
-      <h2>Top Priority</h2>
-      <p>Maintain current security posture and continue monitoring.</p>
+    <div class="card">
+      <h2>Public Results</h2>
+      <table>
+        <tr><th>Category</th><th>Public Status</th></tr>
+        <tr><td>Dependency Risk</td><td>Summary Available</td></tr>
+        <tr><td>Smart Contract Risk</td><td>Summary Available</td></tr>
+        <tr><td>Quantum Exposure</td><td>Summary Available</td></tr>
+        <tr><td>Full Remediation Report</td><td class="locked">Locked</td></tr>
+        <tr><td>SARIF Export</td><td class="locked">Locked</td></tr>
+        <tr><td>Executive HTML Report</td><td class="locked">Locked</td></tr>
+      </table>
     </div>
 
-    <div class="section">
-      <h2>Executive Summary</h2>
-      <pre>{
-  &quot;summary&quot;: {
-    &quot;title&quot;: &quot;Quantum Shield Trinity Scan Summary&quot;,
-    &quot;repositoryRiskLevel&quot;: &quot;CRITICAL&quot;,
-    &quot;score&quot;: 100,
-    &quot;scannedFiles&quot;: 45,
-    &quot;criticalFindings&quot;: 12,
-    &quot;highFindings&quot;: 60,
-    &quot;mediumFindings&quot;: 28,
-    &quot;topRecommendations&quot;: [
-      {
-        &quot;file&quot;: &quot;src/data/quantumRules.js&quot;,
-        &quot;line&quot;: 3,
-        &quot;type&quot;: &quot;RSA&quot;,
-        &quot;severity&quot;: &quot;HIGH&quot;,
-        &quot;recommendation&quot;: &quot;Inventory all RSA usage and determine whether it is used for encryption, signing, TLS, or certificates.&quot;,
-        &quot;migrationPath&quot;: &quot;RSA → ML-KEM for key establishment, ML-DSA or SLH-DSA for signatures&quot;
-      },
-      {
-        &quot;file&quot;: &quot;src/data/quantumRules.js&quot;,
-        &quot;line&quot;: 4,
-        &quot;type&quot;: &quot;RSA&quot;,
-        &quot;severity&quot;: &quot;HIGH&quot;,
-        &quot;recommendation&quot;: &quot;Inventory all RSA usage and determine whether it is used for encryption, signing, TLS, or certificates.&quot;,
-        &quot;migrationPath&quot;: &quot;RSA → ML-KEM for key establishment, ML-DSA or SLH-DSA for signatures&quot;
-      },
-      {
-        &quot;file&quot;: &quot;src/data/quantumRules.js&quot;,
-        &quot;line&quot;: 5,
-        &quot;type&quot;: &quot;RSA&quot;,
-        &quot;severity&quot;: &quot;HIGH&quot;,
-        &quot;recommendation&quot;: &quot;Inventory all RSA usage and determine whether it is used for encryption, signing, TLS, or certificates.&quot;,
-        &quot;migrationPath&quot;: &quot;RSA → ML-KEM for key establishment, ML-DSA or SLH-DSA for signatures&quot;
-      },
-      {
-        &quot;file&quot;: &quot;src/data/quantumRules.js&quot;,
-        &quot;line&quot;: 8,
-        &quot;type&quot;: &quot;RSA&quot;,
-        &quot;severity&quot;: &quot;HIGH&quot;,
-        &quot;recommendation&quot;: &quot;Inventory all RSA usage and determine whether it is used for encryption, signing, TLS, or certificates.&quot;,
-        &quot;migrationPath&quot;: &quot;RSA → ML-KEM for key establishment, ML-DSA or SLH-DSA for signatures&quot;
-      },
-      {
-        &quot;file&quot;: &quot;src/data/quantumRules.js&quot;,
-        &quot;line&quot;: 9,
-        &quot;type&quot;: &quot;RSA&quot;,
-        &quot;severity&quot;: &quot;HIGH&quot;,
-        &quot;recommendation&quot;: &quot;Inventory all RSA usage and determine whether it is used for encryption, signing, TLS, or certificates.&quot;,
-        &quot;migrationPath&quot;: &quot;RSA → ML-KEM for key establishment, ML-DSA or SLH-DSA for signatures&quot;
-      }
-    ]
-  },
-  &quot;markdownReport&quot;: {
-    &quot;reporter&quot;: &quot;Markdown Report Generator&quot;,
-    &quot;outputPath&quot;: &quot;quantum-shield-report.md&quot;,
-    &quot;generatedAt&quot;: &quot;2026-06-08T00:20:26.743Z&quot;
-  }
-}</pre>
-    </div>
-
-    <div class="section">
-      <h2>Dependency Risk</h2>
-      <p>No dependency findings detected.</p>
-    </div>
-
-    <div class="section">
-      <h2>Security Assessment</h2>
-      <pre>{}</pre>
-    </div>
-
-    <div class="section">
-      <h2>Wallet Risk</h2>
-      <pre>{}</pre>
-    </div>
-
-    <div class="section">
-      <h2>Crypto Inventory</h2>
-      <pre>{}</pre>
-    </div>
-
-    <div class="footer">
-      Generated by Quantum Shield Trinity
+    <div class="card">
+      <h2>Unlock Full Report</h2>
+      <p>The paid report includes full findings, exploit simulation, remediation recommendations, SARIF export, and executive-ready HTML reporting.</p>
+      <a class="button" href="https://github.com/bilyeutaylor9-lang/quantum-shield-trinity">View Project</a>
     </div>
   </div>
 </body>
