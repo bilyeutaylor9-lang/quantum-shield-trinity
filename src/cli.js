@@ -8,6 +8,7 @@ import { securityScoreEngine } from "./engines/securityScoreEngine.js";
 import { remediationEngine } from "./engines/remediationEngine.js";
 import { quantumReadinessEngine } from "./engines/quantumReadinessEngine.js";
 import { autoFixEngine } from "./engines/autoFixEngine.js";
+import { attackPathGeneratorEngine } from "./engines/attackPathGeneratorEngine.js";
 import { htmlReportGenerator } from "./reporters/htmlReportGenerator.js";
 import { sarifReportGenerator } from "./reporters/sarifReportGenerator.js";
 import { summaryFormatter } from "./utils/summaryFormatter.js";
@@ -36,7 +37,6 @@ report.smartContractAuditReport = smartContractAuditReport;
 report.quantumReadinessReport = quantumReadinessReport;
 
 const exploitSimulationReport = exploitSimulationEngine(report);
-
 report.exploitSimulationReport = exploitSimulationReport;
 
 const securityScoreReport = securityScoreEngine({
@@ -47,16 +47,16 @@ const securityScoreReport = securityScoreEngine({
   quantumReadinessReport,
   repositoryReport: report
 });
-
 report.securityScoreReport = securityScoreReport;
 
 const remediationReport = remediationEngine(report);
-
 report.remediationReport = remediationReport;
 
 const autoFixReport = autoFixEngine(report);
-
 report.autoFixReport = autoFixReport;
+
+const attackPathReport = attackPathGeneratorEngine(report);
+report.attackPathReport = attackPathReport;
 
 const summary = summaryFormatter(report);
 
@@ -72,7 +72,7 @@ const htmlReport = htmlReportGenerator({
 
 const sarifReport = sarifReportGenerator({
   ...report,
-  version: "1.6.0"
+  version: "1.7.0"
 });
 
 fs.writeFileSync("report.json", JSON.stringify(report, null, 2), "utf8");
@@ -82,13 +82,14 @@ fs.writeFileSync(
   JSON.stringify(
     {
       platform: "Quantum Shield Trinity",
-      version: "1.6.0",
+      version: "1.7.0",
       summary,
       markdownReport,
       securityScoreReport,
       remediationReport,
       quantumReadinessReport,
-      autoFixReport
+      autoFixReport,
+      attackPathReport
     },
     null,
     2
@@ -191,6 +192,25 @@ autoFixReport.fixes.slice(0, 5).forEach((item, index) => {
   console.log(`   Confidence: ${item.confidence}`);
   console.log(`   Recommended Fix: ${item.recommendedFix}`);
   console.log(`   Patch Suggestion: ${item.patchSuggestion}`);
+  console.log("");
+});
+
+console.log("Generated Attack Paths");
+console.log("----------------------");
+console.log(`Total Attack Paths: ${attackPathReport.totalAttackPaths}`);
+console.log(`Critical Attack Paths: ${attackPathReport.criticalAttackPaths}`);
+console.log(`High Attack Paths: ${attackPathReport.highAttackPaths}`);
+console.log(`Medium Attack Paths: ${attackPathReport.mediumAttackPaths}`);
+console.log("");
+
+attackPathReport.attackPaths.slice(0, 5).forEach((item, index) => {
+  console.log(`${index + 1}. ${item.title} (${item.severity})`);
+  console.log(`   File: ${item.file}`);
+  console.log(`   Line: ${item.line}`);
+  console.log(`   Entry Point: ${item.entryPoint}`);
+  console.log(`   Impact: ${item.potentialImpact}`);
+  console.log(`   Likelihood: ${item.likelihood}`);
+  console.log(`   Defense: ${item.recommendedDefense}`);
   console.log("");
 });
 
