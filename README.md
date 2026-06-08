@@ -5,7 +5,11 @@
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Node](https://img.shields.io/badge/node-20-green)
 
+## Public Demo Results
 
+View example scan results here:
+
+[Quantum Shield Trinity Scan Results](docs/results.md)
 Quantum Shield Trinity
 
 Quantum Risk Intelligence for Web3, Smart Contracts, and Modern Software
