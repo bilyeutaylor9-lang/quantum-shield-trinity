@@ -6,6 +6,7 @@ import { smartContractAuditEngine } from "./engines/smartContractAuditEngine.js"
 import { exploitSimulationEngine } from "./engines/exploitSimulationEngine.js";
 import { securityScoreEngine } from "./engines/securityScoreEngine.js";
 import { remediationEngine } from "./engines/remediationEngine.js";
+import { quantumReadinessEngine } from "./engines/quantumReadinessEngine.js";
 import { htmlReportGenerator } from "./reporters/htmlReportGenerator.js";
 import { sarifReportGenerator } from "./reporters/sarifReportGenerator.js";
 import { summaryFormatter } from "./utils/summaryFormatter.js";
@@ -26,10 +27,12 @@ const report = repositoryScannerEngine(scanResult.files);
 const dependencyReport = dependencyIntelligenceEngine(scanResult.files);
 const attackSurfaceReport = attackSurfaceEngine(scanResult.files);
 const smartContractAuditReport = smartContractAuditEngine(scanResult.files);
+const quantumReadinessReport = quantumReadinessEngine(scanResult.files);
 
 report.dependencyReport = dependencyReport;
 report.attackSurfaceReport = attackSurfaceReport;
 report.smartContractAuditReport = smartContractAuditReport;
+report.quantumReadinessReport = quantumReadinessReport;
 
 const exploitSimulationReport = exploitSimulationEngine(report);
 
@@ -40,6 +43,7 @@ const securityScoreReport = securityScoreEngine({
   attackSurfaceReport,
   smartContractAuditReport,
   exploitSimulationReport,
+  quantumReadinessReport,
   repositoryReport: report
 });
 
@@ -63,7 +67,7 @@ const htmlReport = htmlReportGenerator({
 
 const sarifReport = sarifReportGenerator({
   ...report,
-  version: "1.4.0"
+  version: "1.5.0"
 });
 
 fs.writeFileSync("report.json", JSON.stringify(report, null, 2), "utf8");
@@ -73,11 +77,12 @@ fs.writeFileSync(
   JSON.stringify(
     {
       platform: "Quantum Shield Trinity",
-      version: "1.4.0",
+      version: "1.5.0",
       summary,
       markdownReport,
       securityScoreReport,
-      remediationReport
+      remediationReport,
+      quantumReadinessReport
     },
     null,
     2
@@ -132,6 +137,15 @@ console.log(`High Audit Findings: ${smartContractAuditReport.highFindings}`);
 console.log(`Medium Audit Findings: ${smartContractAuditReport.mediumFindings}`);
 console.log("");
 
+console.log("Quantum Readiness");
+console.log("-----------------");
+console.log(`Quantum Readiness Score: ${quantumReadinessReport.quantumReadinessScore}/100`);
+console.log(`Quantum Risk Level: ${quantumReadinessReport.quantumRiskLevel}`);
+console.log(`Quantum Findings: ${quantumReadinessReport.totalQuantumFindings}`);
+console.log(`Migration Readiness: ${quantumReadinessReport.migrationReadiness}`);
+console.log(`Recommended Path: ${quantumReadinessReport.recommendedMigrationPath}`);
+console.log("");
+
 console.log("Exploit Simulation");
 console.log("------------------");
 console.log(`Simulation Risk Level: ${exploitSimulationReport.simulationRiskLevel}`);
@@ -156,6 +170,19 @@ remediationReport.remediationItems.slice(0, 5).forEach((item, index) => {
   console.log(`   Example Fix: ${item.exampleFix}`);
   console.log("");
 });
+
+if (quantumReadinessReport.findings.length > 0) {
+  console.log("Top Quantum Readiness Findings");
+  console.log("------------------------------");
+
+  quantumReadinessReport.findings.slice(0, 5).forEach((item, index) => {
+    console.log(`${index + 1}. ${item.type} (${item.severity})`);
+    console.log(`   File: ${item.file}`);
+    console.log(`   Line: ${item.line}`);
+    console.log(`   Recommendation: ${item.recommendation}`);
+    console.log("");
+  });
+}
 
 if (exploitSimulationReport.simulations.length > 0) {
   console.log("Top Exploit Simulations");
