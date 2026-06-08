@@ -7,6 +7,7 @@ import { exploitSimulationEngine } from "./engines/exploitSimulationEngine.js";
 import { securityScoreEngine } from "./engines/securityScoreEngine.js";
 import { remediationEngine } from "./engines/remediationEngine.js";
 import { quantumReadinessEngine } from "./engines/quantumReadinessEngine.js";
+import { cryptoInventoryEngine } from "./engines/cryptoInventoryEngine.js";
 import { autoFixEngine } from "./engines/autoFixEngine.js";
 import { attackPathGeneratorEngine } from "./engines/attackPathGeneratorEngine.js";
 import { complianceMappingEngine } from "./engines/complianceMappingEngine.js";
@@ -31,11 +32,14 @@ const dependencyReport = dependencyIntelligenceEngine(scanResult.files);
 const attackSurfaceReport = attackSurfaceEngine(scanResult.files);
 const smartContractAuditReport = smartContractAuditEngine(scanResult.files);
 const quantumReadinessReport = quantumReadinessEngine(scanResult.files);
+const cryptoInventoryReport = cryptoInventoryEngine(scanResult.files);
 
 report.dependencyReport = dependencyReport;
 report.attackSurfaceReport = attackSurfaceReport;
 report.smartContractAuditReport = smartContractAuditReport;
 report.quantumReadinessReport = quantumReadinessReport;
+report.cryptoInventoryReport = cryptoInventoryReport;
+report.inventoryReport = cryptoInventoryReport;
 
 const exploitSimulationReport = exploitSimulationEngine(report);
 report.exploitSimulationReport = exploitSimulationReport;
@@ -46,6 +50,7 @@ const securityScoreReport = securityScoreEngine({
   smartContractAuditReport,
   exploitSimulationReport,
   quantumReadinessReport,
+  cryptoInventoryReport,
   repositoryReport: report
 });
 report.securityScoreReport = securityScoreReport;
@@ -76,22 +81,24 @@ const htmlReport = htmlReportGenerator({
 
 const sarifReport = sarifReportGenerator({
   ...report,
-  version: "1.8.0"
+  version: "1.9.0"
 });
 
 fs.writeFileSync("report.json", JSON.stringify(report, null, 2), "utf8");
 fs.writeFileSync("report.html", htmlReport, "utf8");
+
 fs.writeFileSync(
   "executive-report.json",
   JSON.stringify(
     {
       platform: "Quantum Shield Trinity",
-      version: "1.8.0",
+      version: "1.9.0",
       summary,
       markdownReport,
       securityScoreReport,
       remediationReport,
       quantumReadinessReport,
+      cryptoInventoryReport,
       autoFixReport,
       attackPathReport,
       complianceMappingReport
@@ -101,6 +108,7 @@ fs.writeFileSync(
   ),
   "utf8"
 );
+
 fs.writeFileSync("report.sarif", JSON.stringify(sarifReport, null, 2), "utf8");
 
 console.log("Executive Summary");
@@ -113,12 +121,43 @@ console.log(`High Findings: ${summary.highFindings}`);
 console.log(`Medium Findings: ${summary.mediumFindings}`);
 console.log("");
 
+console.log("Crypto Inventory");
+console.log("----------------");
+console.log(`Inventory Risk Level: ${cryptoInventoryReport.inventoryRiskLevel}`);
+console.log(`Inventory Security Score: ${cryptoInventoryReport.inventorySecurityScore}/100`);
+console.log(`Total Crypto Assets: ${cryptoInventoryReport.totalCryptoAssets}`);
+console.log(`Quantum Exposed Assets: ${cryptoInventoryReport.quantumExposedAssets}`);
+console.log(`Critical Crypto Assets: ${cryptoInventoryReport.criticalAssets}`);
+console.log(`High Crypto Assets: ${cryptoInventoryReport.highAssets}`);
+console.log(`Summary: ${cryptoInventoryReport.quantumExposureSummary}`);
+console.log("");
+
+if (cryptoInventoryReport.recommendedActions.length > 0) {
+  console.log("Crypto Inventory Recommended Actions");
+  console.log("------------------------------------");
+
+  cryptoInventoryReport.recommendedActions.forEach((action, index) => {
+    console.log(`${index + 1}. ${action}`);
+  });
+
+  console.log("");
+}
+
 console.log("Executive Security Score");
 console.log("------------------------");
 console.log(`Security Score: ${securityScoreReport.securityScore ?? "N/A"}/100`);
 console.log(`Risk Level: ${securityScoreReport.riskLevel ?? "UNKNOWN"}`);
 console.log(`Grade: ${securityScoreReport.grade ?? securityScoreReport.securityGrade ?? "N/A"}`);
 console.log(`Top Priority: ${securityScoreReport.topPriority ?? "Review high and critical findings."}`);
+console.log("");
+
+console.log("Quantum Readiness");
+console.log("-----------------");
+console.log(`Quantum Readiness Score: ${quantumReadinessReport.quantumReadinessScore}/100`);
+console.log(`Quantum Risk Level: ${quantumReadinessReport.quantumRiskLevel}`);
+console.log(`Quantum Findings: ${quantumReadinessReport.totalQuantumFindings}`);
+console.log(`Migration Readiness: ${quantumReadinessReport.migrationReadiness}`);
+console.log(`Recommended Path: ${quantumReadinessReport.recommendedMigrationPath}`);
 console.log("");
 
 console.log("Dependency Intelligence");
@@ -147,15 +186,6 @@ console.log(`Audited Contracts: ${smartContractAuditReport.auditedContracts}`);
 console.log(`Critical Audit Findings: ${smartContractAuditReport.criticalFindings}`);
 console.log(`High Audit Findings: ${smartContractAuditReport.highFindings}`);
 console.log(`Medium Audit Findings: ${smartContractAuditReport.mediumFindings}`);
-console.log("");
-
-console.log("Quantum Readiness");
-console.log("-----------------");
-console.log(`Quantum Readiness Score: ${quantumReadinessReport.quantumReadinessScore}/100`);
-console.log(`Quantum Risk Level: ${quantumReadinessReport.quantumRiskLevel}`);
-console.log(`Quantum Findings: ${quantumReadinessReport.totalQuantumFindings}`);
-console.log(`Migration Readiness: ${quantumReadinessReport.migrationReadiness}`);
-console.log(`Recommended Path: ${quantumReadinessReport.recommendedMigrationPath}`);
 console.log("");
 
 console.log("Exploit Simulation");
@@ -232,6 +262,20 @@ complianceMappingReport.mappedFindings.slice(0, 5).forEach((item, index) => {
   console.log(`   Control: ${item.recommendedControl}`);
   console.log("");
 });
+
+if (cryptoInventoryReport.assets.length > 0) {
+  console.log("Top Crypto Inventory Findings");
+  console.log("-----------------------------");
+
+  cryptoInventoryReport.assets.slice(0, 5).forEach((item, index) => {
+    console.log(`${index + 1}. ${item.type} (${item.severity})`);
+    console.log(`   File: ${item.file}`);
+    console.log(`   Line: ${item.line}`);
+    console.log(`   Quantum Exposure: ${item.quantumExposure}`);
+    console.log(`   Recommendation: ${item.recommendation}`);
+    console.log("");
+  });
+}
 
 if (quantumReadinessReport.findings.length > 0) {
   console.log("Top Quantum Readiness Findings");
