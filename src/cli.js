@@ -5,6 +5,7 @@ import { attackSurfaceEngine } from "./engines/attackSurfaceEngine.js";
 import { smartContractAuditEngine } from "./engines/smartContractAuditEngine.js";
 import { exploitSimulationEngine } from "./engines/exploitSimulationEngine.js";
 import { securityScoreEngine } from "./engines/securityScoreEngine.js";
+import { remediationEngine } from "./engines/remediationEngine.js";
 import { htmlReportGenerator } from "./reporters/htmlReportGenerator.js";
 import { sarifReportGenerator } from "./reporters/sarifReportGenerator.js";
 import { summaryFormatter } from "./utils/summaryFormatter.js";
@@ -44,6 +45,10 @@ const securityScoreReport = securityScoreEngine({
 
 report.securityScoreReport = securityScoreReport;
 
+const remediationReport = remediationEngine(report);
+
+report.remediationReport = remediationReport;
+
 const summary = summaryFormatter(report);
 
 const markdownReport = markdownReportGenerator(report);
@@ -58,7 +63,7 @@ const htmlReport = htmlReportGenerator({
 
 const sarifReport = sarifReportGenerator({
   ...report,
-  version: "1.3.0"
+  version: "1.4.0"
 });
 
 fs.writeFileSync("report.json", JSON.stringify(report, null, 2), "utf8");
@@ -68,10 +73,11 @@ fs.writeFileSync(
   JSON.stringify(
     {
       platform: "Quantum Shield Trinity",
-      version: "1.3.0",
+      version: "1.4.0",
       summary,
       markdownReport,
-      securityScoreReport
+      securityScoreReport,
+      remediationReport
     },
     null,
     2
@@ -119,7 +125,7 @@ console.log("");
 console.log("Smart Contract Audit");
 console.log("--------------------");
 console.log(`Audit Risk Level: ${smartContractAuditReport.auditRiskLevel}`);
-console.log(`Audit Score: ${smartContractAuditReport.auditScore}/100`);
+console.log(`Audit Score: ${smartContractAuditReport.auditSecurityScore}/100`);
 console.log(`Audited Contracts: ${smartContractAuditReport.auditedContracts}`);
 console.log(`Critical Audit Findings: ${smartContractAuditReport.criticalFindings}`);
 console.log(`High Audit Findings: ${smartContractAuditReport.highFindings}`);
@@ -134,6 +140,22 @@ console.log(`Total Simulations: ${exploitSimulationReport.totalSimulations}`);
 console.log(`Critical Simulations: ${exploitSimulationReport.criticalSimulations}`);
 console.log(`High Simulations: ${exploitSimulationReport.highSimulations}`);
 console.log("");
+
+console.log("Remediation Guidance");
+console.log("--------------------");
+console.log(`Total Remediation Items: ${remediationReport.totalRemediationItems}`);
+console.log("");
+
+remediationReport.remediationItems.slice(0, 5).forEach((item, index) => {
+  console.log(`${index + 1}. ${item.type} (${item.severity})`);
+  console.log(`   File: ${item.file}`);
+  console.log(`   Line: ${item.line}`);
+  console.log(`   Priority: ${item.priority}`);
+  console.log(`   Why It Matters: ${item.whyItMatters}`);
+  console.log(`   Fix: ${item.howToFix}`);
+  console.log(`   Example Fix: ${item.exampleFix}`);
+  console.log("");
+});
 
 if (exploitSimulationReport.simulations.length > 0) {
   console.log("Top Exploit Simulations");
