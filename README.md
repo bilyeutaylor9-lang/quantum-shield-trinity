@@ -8,12 +8,12 @@
 
 View public demo scan results:
 
-https://bilyeutaylor9-lang.github.io/quantum-shield-trinity/results
+https://bilyeutaylor9-lang.github.io/quantum-shield-trinity/results/
 ## Public Demo Results
 
 View example scan results here:
+https://bilyeutaylor9-lang.github.io/quantum-shield-trinity/results/
 
-[Quantum Shield Trinity Scan Results](docs/results.md)
 Quantum Shield Trinity
 
 Quantum Risk Intelligence for Web3, Smart Contracts, and Modern Software
