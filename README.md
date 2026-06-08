@@ -1,3 +1,11 @@
+
+# Quantum Shield Trinity
+
+![Build](https://img.shields.io/badge/build-passing-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-blue)
+![Node](https://img.shields.io/badge/node-20-green)
+
+
 Quantum Shield Trinity
 
 Quantum Risk Intelligence for Web3, Smart Contracts, and Modern Software
