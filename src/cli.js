@@ -7,6 +7,7 @@ import { exploitSimulationEngine } from "./engines/exploitSimulationEngine.js";
 import { securityScoreEngine } from "./engines/securityScoreEngine.js";
 import { remediationEngine } from "./engines/remediationEngine.js";
 import { quantumReadinessEngine } from "./engines/quantumReadinessEngine.js";
+import { autoFixEngine } from "./engines/autoFixEngine.js";
 import { htmlReportGenerator } from "./reporters/htmlReportGenerator.js";
 import { sarifReportGenerator } from "./reporters/sarifReportGenerator.js";
 import { summaryFormatter } from "./utils/summaryFormatter.js";
@@ -53,6 +54,10 @@ const remediationReport = remediationEngine(report);
 
 report.remediationReport = remediationReport;
 
+const autoFixReport = autoFixEngine(report);
+
+report.autoFixReport = autoFixReport;
+
 const summary = summaryFormatter(report);
 
 const markdownReport = markdownReportGenerator(report);
@@ -67,7 +72,7 @@ const htmlReport = htmlReportGenerator({
 
 const sarifReport = sarifReportGenerator({
   ...report,
-  version: "1.5.0"
+  version: "1.6.0"
 });
 
 fs.writeFileSync("report.json", JSON.stringify(report, null, 2), "utf8");
@@ -77,12 +82,13 @@ fs.writeFileSync(
   JSON.stringify(
     {
       platform: "Quantum Shield Trinity",
-      version: "1.5.0",
+      version: "1.6.0",
       summary,
       markdownReport,
       securityScoreReport,
       remediationReport,
-      quantumReadinessReport
+      quantumReadinessReport,
+      autoFixReport
     },
     null,
     2
@@ -168,6 +174,23 @@ remediationReport.remediationItems.slice(0, 5).forEach((item, index) => {
   console.log(`   Why It Matters: ${item.whyItMatters}`);
   console.log(`   Fix: ${item.howToFix}`);
   console.log(`   Example Fix: ${item.exampleFix}`);
+  console.log("");
+});
+
+console.log("AutoFix Suggestions");
+console.log("-------------------");
+console.log(`Total Fixes: ${autoFixReport.totalFixes}`);
+console.log(`Safe AutoFixes: ${autoFixReport.safeAutoFixes}`);
+console.log(`Manual Review Fixes: ${autoFixReport.manualReviewFixes}`);
+console.log("");
+
+autoFixReport.fixes.slice(0, 5).forEach((item, index) => {
+  console.log(`${index + 1}. ${item.type} (${item.severity})`);
+  console.log(`   File: ${item.file}`);
+  console.log(`   Line: ${item.line}`);
+  console.log(`   Confidence: ${item.confidence}`);
+  console.log(`   Recommended Fix: ${item.recommendedFix}`);
+  console.log(`   Patch Suggestion: ${item.patchSuggestion}`);
   console.log("");
 });
 
