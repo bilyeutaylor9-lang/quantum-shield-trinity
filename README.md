@@ -1,5 +1,10 @@
 Quantum Shield Trinity
-
+![Build](https://img.shields.io/badge/build-passing-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-blue)
+![Node](https://img.shields.io/badge/node-20-green)
+![Security](https://img.shields.io/badge/security-AI%20Powered-red)
+![Quantum](https://img.shields.io/badge/quantum-ready-purple)
+![OWASP](https://img.shields.io/badge/OWASP-mapped-orange)
 Public Scan Results
 
 View public demo scan results:
