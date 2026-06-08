@@ -3,13 +3,46 @@ export function htmlReportGenerator(report = {}) {
   const executive = report.executiveReport ?? {};
   const dependency = report.dependencyRiskReport ?? {};
   const assessment = report.assessmentReport ?? {};
-  const wallet = report.walletReport ?? {};
+  const audit = report.smartContractAuditReport ?? {};
+  const attackSurface = report.attackSurfaceReport ?? {};
+  const simulation = report.exploitSimulationReport ?? {};
   const inventory = report.inventoryReport ?? {};
 
-  const securityScore = score.securityScore ?? "N/A";
+  const securityScore = score.securityScore ?? 0;
   const riskLevel = score.riskLevel ?? "UNKNOWN";
   const grade = score.grade ?? score.securityGrade ?? "N/A";
   const topPriority = score.topPriority ?? "Review high and critical findings.";
+
+  const criticalFindings =
+    score.findingCounts?.critical ??
+    audit.criticalFindings ??
+    assessment.criticalFindings?.length ??
+    report.criticalFindings ??
+    0;
+
+  const highFindings =
+    score.findingCounts?.high ??
+    audit.highFindings ??
+    report.highFindings ??
+    0;
+
+  const mediumFindings =
+    score.findingCounts?.medium ??
+    audit.mediumFindings ??
+    report.mediumFindings ??
+    0;
+
+  const lowFindings =
+    score.findingCounts?.low ??
+    audit.lowFindings ??
+    report.lowFindings ??
+    0;
+
+  const scannedFiles =
+    executive.keyMetrics?.scannedFiles ??
+    report.scannedFiles ??
+    report.repositoryReport?.scannedFiles ??
+    0;
 
   return `<!DOCTYPE html>
 <html>
@@ -49,11 +82,13 @@ export function htmlReportGenerator(report = {}) {
       gap: 16px;
       margin-bottom: 24px;
     }
-    .card {
+    .card,
+    .section {
       background: #111827;
       border: 1px solid #334155;
       border-radius: 16px;
-      padding: 20px;
+      padding: 22px;
+      margin-bottom: 20px;
     }
     .label {
       color: #94a3b8;
@@ -70,25 +105,12 @@ export function htmlReportGenerator(report = {}) {
     .risk-medium { color: #f59e0b; }
     .risk-high { color: #fb7185; }
     .risk-critical { color: #ef4444; }
-    .section {
-      background: #111827;
-      border: 1px solid #334155;
-      border-radius: 16px;
-      padding: 22px;
-      margin-bottom: 20px;
-    }
     h2 {
       margin-top: 0;
       color: #f8fafc;
     }
-    pre {
-      white-space: pre-wrap;
-      background: #020617;
-      border: 1px solid #1e293b;
-      border-radius: 12px;
-      padding: 16px;
-      overflow-x: auto;
-      color: #cbd5e1;
+    h3 {
+      color: #93c5fd;
     }
     table {
       width: 100%;
@@ -104,6 +126,16 @@ export function htmlReportGenerator(report = {}) {
     th {
       color: #93c5fd;
     }
+    .button {
+      display: inline-block;
+      padding: 14px 20px;
+      background: #2563eb;
+      color: #ffffff;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: bold;
+      margin-top: 12px;
+    }
     .footer {
       color: #64748b;
       font-size: 13px;
@@ -112,11 +144,14 @@ export function htmlReportGenerator(report = {}) {
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <div class="header">
       <h1>Quantum Shield Trinity</h1>
-      <div class="subtitle">Executive security, quantum exposure, wallet, dependency, and migration risk report.</div>
+      <div class="subtitle">
+        Security intelligence for smart contracts, dependencies, attack surfaces, and quantum exposure.
+      </div>
     </div>
 
     <div class="grid">
@@ -124,14 +159,17 @@ export function htmlReportGenerator(report = {}) {
         <div class="label">Security Score</div>
         <div class="value">${escapeHtml(securityScore)}/100</div>
       </div>
+
       <div class="card">
         <div class="label">Risk Level</div>
         <div class="value ${riskClass(riskLevel)}">${escapeHtml(riskLevel)}</div>
       </div>
+
       <div class="card">
         <div class="label">Grade</div>
         <div class="value">${escapeHtml(grade)}</div>
       </div>
+
       <div class="card">
         <div class="label">Version</div>
         <div class="value">${escapeHtml(report.version ?? "N/A")}</div>
@@ -139,13 +177,65 @@ export function htmlReportGenerator(report = {}) {
     </div>
 
     <div class="section">
-      <h2>Top Priority</h2>
+      <h2>Executive Summary</h2>
+
+      <table>
+        <tr>
+          <th>Metric</th>
+          <th>Result</th>
+        </tr>
+        <tr>
+          <td>Files Scanned</td>
+          <td>${escapeHtml(scannedFiles)}</td>
+        </tr>
+        <tr>
+          <td>Critical Findings</td>
+          <td class="risk-critical">${escapeHtml(criticalFindings)}</td>
+        </tr>
+        <tr>
+          <td>High Findings</td>
+          <td class="risk-high">${escapeHtml(highFindings)}</td>
+        </tr>
+        <tr>
+          <td>Medium Findings</td>
+          <td class="risk-medium">${escapeHtml(mediumFindings)}</td>
+        </tr>
+        <tr>
+          <td>Low Findings</td>
+          <td class="risk-low">${escapeHtml(lowFindings)}</td>
+        </tr>
+      </table>
+
+      <h3>Top Priority</h3>
       <p>${escapeHtml(topPriority)}</p>
     </div>
 
     <div class="section">
-      <h2>Executive Summary</h2>
-      <pre>${escapeHtml(JSON.stringify(executive, null, 2))}</pre>
+      <h2>Smart Contract Audit</h2>
+      ${renderSmartContractTable(audit)}
+    </div>
+
+    <div class="section">
+      <h2>Attack Surface Intelligence</h2>
+      ${renderSimpleMetricsTable({
+        "Risk Level": attackSurface.attackSurfaceRiskLevel ?? "N/A",
+        "Attack Surface Score": `${attackSurface.attackSurfaceScore ?? "N/A"}/100`,
+        "Total Attack Findings": attackSurface.totalAttackFindings ?? 0,
+        "Critical Attack Paths": attackSurface.criticalAttackPaths ?? 0,
+        "High Attack Paths": attackSurface.highAttackPaths ?? 0,
+        "Medium Attack Paths": attackSurface.mediumAttackPaths ?? 0
+      })}
+    </div>
+
+    <div class="section">
+      <h2>Exploit Simulation</h2>
+      ${renderSimpleMetricsTable({
+        "Simulation Risk Level": simulation.simulationRiskLevel ?? "N/A",
+        "Simulation Score": `${simulation.simulationScore ?? "N/A"}/100`,
+        "Total Simulations": simulation.totalSimulations ?? 0,
+        "Critical Simulations": simulation.criticalSimulations ?? 0,
+        "High Simulations": simulation.highSimulations ?? 0
+      })}
     </div>
 
     <div class="section">
@@ -154,18 +244,95 @@ export function htmlReportGenerator(report = {}) {
     </div>
 
     <div class="section">
-      <h2>Security Assessment</h2>
-      <pre>${escapeHtml(JSON.stringify(assessment, null, 2))}</pre>
+      <h2>Quantum / Crypto Inventory</h2>
+      ${renderSimpleMetricsTable({
+        "Inventory Risk": inventory.riskLevel ?? inventory.inventoryRiskLevel ?? "N/A",
+        "Detected Items": inventory.detectedItems?.length ?? inventory.totalItems ?? 0,
+        "Quantum Exposure": inventory.quantumExposure ?? "Review Required"
+      })}
     </div>
 
     <div class="section">
-      <h2>Wallet Risk</h2>
-      <pre>${escapeHtml(JSON.stringify(wallet, null, 2))}</pre>
-    </div>
+      <h2>Unlock the Full Quantum Shield Trinity Report</h2>
 
-    <div class="section">
-      <h2>Crypto Inventory</h2>
-      <pre>${escapeHtml(JSON.stringify(inventory, null, 2))}</pre>
+      <p>
+        The public dashboard only displays a limited security summary.
+        Upgrade to access the complete security intelligence package.
+      </p>
+
+      <table>
+        <tr>
+          <th>Feature</th>
+          <th>Public</th>
+          <th>Premium</th>
+        </tr>
+        <tr>
+          <td>Security Score</td>
+          <td>✓</td>
+          <td>✓</td>
+        </tr>
+        <tr>
+          <td>Risk Level</td>
+          <td>✓</td>
+          <td>✓</td>
+        </tr>
+        <tr>
+          <td>Top Findings</td>
+          <td>✓</td>
+          <td>✓</td>
+        </tr>
+        <tr>
+          <td>Full HTML Report</td>
+          <td>✗</td>
+          <td>✓</td>
+        </tr>
+        <tr>
+          <td>SARIF Export</td>
+          <td>✗</td>
+          <td>✓</td>
+        </tr>
+        <tr>
+          <td>Executive Report</td>
+          <td>✗</td>
+          <td>✓</td>
+        </tr>
+        <tr>
+          <td>Exploit Simulation Analysis</td>
+          <td>✗</td>
+          <td>✓</td>
+        </tr>
+        <tr>
+          <td>Dependency Intelligence</td>
+          <td>✗</td>
+          <td>✓</td>
+        </tr>
+        <tr>
+          <td>Quantum Migration Guidance</td>
+          <td>✗</td>
+          <td>✓</td>
+        </tr>
+        <tr>
+          <td>AI Remediation Recommendations</td>
+          <td>✗</td>
+          <td>✓</td>
+        </tr>
+      </table>
+
+      <h3>Professional Security Analysis</h3>
+
+      <p>
+        Receive a complete security assessment including remediation guidance,
+        attack-path analysis, smart contract findings, dependency risk analysis,
+        quantum readiness evaluation, SARIF exports, and executive-ready reporting.
+      </p>
+
+      <p><strong>Coming Soon</strong></p>
+
+      <p>Premium Reports • Enterprise Audits • Security Consulting</p>
+
+      <a class="button" href="https://github.com/bilyeutaylor9-lang/quantum-shield-trinity">
+        View Quantum Shield Trinity on GitHub
+      </a>
     </div>
 
     <div class="footer">
@@ -176,21 +343,56 @@ export function htmlReportGenerator(report = {}) {
 </html>`;
 }
 
+function renderSmartContractTable(audit = {}) {
+  const findings = audit.topAuditFindings ?? audit.auditFindings ?? [];
+
+  if (!findings.length) {
+    return "<p>No smart contract findings detected.</p>";
+  }
+
+  const rows = findings
+    .slice(0, 12)
+    .map(
+      finding => `<tr>
+        <td>${escapeHtml(finding.severity)}</td>
+        <td>${escapeHtml(finding.type)}</td>
+        <td>${escapeHtml(finding.file)}</td>
+        <td>${escapeHtml(finding.line)}</td>
+        <td>${escapeHtml(finding.recommendation)}</td>
+      </tr>`
+    )
+    .join("");
+
+  return `<table>
+    <thead>
+      <tr>
+        <th>Severity</th>
+        <th>Finding</th>
+        <th>File</th>
+        <th>Line</th>
+        <th>Recommendation</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
 function renderDependencyTable(dependency = {}) {
-  const findings = dependency.findings ?? [];
+  const findings = dependency.findings ?? dependency.dependencyFindings ?? [];
 
   if (!findings.length) {
     return "<p>No dependency findings detected.</p>";
   }
 
   const rows = findings
+    .slice(0, 12)
     .map(
       finding => `<tr>
-        <td>${escapeHtml(finding.dependency)}</td>
-        <td>${escapeHtml(finding.version)}</td>
-        <td>${escapeHtml(finding.severity)}</td>
-        <td>${escapeHtml(finding.category)}</td>
-        <td>${escapeHtml(finding.recommendation)}</td>
+        <td>${escapeHtml(finding.dependency ?? "N/A")}</td>
+        <td>${escapeHtml(finding.version ?? "N/A")}</td>
+        <td>${escapeHtml(finding.severity ?? "N/A")}</td>
+        <td>${escapeHtml(finding.category ?? finding.risk ?? "N/A")}</td>
+        <td>${escapeHtml(finding.recommendation ?? "Review dependency risk.")}</td>
       </tr>`
     )
     .join("");
@@ -205,6 +407,21 @@ function renderDependencyTable(dependency = {}) {
         <th>Recommendation</th>
       </tr>
     </thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function renderSimpleMetricsTable(metrics = {}) {
+  const rows = Object.entries(metrics)
+    .map(
+      ([label, value]) => `<tr>
+        <td>${escapeHtml(label)}</td>
+        <td>${escapeHtml(value)}</td>
+      </tr>`
+    )
+    .join("");
+
+  return `<table>
     <tbody>${rows}</tbody>
   </table>`;
 }
