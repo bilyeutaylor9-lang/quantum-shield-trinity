@@ -4,7 +4,11 @@
 ![Build](https://img.shields.io/badge/build-passing-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Node](https://img.shields.io/badge/node-20-green)
+## Public Scan Results
 
+View public demo scan results:
+
+https://bilyeutaylor9-lang.github.io/quantum-shield-trinity/scans/
 ## Public Demo Results
 
 View example scan results here:
