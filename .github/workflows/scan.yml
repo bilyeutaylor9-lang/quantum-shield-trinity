@@ -45,24 +45,29 @@ jobs:
           node -e "console.log('Heap Limit MB:', require('v8').getHeapStatistics().heap_size_limit / 1024 / 1024)"
 
       - name: Run Quantum Shield Trinity Scan
-        run: npm run scan -- src > quantum-shield-report.txt
+        run: |
+          npm run scan -- src 2>&1 | tee quantum-shield-report.txt
 
       - name: Verify generated reports
         if: always()
         run: |
+          echo "=== Current files ==="
           ls -lah
-          find . -maxdepth 3 -name "*.sarif" -print || true
-          test -f report.json
-          test -f report.html
+
+          echo "=== Scan output ==="
+          cat quantum-shield-report.txt || true
+
+          echo "=== Report files found ==="
+          find . -maxdepth 3 \( -name "*.json" -o -name "*.html" -o -name "*.sarif" \) -print || true
 
       - name: Publish latest HTML report to docs
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && hashFiles('report.html') != ''
         run: |
           mkdir -p docs/results
           cp report.html docs/results/index.html
 
       - name: Commit latest public report
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && hashFiles('docs/results/index.html') != ''
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
@@ -102,3 +107,4 @@ jobs:
         run: |
           echo "Quantum Shield Trinity Scan Complete"
           ls -1 *.json 2>/dev/null || true
+          
