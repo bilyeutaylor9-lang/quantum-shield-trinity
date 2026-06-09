@@ -13,6 +13,8 @@ import { attackPathGeneratorEngine } from "./engines/attackPathGeneratorEngine.j
 import { complianceMappingEngine } from "./engines/complianceMappingEngine.js";
 import { codeFlowScannerEngine } from "./engines/codeFlowScannerEngine.js";
 import { routeExposureEngine } from "./engines/routeExposureEngine.js";
+import { trustBoundaryEngine } from "./engines/trustBoundaryEngine.js";
+import { attackChainBuilderEngine } from "./engines/attackChainBuilderEngine.js";
 import { createEvidenceGraph } from "./engines/evidenceGraphEngine.js";
 import { htmlReportGenerator } from "./reporters/htmlReportGenerator.js";
 import { sarifReportGenerator } from "./reporters/sarifReportGenerator.js";
@@ -40,6 +42,10 @@ const cryptoInventoryReport = cryptoInventoryEngine(scanResult.files);
 // Deep Scan X engines
 const codeFlowReport = codeFlowScannerEngine(scanResult.files);
 const routeExposureReport = routeExposureEngine(scanResult.files);
+const trustBoundaryReport = trustBoundaryEngine(scanResult.files, {
+  codeFlowReport,
+  routeExposureReport
+});
 
 report.dependencyReport = dependencyReport;
 report.attackSurfaceReport = attackSurfaceReport;
@@ -49,6 +55,7 @@ report.cryptoInventoryReport = cryptoInventoryReport;
 report.inventoryReport = cryptoInventoryReport;
 report.codeFlowReport = codeFlowReport;
 report.routeExposureReport = routeExposureReport;
+report.trustBoundaryReport = trustBoundaryReport;
 
 const exploitSimulationReport = exploitSimulationEngine(report);
 report.exploitSimulationReport = exploitSimulationReport;
@@ -62,6 +69,7 @@ const securityScoreReport = securityScoreEngine({
   cryptoInventoryReport,
   codeFlowReport,
   routeExposureReport,
+  trustBoundaryReport,
   repositoryReport: report
 });
 
@@ -78,6 +86,13 @@ report.attackPathReport = attackPathReport;
 
 const complianceMappingReport = complianceMappingEngine(report);
 report.complianceMappingReport = complianceMappingReport;
+
+// Build advanced attack chains after all major reports exist.
+const attackChainBuilderReport = attackChainBuilderEngine(report, {
+  maxDepth: 5,
+  limit: 50
+});
+report.attackChainBuilderReport = attackChainBuilderReport;
 
 //============================================================================
 // EVIDENCE GRAPH INTEGRATION
@@ -105,12 +120,14 @@ const addEvidenceItems = (items = [], engine = "unknown", fallbackCategory = "ge
         item.whyItMatters ??
         item.potentialImpact ??
         item.recommendation ??
+        item.summary ??
         "",
       severity:
         item.severity ??
         item.riskLevel ??
         item.routeExposureRiskLevel ??
-        item.riskLevel ??
+        item.trustBoundaryRiskLevel ??
+        item.attackChainRiskLevel ??
         "info",
       confidence: item.confidence ?? item.likelihood ?? 0.75,
       file: item.file ?? item.path ?? null,
@@ -135,6 +152,7 @@ const addEvidenceItems = (items = [], engine = "unknown", fallbackCategory = "ge
         item.method ??
         [],
       assets: [
+        ...(Array.isArray(item.assets) ? item.assets : []),
         item.dependency,
         item.asset,
         item.contract,
@@ -142,6 +160,8 @@ const addEvidenceItems = (items = [], engine = "unknown", fallbackCategory = "ge
         item.path,
         item.route,
         item.method,
+        item.entryPoint,
+        item.finalImpact,
         item.sink?.label,
         item.source?.label
       ].filter(Boolean),
@@ -151,7 +171,8 @@ const addEvidenceItems = (items = [], engine = "unknown", fallbackCategory = "ge
         item.recommendedFix,
         item.recommendedDefense,
         item.migrationPath,
-        ...(Array.isArray(item.remediation) ? item.remediation : [])
+        ...(Array.isArray(item.remediation) ? item.remediation : []),
+        ...(Array.isArray(item.recommendations) ? item.recommendations : [])
       ].filter(Boolean),
       metadata: item
     });
@@ -167,6 +188,8 @@ addEvidenceItems(smartContractAuditReport.auditFindings, "smartContractAuditEngi
 // Deep Scan X evidence
 addEvidenceItems(codeFlowReport.findings, "codeFlowScannerEngine", "code_flow");
 addEvidenceItems(routeExposureReport.findings, "routeExposureEngine", "route_exposure");
+addEvidenceItems(trustBoundaryReport.findings, "trustBoundaryEngine", "trust_boundary");
+addEvidenceItems(attackChainBuilderReport.attackChains, "attackChainBuilderEngine", "attack_chain_builder");
 
 addEvidenceItems(exploitSimulationReport.simulations, "exploitSimulationEngine", "exploit_simulation");
 addEvidenceItems(remediationReport.remediationItems, "remediationEngine", "remediation");
@@ -204,13 +227,15 @@ fs.writeFileSync("report.html", htmlReport, "utf8");
 fs.writeFileSync("evidence-graph.json", JSON.stringify(evidenceGraphReport, null, 2), "utf8");
 fs.writeFileSync("code-flow-report.json", JSON.stringify(codeFlowReport, null, 2), "utf8");
 fs.writeFileSync("route-exposure-report.json", JSON.stringify(routeExposureReport, null, 2), "utf8");
+fs.writeFileSync("trust-boundary-report.json", JSON.stringify(trustBoundaryReport, null, 2), "utf8");
+fs.writeFileSync("attack-chain-builder-report.json", JSON.stringify(attackChainBuilderReport, null, 2), "utf8");
 
 fs.writeFileSync(
   "executive-report.json",
   JSON.stringify(
     {
       platform: "Quantum Shield Trinity",
-      version: "2.1.0",
+      version: "2.2.0",
       summary,
       markdownReport,
       securityScoreReport,
@@ -219,6 +244,8 @@ fs.writeFileSync(
       cryptoInventoryReport,
       codeFlowReport,
       routeExposureReport,
+      trustBoundaryReport,
+      attackChainBuilderReport,
       autoFixReport,
       attackPathReport,
       complianceMappingReport,
@@ -271,6 +298,19 @@ console.log(`Public Routes: ${routeExposureReport.publicRoutes}`);
 console.log(`Sensitive Routes: ${routeExposureReport.sensitiveRoutes}`);
 console.log(`Critical Routes: ${routeExposureReport.criticalRoutes}`);
 console.log(`High Routes: ${routeExposureReport.highRoutes}`);
+console.log("");
+console.log(`Trust Boundary Risk Level: ${trustBoundaryReport.trustBoundaryRiskLevel}`);
+console.log(`Trust Boundary Score: ${trustBoundaryReport.trustBoundaryScore}/100`);
+console.log(`Total Trust Boundary Findings: ${trustBoundaryReport.totalTrustBoundaryFindings}`);
+console.log(`Critical Trust Boundaries: ${trustBoundaryReport.criticalTrustBoundaries}`);
+console.log(`High Trust Boundaries: ${trustBoundaryReport.highTrustBoundaries}`);
+console.log(`Medium Trust Boundaries: ${trustBoundaryReport.mediumTrustBoundaries}`);
+console.log("");
+console.log(`Attack Chain Builder Risk Level: ${attackChainBuilderReport.attackChainRiskLevel}`);
+console.log(`Attack Chain Builder Score: ${attackChainBuilderReport.attackChainScore}/100`);
+console.log(`Total Built Attack Chains: ${attackChainBuilderReport.totalAttackChains}`);
+console.log(`Critical Built Chains: ${attackChainBuilderReport.criticalAttackChains}`);
+console.log(`High Built Chains: ${attackChainBuilderReport.highAttackChains}`);
 console.log("");
 
 console.log("Evidence Graph");
@@ -408,6 +448,18 @@ attackPathReport.attackPaths.slice(0, 5).forEach((item, index) => {
   console.log("");
 });
 
+console.log("Built Attack Chains");
+console.log("-------------------");
+attackChainBuilderReport.attackChains.slice(0, 10).forEach((item, index) => {
+  console.log(`${index + 1}. ${item.summary} (${item.severity})`);
+  console.log(` Score: ${item.chainScore}`);
+  console.log(` Exploitability: ${item.exploitability}`);
+  console.log(` Entry Point: ${item.entryPoint}`);
+  console.log(` Final Impact: ${item.finalImpact}`);
+  console.log(` Files: ${item.files?.join(", ") || "N/A"}`);
+  console.log("");
+});
+
 console.log("Code Flow Findings");
 console.log("------------------");
 codeFlowReport.findings.slice(0, 10).forEach((item, index) => {
@@ -430,6 +482,18 @@ routeExposureReport.findings.slice(0, 10).forEach((item, index) => {
   console.log(` Framework: ${item.framework}`);
   console.log(` Auth Detected: ${item.hasAuth}`);
   console.log(` Validation Detected: ${item.hasValidation}`);
+  console.log(` Recommendation: ${item.recommendation}`);
+  console.log("");
+});
+
+console.log("Trust Boundary Findings");
+console.log("-----------------------");
+trustBoundaryReport.findings.slice(0, 10).forEach((item, index) => {
+  console.log(`${index + 1}. ${item.title} (${item.severity})`);
+  console.log(` File: ${item.file}`);
+  console.log(` Line: ${item.line}`);
+  console.log(` Category: ${item.category}`);
+  console.log(` Trust Control Detected: ${item.trustControlDetected ?? "N/A"}`);
   console.log(` Recommendation: ${item.recommendation}`);
   console.log("");
 });
@@ -554,6 +618,8 @@ console.log("JSON Report: report.json");
 console.log("Evidence Graph: evidence-graph.json");
 console.log("Code Flow Report: code-flow-report.json");
 console.log("Route Exposure Report: route-exposure-report.json");
+console.log("Trust Boundary Report: trust-boundary-report.json");
+console.log("Attack Chain Builder Report: attack-chain-builder-report.json");
 console.log("Executive Report: executive-report.json");
 console.log("SARIF Report: report.sarif");
 console.log("Security Badge SVG: badge.svg");
