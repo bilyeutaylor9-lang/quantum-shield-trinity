@@ -1,6 +1,7 @@
 import { fileScanner } from "./scanners/fileScanner.js";
 import { repositoryScannerEngine } from "./engines/repositoryScannerEngine.js";
 import { dependencyIntelligenceEngine } from "./engines/dependencyIntelligenceEngine.js";
+import { dependencyRiskEngine } from "./engines/dependencyRiskEngine.js";
 import { attackSurfaceEngine } from "./engines/attackSurfaceEngine.js";
 import { smartContractAuditEngine } from "./engines/smartContractAuditEngine.js";
 import { exploitSimulationEngine } from "./engines/exploitSimulationEngine.js";
@@ -11,6 +12,8 @@ import { cryptoInventoryEngine } from "./engines/cryptoInventoryEngine.js";
 import { autoFixEngine } from "./engines/autoFixEngine.js";
 import { attackPathGeneratorEngine } from "./engines/attackPathGeneratorEngine.js";
 import { complianceMappingEngine } from "./engines/complianceMappingEngine.js";
+import { executiveReportEngine } from "./engines/executiveReportEngine.js";
+import { jsonExportEngine } from "./engines/jsonExportEngine.js";
 import { codeFlowScannerEngine } from "./engines/codeFlowScannerEngine.js";
 import { routeExposureEngine } from "./engines/routeExposureEngine.js";
 import { trustBoundaryEngine } from "./engines/trustBoundaryEngine.js";
@@ -25,6 +28,40 @@ import fs from "fs";
 
 const targetDirectory = process.argv[2] ?? "src";
 
+const findPackageJson = (files = []) => {
+  const packageFile = files.find(file => {
+    const filePath = file.path ?? file.file ?? file.name ?? file.filename ?? "";
+    return filePath.endsWith("package.json");
+  });
+
+  if (!packageFile) return {};
+
+  try {
+    const raw = packageFile.content ?? packageFile.text ?? packageFile.source ?? "{}";
+    return typeof raw === "string" ? JSON.parse(raw) : raw;
+  } catch (error) {
+    console.warn("Warning: package.json was found but could not be parsed.");
+    console.warn(error.message);
+    return {};
+  }
+};
+
+const normalizeDependencyRiskFinding = (item = {}) => ({
+  ...item,
+  type: item.type ?? "dependency_risk",
+  title: item.title ?? `${item.dependency ?? "Dependency"} risk`,
+  description: item.description ?? item.reason ?? item.recommendation ?? "",
+  severity: String(item.severity ?? "info").toLowerCase(),
+  riskLevel: String(item.severity ?? "info").toLowerCase(),
+  file: item.file ?? "package.json",
+  line: item.line ?? null,
+  category: item.category ?? "Dependency Risk",
+  ruleId: item.ruleId ?? `DEPENDENCY_RISK_${String(item.dependency ?? "UNKNOWN").toUpperCase().replace(/[^A-Z0-9]/g, "_")}`,
+  confidence: typeof item.confidence === "number" ? item.confidence / 100 : 0.75,
+  recommendation: item.recommendation
+});
+
+
 console.log("Quantum Shield Trinity");
 console.log("----------------------");
 console.log(`Scanning directory: ${targetDirectory}`);
@@ -32,6 +69,9 @@ console.log("");
 
 const scanResult = fileScanner(targetDirectory);
 const report = repositoryScannerEngine(scanResult.files);
+const packageJson = findPackageJson(scanResult.files);
+const dependencyRiskReport = dependencyRiskEngine(packageJson);
+dependencyRiskReport.findings = dependencyRiskReport.findings.map(normalizeDependencyRiskFinding);
 
 const dependencyReport = dependencyIntelligenceEngine(scanResult.files);
 const attackSurfaceReport = attackSurfaceEngine(scanResult.files);
@@ -48,6 +88,7 @@ const trustBoundaryReport = trustBoundaryEngine(scanResult.files, {
 });
 
 report.dependencyReport = dependencyReport;
+report.dependencyRiskReport = dependencyRiskReport;
 report.attackSurfaceReport = attackSurfaceReport;
 report.smartContractAuditReport = smartContractAuditReport;
 report.quantumReadinessReport = quantumReadinessReport;
@@ -62,6 +103,7 @@ report.exploitSimulationReport = exploitSimulationReport;
 
 const securityScoreReport = securityScoreEngine({
   dependencyReport,
+  dependencyRiskReport,
   attackSurfaceReport,
   smartContractAuditReport,
   exploitSimulationReport,
@@ -86,6 +128,17 @@ report.attackPathReport = attackPathReport;
 
 const complianceMappingReport = complianceMappingEngine(report);
 report.complianceMappingReport = complianceMappingReport;
+
+
+// Merge Dependency Risk Engine findings into dependencyReport for attack-chain correlation.
+const dependencyFindingsForChains = [
+  ...(dependencyReport.dependencyFindings ?? []),
+  ...(dependencyRiskReport.findings ?? [])
+];
+report.dependencyReport = {
+  ...dependencyReport,
+  dependencyFindings: dependencyFindingsForChains
+};
 
 // Build advanced attack chains after all major reports exist.
 const attackChainBuilderReport = attackChainBuilderEngine(report, {
@@ -181,7 +234,8 @@ const addEvidenceItems = (items = [], engine = "unknown", fallbackCategory = "ge
 
 addEvidenceItems(cryptoInventoryReport.assets, "cryptoInventoryEngine", "crypto_inventory");
 addEvidenceItems(quantumReadinessReport.findings, "quantumReadinessEngine", "quantum_readiness");
-addEvidenceItems(dependencyReport.dependencyFindings, "dependencyIntelligenceEngine", "dependency_risk");
+addEvidenceItems(dependencyReport.dependencyFindings, "dependencyIntelligenceEngine", "dependency_intelligence");
+addEvidenceItems(dependencyRiskReport.findings, "dependencyRiskEngine", "dependency_risk");
 addEvidenceItems(attackSurfaceReport.attackFindings, "attackSurfaceEngine", "attack_surface");
 addEvidenceItems(smartContractAuditReport.auditFindings, "smartContractAuditEngine", "smart_contract_audit");
 
@@ -199,6 +253,83 @@ addEvidenceItems(complianceMappingReport.mappedFindings, "complianceMappingEngin
 
 const evidenceGraphReport = evidenceGraph.exportGraph();
 report.evidenceGraphReport = evidenceGraphReport;
+
+//============================================================================
+// EXECUTIVE REPORT ENGINE
+//============================================================================
+
+const executiveReportEngineReport = executiveReportEngine({
+  ...report,
+  executiveReport: {
+    summary: summaryFormatter(report)
+  },
+  assessmentReport: report.securityAssessmentReport ?? report.assessmentReport ?? {},
+  auditReport: report.securityAuditReport ?? report.auditReport ?? smartContractAuditReport,
+  riskProfile: {
+    wallet: report.walletRiskReport ?? {},
+    inventory: {
+      riskLevel:
+        cryptoInventoryReport.inventoryRiskLevel ??
+        cryptoInventoryReport.riskLevel ??
+        "UNKNOWN"
+    },
+    migration: {
+      ready:
+        quantumReadinessReport.migrationReadiness === "READY" ||
+        quantumReadinessReport.migrationReady === true
+    }
+  }
+});
+
+report.executiveReportEngineReport = executiveReportEngineReport;
+
+//============================================================================
+// JSON EXPORT ENGINE
+//============================================================================
+
+const jsonExportReport = jsonExportEngine({
+  platform: "Quantum Shield Trinity",
+  version: "2.2.2",
+  ...report,
+  riskProfile: {
+    wallet: report.walletRiskReport ?? {},
+    inventory: {
+      riskLevel:
+        cryptoInventoryReport.inventoryRiskLevel ??
+        cryptoInventoryReport.riskLevel ??
+        "UNKNOWN",
+      totalCryptoAssets: cryptoInventoryReport.totalCryptoAssets,
+      quantumExposedAssets: cryptoInventoryReport.quantumExposedAssets
+    },
+    migration: {
+      ready:
+        quantumReadinessReport.migrationReadiness === "READY" ||
+        quantumReadinessReport.migrationReady === true,
+      readinessScore: quantumReadinessReport.quantumReadinessScore,
+      recommendedPath: quantumReadinessReport.recommendedMigrationPath
+    },
+    dependencyRisk: {
+      riskLevel: dependencyRiskReport.riskLevel,
+      riskScore: dependencyRiskReport.riskScore
+    },
+    deepScan: {
+      codeFlowRiskLevel: codeFlowReport.riskLevel,
+      routeExposureRiskLevel: routeExposureReport.routeExposureRiskLevel,
+      trustBoundaryRiskLevel: trustBoundaryReport.trustBoundaryRiskLevel,
+      attackChainRiskLevel: attackChainBuilderReport.attackChainRiskLevel,
+      evidenceGraphRiskLevel: evidenceGraphReport.summary?.risk?.level
+    }
+  },
+  assessmentReport: report.securityAssessmentReport ?? report.assessmentReport ?? securityScoreReport,
+  auditReport: report.securityAuditReport ?? report.auditReport ?? smartContractAuditReport,
+  walletReport: report.walletRiskReport ?? {},
+  inventoryReport: cryptoInventoryReport,
+  migrationReport: quantumReadinessReport,
+  forecastReport: report.quantumExposureForecastReport ?? {},
+  simulationReport: exploitSimulationReport
+});
+
+report.jsonExportReport = jsonExportReport;
 
 //============================================================================
 // REPORT GENERATION
@@ -225,6 +356,9 @@ const securityBadgeReport = securityBadgeGenerator(report);
 fs.writeFileSync("report.json", JSON.stringify(report, null, 2), "utf8");
 fs.writeFileSync("report.html", htmlReport, "utf8");
 fs.writeFileSync("evidence-graph.json", JSON.stringify(evidenceGraphReport, null, 2), "utf8");
+fs.writeFileSync("dependency-risk-report.json", JSON.stringify(dependencyRiskReport, null, 2), "utf8");
+fs.writeFileSync("executive-summary.json", JSON.stringify(executiveReportEngineReport, null, 2), "utf8");
+fs.writeFileSync("quantum-risk-export.json", JSON.stringify(jsonExportReport, null, 2), "utf8");
 fs.writeFileSync("code-flow-report.json", JSON.stringify(codeFlowReport, null, 2), "utf8");
 fs.writeFileSync("route-exposure-report.json", JSON.stringify(routeExposureReport, null, 2), "utf8");
 fs.writeFileSync("trust-boundary-report.json", JSON.stringify(trustBoundaryReport, null, 2), "utf8");
@@ -239,9 +373,12 @@ fs.writeFileSync(
       summary,
       markdownReport,
       securityScoreReport,
+      executiveReportEngineReport,
+      jsonExportReport,
       remediationReport,
       quantumReadinessReport,
       cryptoInventoryReport,
+      dependencyRiskReport,
       codeFlowReport,
       routeExposureReport,
       trustBoundaryReport,
@@ -280,6 +417,31 @@ console.log(`Scanned Files: ${summary.scannedFiles}`);
 console.log(`Critical Findings: ${summary.criticalFindings}`);
 console.log(`High Findings: ${summary.highFindings}`);
 console.log(`Medium Findings: ${summary.mediumFindings}`);
+console.log("");
+
+console.log("Executive Report Engine");
+console.log("-----------------------");
+console.log(`Headline: ${executiveReportEngineReport.headline}`);
+console.log(`Report Type: ${executiveReportEngineReport.reportType}`);
+console.log(`Security Score: ${executiveReportEngineReport.keyMetrics?.securityScore ?? "N/A"}`);
+console.log(`Risk Level: ${executiveReportEngineReport.keyMetrics?.riskLevel ?? "UNKNOWN"}`);
+console.log(`Grade: ${executiveReportEngineReport.keyMetrics?.grade ?? "N/A"}`);
+console.log("");
+
+if (executiveReportEngineReport.recommendedActions?.length > 0) {
+  console.log("Executive Recommended Actions");
+  console.log("-----------------------------");
+  executiveReportEngineReport.recommendedActions.slice(0, 5).forEach((action, index) => {
+    console.log(`${index + 1}. ${action}`);
+  });
+  console.log("");
+}
+
+console.log("JSON Export Engine");
+console.log("------------------");
+console.log(`Export Type: ${jsonExportReport.exportType}`);
+console.log(`Schema Version: ${jsonExportReport.schemaVersion}`);
+console.log(`Exported At: ${jsonExportReport.exportedAt}`);
 console.log("");
 
 console.log("Deep Scan X");
@@ -366,6 +528,31 @@ console.log(`Dependency Files Scanned: ${dependencyReport.scannedDependencyFiles
 console.log(`High Risk Dependencies: ${dependencyReport.highRiskDependencies}`);
 console.log(`Medium Risk Dependencies: ${dependencyReport.mediumRiskDependencies}`);
 console.log("");
+
+
+console.log("Dependency Risk Engine");
+console.log("----------------------");
+console.log(`Dependency Risk Level: ${dependencyRiskReport.riskLevel}`);
+console.log(`Dependency Risk Score: ${dependencyRiskReport.riskScore}/100`);
+console.log(`Scanned Dependencies: ${dependencyRiskReport.scannedDependencies}`);
+console.log(`Total Dependency Risk Findings: ${dependencyRiskReport.counts?.totalFindings ?? dependencyRiskReport.findings.length}`);
+console.log(`Critical Dependency Risk Findings: ${dependencyRiskReport.counts?.criticalFindings ?? 0}`);
+console.log(`High Dependency Risk Findings: ${dependencyRiskReport.counts?.highFindings ?? 0}`);
+console.log(`Medium Dependency Risk Findings: ${dependencyRiskReport.counts?.mediumFindings ?? 0}`);
+console.log("");
+
+if (dependencyRiskReport.findings.length > 0) {
+  console.log("Top Dependency Risk Findings");
+  console.log("----------------------------");
+  dependencyRiskReport.findings.slice(0, 10).forEach((item, index) => {
+    console.log(`${index + 1}. ${item.dependency} (${item.severity})`);
+    console.log(` Version: ${item.version}`);
+    console.log(` Category: ${item.category}`);
+    console.log(` Reason: ${item.reason}`);
+    console.log(` Recommendation: ${item.recommendation}`);
+    console.log("");
+  });
+}
 
 console.log("Attack Surface Intelligence");
 console.log("---------------------------");
@@ -616,11 +803,14 @@ console.log(`Markdown Report: ${markdownReport.outputPath}`);
 console.log("HTML Report: report.html");
 console.log("JSON Report: report.json");
 console.log("Evidence Graph: evidence-graph.json");
+console.log("Dependency Risk Report: dependency-risk-report.json");
 console.log("Code Flow Report: code-flow-report.json");
 console.log("Route Exposure Report: route-exposure-report.json");
 console.log("Trust Boundary Report: trust-boundary-report.json");
 console.log("Attack Chain Builder Report: attack-chain-builder-report.json");
 console.log("Executive Report: executive-report.json");
+console.log("Executive Summary: executive-summary.json");
+console.log("Quantum Risk Export: quantum-risk-export.json");
 console.log("SARIF Report: report.sarif");
 console.log("Security Badge SVG: badge.svg");
 console.log("Security Badge HTML: badge.html");
