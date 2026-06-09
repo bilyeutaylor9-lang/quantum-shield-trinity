@@ -73,6 +73,23 @@ export {
   summaryFormatter
 };
 
+const timedStep = (label, fn) => {
+  const started = Date.now();
+  console.log(`[QST] START ${label}`);
+
+  try {
+    const result = fn();
+    const elapsed = ((Date.now() - started) / 1000).toFixed(2);
+    console.log(`[QST] DONE  ${label} in ${elapsed}s`);
+    return result;
+  } catch (error) {
+    const elapsed = ((Date.now() - started) / 1000).toFixed(2);
+    console.error(`[QST] FAIL  ${label} after ${elapsed}s`);
+    console.error(error?.stack ?? error?.message ?? error);
+    throw error;
+  }
+};
+
 const findPackageJson = (files = []) => {
   const packageFile = files.find((file) => {
     const filePath = file.path ?? file.file ?? file.name ?? file.filename ?? "";
@@ -389,72 +406,121 @@ const addEvidenceItemsToGraph = (evidenceGraph, items = [], engine = "unknown", 
 };
 
 export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
-  const scanResult = fileScanner(targetDirectory);
-  const report = repositoryScannerEngine(scanResult.files);
-  const packageJson = findPackageJson(scanResult.files);
+  console.log("");
+  console.log("Quantum Shield Trinity Deep Scan");
+  console.log("--------------------------------");
+  console.log(`[QST] Scan booted for: ${targetDirectory}`);
+  console.log("");
 
-  const dependencyRiskReport = dependencyRiskEngine(packageJson);
+  const scanResult = timedStep("fileScanner", () => fileScanner(targetDirectory));
+
+  console.log(`[QST] Files discovered: ${scanResult.files?.length ?? 0}`);
+
+  const report = timedStep("repositoryScannerEngine", () =>
+    repositoryScannerEngine(scanResult.files)
+  );
+
+  const packageJson = timedStep("findPackageJson", () => findPackageJson(scanResult.files));
+
+  const dependencyRiskReport = timedStep("dependencyRiskEngine", () =>
+    dependencyRiskEngine(packageJson)
+  );
+
   dependencyRiskReport.findings = (dependencyRiskReport.findings ?? []).map(
     normalizeDependencyRiskFinding
   );
 
-  const dependencyReport = dependencyIntelligenceEngine(scanResult.files);
-  const attackSurfaceReport = attackSurfaceEngine(scanResult.files);
-  const smartContractAuditReport = smartContractAuditEngine(scanResult.files);
-  const quantumReadinessReport = quantumReadinessEngine(scanResult.files);
-  const cryptoInventoryReport = cryptoInventoryEngine(scanResult.files);
-  const smartContractContextReport = buildSmartContractContextReport(scanResult.files);
+  const dependencyReport = timedStep("dependencyIntelligenceEngine", () =>
+    dependencyIntelligenceEngine(scanResult.files)
+  );
+
+  const attackSurfaceReport = timedStep("attackSurfaceEngine", () =>
+    attackSurfaceEngine(scanResult.files)
+  );
+
+  const smartContractAuditReport = timedStep("smartContractAuditEngine", () =>
+    smartContractAuditEngine(scanResult.files)
+  );
+
+  const quantumReadinessReport = timedStep("quantumReadinessEngine", () =>
+    quantumReadinessEngine(scanResult.files)
+  );
+
+  const cryptoInventoryReport = timedStep("cryptoInventoryEngine", () =>
+    cryptoInventoryEngine(scanResult.files)
+  );
+
+  const smartContractContextReport = timedStep("buildSmartContractContextReport", () =>
+    buildSmartContractContextReport(scanResult.files)
+  );
 
   const walletInput = options.wallet ?? buildWalletInputFromReports(report, cryptoInventoryReport);
-  const walletReport = walletRiskEngine(walletInput);
 
-  const migrationShieldReport = migrationShieldEngine(walletReport, cryptoInventoryReport);
+  const walletReport = timedStep("walletRiskEngine", () => walletRiskEngine(walletInput));
 
-  const quantumExposureForecastReport = quantumExposureForecastEngine({
-    walletReport,
-    inventoryReport: {
-      ...cryptoInventoryReport,
-      score:
-        cryptoInventoryReport.score ??
-        cryptoInventoryReport.inventorySecurityScore ??
-        cryptoInventoryReport.inventoryRiskScore ??
-        0
-    },
-    migrationReport: migrationShieldReport
-  });
+  const migrationShieldReport = timedStep("migrationShieldEngine", () =>
+    migrationShieldEngine(walletReport, cryptoInventoryReport)
+  );
 
-  const quantumAttackSimulationReport = quantumAttackSimulationEngine({
-    walletReport,
-    inventoryReport: cryptoInventoryReport,
-    migrationReport: migrationShieldReport,
-    forecastReport: quantumExposureForecastReport
-  });
+  const quantumExposureForecastReport = timedStep("quantumExposureForecastEngine", () =>
+    quantumExposureForecastEngine({
+      walletReport,
+      inventoryReport: {
+        ...cryptoInventoryReport,
+        score:
+          cryptoInventoryReport.score ??
+          cryptoInventoryReport.inventorySecurityScore ??
+          cryptoInventoryReport.inventoryRiskScore ??
+          0
+      },
+      migrationReport: migrationShieldReport
+    })
+  );
 
-  const securityAssessmentReport = securityAssessmentEngine({
-    walletReport,
-    inventoryReport: {
-      ...cryptoInventoryReport,
-      score:
-        cryptoInventoryReport.score ??
-        cryptoInventoryReport.inventorySecurityScore ??
-        cryptoInventoryReport.inventoryRiskScore ??
-        0,
-      findings:
-        cryptoInventoryReport.findings ??
-        cryptoInventoryReport.totalCryptoAssets ??
-        cryptoInventoryReport.assets?.length ??
-        0
-    },
-    migrationReport: migrationShieldReport,
-    forecastReport: quantumExposureForecastReport
-  });
+  const quantumAttackSimulationReport = timedStep("quantumAttackSimulationEngine", () =>
+    quantumAttackSimulationEngine({
+      walletReport,
+      inventoryReport: cryptoInventoryReport,
+      migrationReport: migrationShieldReport,
+      forecastReport: quantumExposureForecastReport
+    })
+  );
 
-  const codeFlowReport = codeFlowScannerEngine(scanResult.files);
-  const routeExposureReport = routeExposureEngine(scanResult.files);
-  const trustBoundaryReport = trustBoundaryEngine(scanResult.files, {
-    codeFlowReport,
-    routeExposureReport
-  });
+  const securityAssessmentReport = timedStep("securityAssessmentEngine", () =>
+    securityAssessmentEngine({
+      walletReport,
+      inventoryReport: {
+        ...cryptoInventoryReport,
+        score:
+          cryptoInventoryReport.score ??
+          cryptoInventoryReport.inventorySecurityScore ??
+          cryptoInventoryReport.inventoryRiskScore ??
+          0,
+        findings:
+          cryptoInventoryReport.findings ??
+          cryptoInventoryReport.totalCryptoAssets ??
+          cryptoInventoryReport.assets?.length ??
+          0
+      },
+      migrationReport: migrationShieldReport,
+      forecastReport: quantumExposureForecastReport
+    })
+  );
+
+  const codeFlowReport = timedStep("codeFlowScannerEngine", () =>
+    codeFlowScannerEngine(scanResult.files)
+  );
+
+  const routeExposureReport = timedStep("routeExposureEngine", () =>
+    routeExposureEngine(scanResult.files)
+  );
+
+  const trustBoundaryReport = timedStep("trustBoundaryEngine", () =>
+    trustBoundaryEngine(scanResult.files, {
+      codeFlowReport,
+      routeExposureReport
+    })
+  );
 
   Object.assign(report, {
     platform: "Quantum Shield Trinity",
@@ -486,34 +552,43 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
     trustBoundaryReport
   });
 
-  const exploitSimulationReport = exploitSimulationEngine(report);
+  const exploitSimulationReport = timedStep("exploitSimulationEngine", () =>
+    exploitSimulationEngine(report)
+  );
+
   report.exploitSimulationReport = exploitSimulationReport;
 
-  const securityScoreReport = securityScoreEngine({
-    dependencyReport,
-    dependencyRiskReport,
-    attackSurfaceReport,
-    smartContractAuditReport,
-    smartContractContextReport,
-    exploitSimulationReport,
-    quantumReadinessReport,
-    cryptoInventoryReport,
-    migrationShieldReport,
-    quantumExposureForecastReport,
-    quantumAttackSimulationReport,
-    securityAssessmentReport,
-    codeFlowReport,
-    routeExposureReport,
-    trustBoundaryReport,
-    repositoryReport: report
-  });
+  const securityScoreReport = timedStep("securityScoreEngine", () =>
+    securityScoreEngine({
+      dependencyReport,
+      dependencyRiskReport,
+      attackSurfaceReport,
+      smartContractAuditReport,
+      smartContractContextReport,
+      exploitSimulationReport,
+      quantumReadinessReport,
+      cryptoInventoryReport,
+      migrationShieldReport,
+      quantumExposureForecastReport,
+      quantumAttackSimulationReport,
+      securityAssessmentReport,
+      codeFlowReport,
+      routeExposureReport,
+      trustBoundaryReport,
+      repositoryReport: report
+    })
+  );
 
   report.securityScoreReport = securityScoreReport;
 
-  const remediationReport = remediationEngine(report);
-  const autoFixReport = autoFixEngine(report);
-  const attackPathReport = attackPathGeneratorEngine(report);
-  const complianceMappingReport = complianceMappingEngine(report);
+  const remediationReport = timedStep("remediationEngine", () => remediationEngine(report));
+  const autoFixReport = timedStep("autoFixEngine", () => autoFixEngine(report));
+  const attackPathReport = timedStep("attackPathGeneratorEngine", () =>
+    attackPathGeneratorEngine(report)
+  );
+  const complianceMappingReport = timedStep("complianceMappingEngine", () =>
+    complianceMappingEngine(report)
+  );
 
   Object.assign(report, {
     remediationReport,
@@ -522,21 +597,23 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
     complianceMappingReport
   });
 
-  const rootCauseReport = buildRootCauseReport([
-    { engine: "cryptoInventoryEngine", items: cryptoInventoryReport.assets },
-    { engine: "quantumReadinessEngine", items: quantumReadinessReport.findings },
-    { engine: "dependencyIntelligenceEngine", items: dependencyReport.dependencyFindings },
-    { engine: "dependencyRiskEngine", items: dependencyRiskReport.findings },
-    { engine: "attackSurfaceEngine", items: attackSurfaceReport.attackFindings },
-    { engine: "smartContractAuditEngine", items: smartContractAuditReport.auditFindings },
-    { engine: "smartContractContextEngine", items: smartContractContextReport.contexts },
-    { engine: "codeFlowScannerEngine", items: codeFlowReport.findings },
-    { engine: "routeExposureEngine", items: routeExposureReport.findings },
-    { engine: "trustBoundaryEngine", items: trustBoundaryReport.findings },
-    { engine: "exploitSimulationEngine", items: exploitSimulationReport.simulations },
-    { engine: "attackPathGeneratorEngine", items: attackPathReport.attackPaths },
-    { engine: "complianceMappingEngine", items: complianceMappingReport.mappedFindings }
-  ]);
+  const rootCauseReport = timedStep("buildRootCauseReport", () =>
+    buildRootCauseReport([
+      { engine: "cryptoInventoryEngine", items: cryptoInventoryReport.assets },
+      { engine: "quantumReadinessEngine", items: quantumReadinessReport.findings },
+      { engine: "dependencyIntelligenceEngine", items: dependencyReport.dependencyFindings },
+      { engine: "dependencyRiskEngine", items: dependencyRiskReport.findings },
+      { engine: "attackSurfaceEngine", items: attackSurfaceReport.attackFindings },
+      { engine: "smartContractAuditEngine", items: smartContractAuditReport.auditFindings },
+      { engine: "smartContractContextEngine", items: smartContractContextReport.contexts },
+      { engine: "codeFlowScannerEngine", items: codeFlowReport.findings },
+      { engine: "routeExposureEngine", items: routeExposureReport.findings },
+      { engine: "trustBoundaryEngine", items: trustBoundaryReport.findings },
+      { engine: "exploitSimulationEngine", items: exploitSimulationReport.simulations },
+      { engine: "attackPathGeneratorEngine", items: attackPathReport.attackPaths },
+      { engine: "complianceMappingEngine", items: complianceMappingReport.mappedFindings }
+    ])
+  );
 
   report.rootCauseReport = rootCauseReport;
 
@@ -548,214 +625,275 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
     ]
   };
 
-  const attackChainBuilderReport = attackChainBuilderEngine(report, {
-    maxDepth: 5,
-    limit: 50
-  });
+  const attackChainBuilderReport = timedStep("attackChainBuilderEngine", () =>
+    attackChainBuilderEngine(report, {
+      maxDepth: 5,
+      limit: 50
+    })
+  );
 
   report.attackChainBuilderReport = attackChainBuilderReport;
 
-  const securityAuditLoopReport = securityAuditLoopEngine({
-    previousHash:
-      process.env.QST_PREVIOUS_AUDIT_HASH ?? report.previousAuditHash ?? "GENESIS",
-    entropySeed: `${Date.now()}-${targetDirectory}-${scanResult.files.length}`,
-    systemState: {
-      platform: "Quantum Shield Trinity",
-      version: "2.3.0",
-      targetDirectory,
-      scannedFiles: scanResult.files.length,
-      walletRiskLevel: walletReport.riskLevel,
-      walletRiskScore: walletReport.score,
-      securityScore:
-        securityScoreReport.securityScore ?? securityAssessmentReport.totalScore ?? 0,
-      securityRiskLevel:
-        securityScoreReport.riskLevel ?? securityAssessmentReport.riskLevel ?? "UNKNOWN",
-      dependencyRiskLevel: dependencyRiskReport.riskLevel,
-      codeFlowRiskLevel: codeFlowReport.riskLevel,
-      routeExposureRiskLevel: routeExposureReport.routeExposureRiskLevel,
-      trustBoundaryRiskLevel: trustBoundaryReport.trustBoundaryRiskLevel,
-      attackChainRiskLevel: attackChainBuilderReport.attackChainRiskLevel,
-      quantumExposure: quantumExposureForecastReport.qDayExposure,
-      quantumBusinessRisk: quantumAttackSimulationReport.businessRisk,
-      rootCauseCriticalCount: rootCauseReport.criticalRootCauses
-    }
-  });
-
-  report.securityAuditLoopReport = securityAuditLoopReport;
-  report.auditLoopReport = securityAuditLoopReport;
-
-  const securityCopilotReport = buildSecurityCopilotReport([
-    { engine: "cryptoInventoryEngine", items: cryptoInventoryReport.assets },
-    { engine: "quantumReadinessEngine", items: quantumReadinessReport.findings },
-    { engine: "dependencyIntelligenceEngine", items: report.dependencyReport.dependencyFindings },
-    { engine: "dependencyRiskEngine", items: dependencyRiskReport.findings },
-    { engine: "attackSurfaceEngine", items: attackSurfaceReport.attackFindings },
-    { engine: "smartContractAuditEngine", items: smartContractAuditReport.auditFindings },
-    { engine: "smartContractContextEngine", items: smartContractContextReport.contexts },
-    { engine: "codeFlowScannerEngine", items: codeFlowReport.findings },
-    { engine: "routeExposureEngine", items: routeExposureReport.findings },
-    { engine: "trustBoundaryEngine", items: trustBoundaryReport.findings },
-    { engine: "exploitSimulationEngine", items: exploitSimulationReport.simulations },
-    { engine: "attackPathGeneratorEngine", items: attackPathReport.attackPaths },
-    { engine: "attackChainBuilderEngine", items: attackChainBuilderReport.attackChains },
-    { engine: "rootCauseEngine", items: rootCauseReport.rootCauses },
-    {
-      engine: "securityAssessmentEngine",
-      items: (securityAssessmentReport.criticalFindings ?? []).map((finding, index) => ({
-        id: `security-assessment-copilot-${index + 1}`,
-        type: "Security Assessment",
-        title: "Security Assessment Finding",
-        description: finding,
-        severity: securityAssessmentReport.riskLevel,
-        category: "Security Assessment",
-        recommendation:
-          securityAssessmentReport.recommendedNextSteps?.[index] ??
-          "Review assessment finding."
-      }))
-    }
-  ]);
-
-  report.securityCopilotReport = securityCopilotReport;
-
-  const evidenceGraph = createEvidenceGraph({
-    autoLinkByFile: true,
-    autoLinkByRule: true,
-    autoLinkByAsset: true,
-    maxAttackChainDepth: 6
-  });
-
-  addEvidenceItemsToGraph(
-    evidenceGraph,
-    [
-      {
-        id: "wallet-risk",
-        type: "wallet_risk",
-        category: "wallet_quantum_risk",
-        title: "Wallet Quantum Risk",
-        description: walletReport.recommendation,
-        severity:
-          walletReport.riskLevel === "CRITICAL"
-            ? "critical"
-            : walletReport.riskLevel === "HIGH"
-              ? "high"
-              : walletReport.riskLevel === "MEDIUM"
-                ? "medium"
-                : "low",
-        confidence: 0.8,
-        recommendation: walletReport.recommendation,
-        remediation: [walletReport.recommendation],
-        assets: [walletReport.walletAddress, "wallet", "signing_activity"].filter(Boolean),
-        metadata: walletReport
-      }
-    ],
-    "walletRiskEngine",
-    "wallet_risk"
-  );
-
-  addEvidenceItemsToGraph(evidenceGraph, cryptoInventoryReport.assets, "cryptoInventoryEngine", "crypto_inventory");
-  addEvidenceItemsToGraph(evidenceGraph, quantumReadinessReport.findings, "quantumReadinessEngine", "quantum_readiness");
-  addEvidenceItemsToGraph(evidenceGraph, report.dependencyReport.dependencyFindings, "dependencyIntelligenceEngine", "dependency_intelligence");
-  addEvidenceItemsToGraph(evidenceGraph, dependencyRiskReport.findings, "dependencyRiskEngine", "dependency_risk");
-  addEvidenceItemsToGraph(evidenceGraph, attackSurfaceReport.attackFindings, "attackSurfaceEngine", "attack_surface");
-  addEvidenceItemsToGraph(evidenceGraph, smartContractAuditReport.auditFindings, "smartContractAuditEngine", "smart_contract_audit");
-  addEvidenceItemsToGraph(evidenceGraph, smartContractContextReport.contexts, "smartContractContextEngine", "smart_contract_context");
-  addEvidenceItemsToGraph(evidenceGraph, codeFlowReport.findings, "codeFlowScannerEngine", "code_flow");
-  addEvidenceItemsToGraph(evidenceGraph, routeExposureReport.findings, "routeExposureEngine", "route_exposure");
-  addEvidenceItemsToGraph(evidenceGraph, trustBoundaryReport.findings, "trustBoundaryEngine", "trust_boundary");
-  addEvidenceItemsToGraph(evidenceGraph, rootCauseReport.rootCauses, "rootCauseEngine", "root_cause");
-  addEvidenceItemsToGraph(evidenceGraph, securityCopilotReport.guidance, "securityCopilotEngine", "security_copilot");
-  addEvidenceItemsToGraph(evidenceGraph, attackChainBuilderReport.attackChains, "attackChainBuilderEngine", "attack_chain_builder");
-  addEvidenceItemsToGraph(evidenceGraph, exploitSimulationReport.simulations, "exploitSimulationEngine", "exploit_simulation");
-  addEvidenceItemsToGraph(evidenceGraph, remediationReport.remediationItems, "remediationEngine", "remediation");
-  addEvidenceItemsToGraph(evidenceGraph, autoFixReport.fixes, "autoFixEngine", "auto_fix");
-  addEvidenceItemsToGraph(evidenceGraph, attackPathReport.attackPaths, "attackPathGeneratorEngine", "attack_path");
-  addEvidenceItemsToGraph(evidenceGraph, complianceMappingReport.mappedFindings, "complianceMappingEngine", "compliance_mapping");
-
-  const evidenceGraphReport = evidenceGraph.exportGraph();
-  report.evidenceGraphReport = evidenceGraphReport;
-
-  const summary = summaryFormatter(report);
-  const markdownReport = markdownReportGenerator(report);
-
-  const executiveReportEngineReport = executiveReportEngine({
-    ...report,
-    executiveReport: { summary },
-    assessmentReport: report.securityAssessmentReport ?? report.assessmentReport ?? {},
-    auditReport: { smartContractAuditReport, securityAuditLoopReport },
-    riskProfile: {
-      wallet: walletReport,
-      inventory: {
-        riskLevel:
-          cryptoInventoryReport.inventoryRiskLevel ??
-          cryptoInventoryReport.riskLevel ??
-          "UNKNOWN"
-      },
-      migration: {
-        ready:
-          quantumReadinessReport.migrationReadiness === "READY" ||
-          quantumReadinessReport.migrationReady === true
-      }
-    }
-  });
-
-  report.executiveReportEngineReport = executiveReportEngineReport;
-
-  const jsonExportReport = jsonExportEngine({
-    platform: "Quantum Shield Trinity",
-    version: "2.3.0",
-    ...report,
-    riskProfile: {
-      wallet: walletReport,
-      inventory: {
-        riskLevel:
-          cryptoInventoryReport.inventoryRiskLevel ??
-          cryptoInventoryReport.riskLevel ??
-          "UNKNOWN",
-        totalCryptoAssets: cryptoInventoryReport.totalCryptoAssets,
-        quantumExposedAssets: cryptoInventoryReport.quantumExposedAssets
-      },
-      migration: {
-        ready:
-          migrationShieldReport.migrationReady === true ||
-          quantumReadinessReport.migrationReadiness === "READY" ||
-          quantumReadinessReport.migrationReady === true,
-        readinessScore: quantumReadinessReport.quantumReadinessScore,
-        recommendedPath: quantumReadinessReport.recommendedMigrationPath,
-        shieldReady: migrationShieldReport.migrationReady,
-        forecastQDayExposure: quantumExposureForecastReport.qDayExposure,
-        forecastMigrationUrgency: quantumExposureForecastReport.migrationUrgency,
-        shieldRecommendations: migrationShieldReport.recommendations
-      },
-      dependencyRisk: {
-        riskLevel: dependencyRiskReport.riskLevel,
-        riskScore: dependencyRiskReport.riskScore
-      },
-      deepScan: {
+  const securityAuditLoopReport = timedStep("securityAuditLoopEngine", () =>
+    securityAuditLoopEngine({
+      previousHash:
+        process.env.QST_PREVIOUS_AUDIT_HASH ?? report.previousAuditHash ?? "GENESIS",
+      entropySeed: `${Date.now()}-${targetDirectory}-${scanResult.files.length}`,
+      systemState: {
+        platform: "Quantum Shield Trinity",
+        version: "2.3.0",
+        targetDirectory,
+        scannedFiles: scanResult.files.length,
+        walletRiskLevel: walletReport.riskLevel,
+        walletRiskScore: walletReport.score,
+        securityScore:
+          securityScoreReport.securityScore ?? securityAssessmentReport.totalScore ?? 0,
+        securityRiskLevel:
+          securityScoreReport.riskLevel ?? securityAssessmentReport.riskLevel ?? "UNKNOWN",
+        dependencyRiskLevel: dependencyRiskReport.riskLevel,
         codeFlowRiskLevel: codeFlowReport.riskLevel,
         routeExposureRiskLevel: routeExposureReport.routeExposureRiskLevel,
         trustBoundaryRiskLevel: trustBoundaryReport.trustBoundaryRiskLevel,
         attackChainRiskLevel: attackChainBuilderReport.attackChainRiskLevel,
-        evidenceGraphRiskLevel: evidenceGraphReport.summary?.risk?.level
+        quantumExposure: quantumExposureForecastReport.qDayExposure,
+        quantumBusinessRisk: quantumAttackSimulationReport.businessRisk,
+        rootCauseCriticalCount: rootCauseReport.criticalRootCauses
       }
-    }
-  });
+    })
+  );
+
+  report.securityAuditLoopReport = securityAuditLoopReport;
+  report.auditLoopReport = securityAuditLoopReport;
+
+  const securityCopilotReport = timedStep("buildSecurityCopilotReport", () =>
+    buildSecurityCopilotReport([
+      { engine: "cryptoInventoryEngine", items: cryptoInventoryReport.assets },
+      { engine: "quantumReadinessEngine", items: quantumReadinessReport.findings },
+      { engine: "dependencyIntelligenceEngine", items: report.dependencyReport.dependencyFindings },
+      { engine: "dependencyRiskEngine", items: dependencyRiskReport.findings },
+      { engine: "attackSurfaceEngine", items: attackSurfaceReport.attackFindings },
+      { engine: "smartContractAuditEngine", items: smartContractAuditReport.auditFindings },
+      { engine: "smartContractContextEngine", items: smartContractContextReport.contexts },
+      { engine: "codeFlowScannerEngine", items: codeFlowReport.findings },
+      { engine: "routeExposureEngine", items: routeExposureReport.findings },
+      { engine: "trustBoundaryEngine", items: trustBoundaryReport.findings },
+      { engine: "exploitSimulationEngine", items: exploitSimulationReport.simulations },
+      { engine: "attackPathGeneratorEngine", items: attackPathReport.attackPaths },
+      { engine: "attackChainBuilderEngine", items: attackChainBuilderReport.attackChains },
+      { engine: "rootCauseEngine", items: rootCauseReport.rootCauses },
+      {
+        engine: "securityAssessmentEngine",
+        items: (securityAssessmentReport.criticalFindings ?? []).map((finding, index) => ({
+          id: `security-assessment-copilot-${index + 1}`,
+          type: "Security Assessment",
+          title: "Security Assessment Finding",
+          description: finding,
+          severity: securityAssessmentReport.riskLevel,
+          category: "Security Assessment",
+          recommendation:
+            securityAssessmentReport.recommendedNextSteps?.[index] ??
+            "Review assessment finding."
+        }))
+      }
+    ])
+  );
+
+  report.securityCopilotReport = securityCopilotReport;
+
+  const evidenceGraph = timedStep("createEvidenceGraph", () =>
+    createEvidenceGraph({
+      autoLinkByFile: true,
+      autoLinkByRule: true,
+      autoLinkByAsset: true,
+      maxAttackChainDepth: 6
+    })
+  );
+
+  timedStep("evidenceGraph.add.walletRiskEngine", () =>
+    addEvidenceItemsToGraph(
+      evidenceGraph,
+      [
+        {
+          id: "wallet-risk",
+          type: "wallet_risk",
+          category: "wallet_quantum_risk",
+          title: "Wallet Quantum Risk",
+          description: walletReport.recommendation,
+          severity:
+            walletReport.riskLevel === "CRITICAL"
+              ? "critical"
+              : walletReport.riskLevel === "HIGH"
+                ? "high"
+                : walletReport.riskLevel === "MEDIUM"
+                  ? "medium"
+                  : "low",
+          confidence: 0.8,
+          recommendation: walletReport.recommendation,
+          remediation: [walletReport.recommendation],
+          assets: [walletReport.walletAddress, "wallet", "signing_activity"].filter(Boolean),
+          metadata: walletReport
+        }
+      ],
+      "walletRiskEngine",
+      "wallet_risk"
+    )
+  );
+
+  timedStep("evidenceGraph.add.cryptoInventoryEngine", () =>
+    addEvidenceItemsToGraph(evidenceGraph, cryptoInventoryReport.assets, "cryptoInventoryEngine", "crypto_inventory")
+  );
+  timedStep("evidenceGraph.add.quantumReadinessEngine", () =>
+    addEvidenceItemsToGraph(evidenceGraph, quantumReadinessReport.findings, "quantumReadinessEngine", "quantum_readiness")
+  );
+  timedStep("evidenceGraph.add.dependencyIntelligenceEngine", () =>
+    addEvidenceItemsToGraph(evidenceGraph, report.dependencyReport.dependencyFindings, "dependencyIntelligenceEngine", "dependency_intelligence")
+  );
+  timedStep("evidenceGraph.add.dependencyRiskEngine", () =>
+    addEvidenceItemsToGraph(evidenceGraph, dependencyRiskReport.findings, "dependencyRiskEngine", "dependency_risk")
+  );
+  timedStep("evidenceGraph.add.attackSurfaceEngine", () =>
+    addEvidenceItemsToGraph(evidenceGraph, attackSurfaceReport.attackFindings, "attackSurfaceEngine", "attack_surface")
+  );
+  timedStep("evidenceGraph.add.smartContractAuditEngine", () =>
+    addEvidenceItemsToGraph(evidenceGraph, smartContractAuditReport.auditFindings, "smartContractAuditEngine", "smart_contract_audit")
+  );
+  timedStep("evidenceGraph.add.smartContractContextEngine", () =>
+    addEvidenceItemsToGraph(evidenceGraph, smartContractContextReport.contexts, "smartContractContextEngine", "smart_contract_context")
+  );
+  timedStep("evidenceGraph.add.codeFlowScannerEngine", () =>
+    addEvidenceItemsToGraph(evidenceGraph, codeFlowReport.findings, "codeFlowScannerEngine", "code_flow")
+  );
+  timedStep("evidenceGraph.add.routeExposureEngine", () =>
+    addEvidenceItemsToGraph(evidenceGraph, routeExposureReport.findings, "routeExposureEngine", "route_exposure")
+  );
+  timedStep("evidenceGraph.add.trustBoundaryEngine", () =>
+    addEvidenceItemsToGraph(evidenceGraph, trustBoundaryReport.findings, "trustBoundaryEngine", "trust_boundary")
+  );
+  timedStep("evidenceGraph.add.rootCauseEngine", () =>
+    addEvidenceItemsToGraph(evidenceGraph, rootCauseReport.rootCauses, "rootCauseEngine", "root_cause")
+  );
+  timedStep("evidenceGraph.add.securityCopilotEngine", () =>
+    addEvidenceItemsToGraph(evidenceGraph, securityCopilotReport.guidance, "securityCopilotEngine", "security_copilot")
+  );
+  timedStep("evidenceGraph.add.attackChainBuilderEngine", () =>
+    addEvidenceItemsToGraph(evidenceGraph, attackChainBuilderReport.attackChains, "attackChainBuilderEngine", "attack_chain_builder")
+  );
+  timedStep("evidenceGraph.add.exploitSimulationEngine", () =>
+    addEvidenceItemsToGraph(evidenceGraph, exploitSimulationReport.simulations, "exploitSimulationEngine", "exploit_simulation")
+  );
+  timedStep("evidenceGraph.add.remediationEngine", () =>
+    addEvidenceItemsToGraph(evidenceGraph, remediationReport.remediationItems, "remediationEngine", "remediation")
+  );
+  timedStep("evidenceGraph.add.autoFixEngine", () =>
+    addEvidenceItemsToGraph(evidenceGraph, autoFixReport.fixes, "autoFixEngine", "auto_fix")
+  );
+  timedStep("evidenceGraph.add.attackPathGeneratorEngine", () =>
+    addEvidenceItemsToGraph(evidenceGraph, attackPathReport.attackPaths, "attackPathGeneratorEngine", "attack_path")
+  );
+  timedStep("evidenceGraph.add.complianceMappingEngine", () =>
+    addEvidenceItemsToGraph(evidenceGraph, complianceMappingReport.mappedFindings, "complianceMappingEngine", "compliance_mapping")
+  );
+
+  const evidenceGraphReport = timedStep("evidenceGraph.exportGraph", () =>
+    evidenceGraph.exportGraph()
+  );
+
+  report.evidenceGraphReport = evidenceGraphReport;
+
+  const summary = timedStep("summaryFormatter", () => summaryFormatter(report));
+  const markdownReport = timedStep("markdownReportGenerator", () =>
+    markdownReportGenerator(report)
+  );
+
+  const executiveReportEngineReport = timedStep("executiveReportEngine", () =>
+    executiveReportEngine({
+      ...report,
+      executiveReport: { summary },
+      assessmentReport: report.securityAssessmentReport ?? report.assessmentReport ?? {},
+      auditReport: { smartContractAuditReport, securityAuditLoopReport },
+      riskProfile: {
+        wallet: walletReport,
+        inventory: {
+          riskLevel:
+            cryptoInventoryReport.inventoryRiskLevel ??
+            cryptoInventoryReport.riskLevel ??
+            "UNKNOWN"
+        },
+        migration: {
+          ready:
+            quantumReadinessReport.migrationReadiness === "READY" ||
+            quantumReadinessReport.migrationReady === true
+        }
+      }
+    })
+  );
+
+  report.executiveReportEngineReport = executiveReportEngineReport;
+
+  const jsonExportReport = timedStep("jsonExportEngine", () =>
+    jsonExportEngine({
+      platform: "Quantum Shield Trinity",
+      version: "2.3.0",
+      ...report,
+      riskProfile: {
+        wallet: walletReport,
+        inventory: {
+          riskLevel:
+            cryptoInventoryReport.inventoryRiskLevel ??
+            cryptoInventoryReport.riskLevel ??
+            "UNKNOWN",
+          totalCryptoAssets: cryptoInventoryReport.totalCryptoAssets,
+          quantumExposedAssets: cryptoInventoryReport.quantumExposedAssets
+        },
+        migration: {
+          ready:
+            migrationShieldReport.migrationReady === true ||
+            quantumReadinessReport.migrationReadiness === "READY" ||
+            quantumReadinessReport.migrationReady === true,
+          readinessScore: quantumReadinessReport.quantumReadinessScore,
+          recommendedPath: quantumReadinessReport.recommendedMigrationPath,
+          shieldReady: migrationShieldReport.migrationReady,
+          forecastQDayExposure: quantumExposureForecastReport.qDayExposure,
+          forecastMigrationUrgency: quantumExposureForecastReport.migrationUrgency,
+          shieldRecommendations: migrationShieldReport.recommendations
+        },
+        dependencyRisk: {
+          riskLevel: dependencyRiskReport.riskLevel,
+          riskScore: dependencyRiskReport.riskScore
+        },
+        deepScan: {
+          codeFlowRiskLevel: codeFlowReport.riskLevel,
+          routeExposureRiskLevel: routeExposureReport.routeExposureRiskLevel,
+          trustBoundaryRiskLevel: trustBoundaryReport.trustBoundaryRiskLevel,
+          attackChainRiskLevel: attackChainBuilderReport.attackChainRiskLevel,
+          evidenceGraphRiskLevel: evidenceGraphReport.summary?.risk?.level
+        }
+      }
+    })
+  );
 
   report.jsonExportReport = jsonExportReport;
 
-  const htmlReport = htmlReportGenerator({
-    ...report,
-    executiveReport: {
-      summary,
-      markdownReport
-    }
-  });
+  const htmlReport = timedStep("htmlReportGenerator", () =>
+    htmlReportGenerator({
+      ...report,
+      executiveReport: {
+        summary,
+        markdownReport
+      }
+    })
+  );
 
-  const sarifReport = sarifReportGenerator({
-    ...report,
-    version: "2.0.0"
-  });
+  const sarifReport = timedStep("sarifReportGenerator", () =>
+    sarifReportGenerator({
+      ...report,
+      version: "2.0.0"
+    })
+  );
 
-  const securityBadgeReport = securityBadgeGenerator(report);
+  const securityBadgeReport = timedStep("securityBadgeGenerator", () =>
+    securityBadgeGenerator(report)
+  );
 
   Object.assign(report, {
     summary,
@@ -764,6 +902,10 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
     sarifReport,
     securityBadgeReport
   });
+
+  console.log("");
+  console.log("[QST] Scan completed successfully.");
+  console.log("");
 
   return report;
 }
