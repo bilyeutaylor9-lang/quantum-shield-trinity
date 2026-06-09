@@ -17,6 +17,7 @@ import { jsonExportEngine } from "./engines/jsonExportEngine.js";
 import { migrationShieldEngine } from "./engines/migrationShieldEngine.js";
 import { quantumAttackSimulationEngine } from "./engines/quantumAttackSimulationEngine.js";
 import { quantumExposureForecastEngine } from "./engines/quantumExposureForecastEngine.js";
+import { rootCauseEngine } from "./engines/rootCauseEngine.js";
 import { codeFlowScannerEngine } from "./engines/codeFlowScannerEngine.js";
 import { routeExposureEngine } from "./engines/routeExposureEngine.js";
 import { trustBoundaryEngine } from "./engines/trustBoundaryEngine.js";
@@ -63,6 +64,55 @@ const normalizeDependencyRiskFinding = (item = {}) => ({
   confidence: typeof item.confidence === "number" ? item.confidence / 100 : 0.75,
   recommendation: item.recommendation
 });
+
+const buildRootCauseReport = (findingGroups = []) => {
+  const rootCauses = [];
+
+  findingGroups.forEach(({ items = [], engine = "unknown" }) => {
+    if (!Array.isArray(items)) return;
+
+    items.forEach((finding, index) => {
+      const rootCause = rootCauseEngine(finding);
+
+      rootCauses.push({
+        id: `root-cause-${engine}-${index + 1}`,
+        engine,
+        findingType: finding.type ?? finding.title ?? finding.dependency ?? finding.simulationName ?? "Unknown Finding",
+        findingSeverity: finding.severity ?? finding.riskLevel ?? "LOW",
+        file: finding.file ?? finding.path ?? null,
+        line: finding.line ?? null,
+        rootCause,
+        source: rootCause.source,
+        reason: rootCause.reason,
+        attackSurface: rootCause.attackSurface,
+        exploitability: rootCause.exploitability,
+        likelihood: rootCause.likelihood,
+        impact: rootCause.impact,
+        remediationPriority: rootCause.remediationPriority,
+        recommendation:
+          finding.recommendation ??
+          finding.recommendedDefense ??
+          finding.howToFix ??
+          "Review root cause and apply targeted remediation."
+      });
+    });
+  });
+
+  const prioritySorted = [...rootCauses].sort(
+    (a, b) => (a.remediationPriority ?? 99) - (b.remediationPriority ?? 99)
+  );
+
+  return {
+    engine: "Root Cause Engine",
+    generatedAt: new Date().toISOString(),
+    totalRootCauses: rootCauses.length,
+    criticalRootCauses: rootCauses.filter(item => item.exploitability === "CRITICAL").length,
+    highRootCauses: rootCauses.filter(item => item.exploitability === "HIGH").length,
+    mediumRootCauses: rootCauses.filter(item => item.exploitability === "MEDIUM").length,
+    topRootCauses: prioritySorted.slice(0, 10),
+    rootCauses: prioritySorted
+  };
+};
 
 
 console.log("Quantum Shield Trinity");
@@ -154,6 +204,7 @@ const securityScoreReport = securityScoreEngine({
   codeFlowReport,
   routeExposureReport,
   trustBoundaryReport,
+  rootCauseReport,
   repositoryReport: report
 });
 
@@ -349,6 +400,7 @@ addEvidenceItems(smartContractAuditReport.auditFindings, "smartContractAuditEngi
 addEvidenceItems(codeFlowReport.findings, "codeFlowScannerEngine", "code_flow");
 addEvidenceItems(routeExposureReport.findings, "routeExposureEngine", "route_exposure");
 addEvidenceItems(trustBoundaryReport.findings, "trustBoundaryEngine", "trust_boundary");
+addEvidenceItems(rootCauseReport.rootCauses, "rootCauseEngine", "root_cause");
 addEvidenceItems(attackChainBuilderReport.attackChains, "attackChainBuilderEngine", "attack_chain_builder");
 
 addEvidenceItems(exploitSimulationReport.simulations, "exploitSimulationEngine", "exploit_simulation");
@@ -432,6 +484,8 @@ const jsonExportReport = jsonExportEngine({
       quantumForecastScore: quantumExposureForecastReport.score,
       quantumAttackBusinessRisk: quantumAttackSimulationReport.businessRisk,
       quantumAttackEstimatedImpact: quantumAttackSimulationReport.estimatedImpact,
+      rootCauseCriticalCount: rootCauseReport.criticalRootCauses,
+      rootCauseHighCount: rootCauseReport.highRootCauses,
       evidenceGraphRiskLevel: evidenceGraphReport.summary?.risk?.level
     }
   },
@@ -477,6 +531,7 @@ fs.writeFileSync("quantum-risk-export.json", JSON.stringify(jsonExportReport, nu
 fs.writeFileSync("migration-shield-report.json", JSON.stringify(migrationShieldReport, null, 2), "utf8");
 fs.writeFileSync("quantum-exposure-forecast-report.json", JSON.stringify(quantumExposureForecastReport, null, 2), "utf8");
 fs.writeFileSync("quantum-attack-simulation-report.json", JSON.stringify(quantumAttackSimulationReport, null, 2), "utf8");
+fs.writeFileSync("root-cause-report.json", JSON.stringify(rootCauseReport, null, 2), "utf8");
 fs.writeFileSync("code-flow-report.json", JSON.stringify(codeFlowReport, null, 2), "utf8");
 fs.writeFileSync("route-exposure-report.json", JSON.stringify(routeExposureReport, null, 2), "utf8");
 fs.writeFileSync("trust-boundary-report.json", JSON.stringify(trustBoundaryReport, null, 2), "utf8");
@@ -499,6 +554,7 @@ fs.writeFileSync(
       migrationShieldReport,
       quantumExposureForecastReport,
       quantumAttackSimulationReport,
+      rootCauseReport,
       dependencyRiskReport,
       codeFlowReport,
       routeExposureReport,
@@ -672,6 +728,29 @@ if (quantumAttackSimulationReport.attackPath.length > 0) {
 }
 console.log(`Note: ${quantumAttackSimulationReport.note}`);
 console.log("");
+
+console.log("Root Cause Analysis");
+console.log("-------------------");
+console.log(`Total Root Causes: ${rootCauseReport.totalRootCauses}`);
+console.log(`Critical Root Causes: ${rootCauseReport.criticalRootCauses}`);
+console.log(`High Root Causes: ${rootCauseReport.highRootCauses}`);
+console.log(`Medium Root Causes: ${rootCauseReport.mediumRootCauses}`);
+console.log("");
+
+if (rootCauseReport.topRootCauses.length > 0) {
+  console.log("Top Root Causes");
+  console.log("---------------");
+  rootCauseReport.topRootCauses.slice(0, 5).forEach((item, index) => {
+    console.log(`${index + 1}. ${item.source} (${item.exploitability})`);
+    console.log(` Finding: ${item.findingType}`);
+    console.log(` File: ${item.file ?? "N/A"}`);
+    console.log(` Line: ${item.line ?? "N/A"}`);
+    console.log(` Reason: ${item.reason}`);
+    console.log(` Impact: ${item.impact}`);
+    console.log(` Priority: ${item.remediationPriority}`);
+    console.log("");
+  });
+}
 
 console.log("Dependency Intelligence");
 console.log("-----------------------");
@@ -966,6 +1045,7 @@ console.log("Quantum Risk Export: quantum-risk-export.json");
 console.log("Migration Shield Report: migration-shield-report.json");
 console.log("Quantum Exposure Forecast Report: quantum-exposure-forecast-report.json");
 console.log("Quantum Attack Simulation Report: quantum-attack-simulation-report.json");
+console.log("Root Cause Report: root-cause-report.json");
 console.log("SARIF Report: report.sarif");
 console.log("Security Badge SVG: badge.svg");
 console.log("Security Badge HTML: badge.html");
