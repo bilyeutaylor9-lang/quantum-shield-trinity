@@ -1,22 +1,5 @@
 // src/engines/evidenceGraphEngine.js
 
-/**
- * Quantum Shield Trinity
- * Evidence Graph Engine
- *
- * Purpose:
- * Converts flat scanner findings into a connected evidence graph.
- *
- * This becomes the core layer for:
- * - deep scan evidence
- * - attack paths
- * - trust boundaries
- * - route exposure
- * - exploit chains
- * - confidence scoring
- * - remediation priority
- */
-
 const SEVERITY_WEIGHT = {
   info: 1,
   low: 2,
@@ -39,12 +22,8 @@ function normalizeSeverity(severity = "info") {
 }
 
 function normalizeConfidence(confidence = 0.5) {
-  if (typeof confidence === "number") {
-    return Math.max(0, Math.min(1, confidence));
-  }
-
-  const c = String(confidence).toLowerCase();
-  return CONFIDENCE_WEIGHT[c] ?? 0.5;
+  if (typeof confidence === "number") return Math.max(0, Math.min(1, confidence));
+  return CONFIDENCE_WEIGHT[String(confidence).toLowerCase()] ?? 0.5;
 }
 
 function makeId(prefix = "QS-EVIDENCE") {
@@ -70,35 +49,29 @@ export class EvidenceNode {
     this.description = data.description || "";
     this.severity = normalizeSeverity(data.severity);
     this.confidence = normalizeConfidence(data.confidence);
-
     this.file = data.file || data.path || null;
     this.line = data.line ?? null;
     this.column = data.column ?? null;
-
     this.ruleId = data.ruleId || data.rule || null;
     this.engine = data.engine || "unknown";
     this.cwe = safeArray(data.cwe);
     this.owasp = safeArray(data.owasp);
     this.tags = safeArray(data.tags);
-
     this.evidence = {
       snippet: cleanSnippet(data.snippet || data.evidence?.snippet || ""),
       matchedText: cleanSnippet(data.matchedText || data.evidence?.matchedText || ""),
       pattern: data.pattern || data.evidence?.pattern || null,
       source: data.source || data.evidence?.source || null
     };
-
     this.attackSurface = safeArray(data.attackSurface);
     this.assets = safeArray(data.assets);
     this.remediation = safeArray(data.remediation || data.fix);
-
     this.metadata = data.metadata || {};
     this.createdAt = data.createdAt || new Date().toISOString();
   }
 
   getRiskScore() {
-    const severityScore = SEVERITY_WEIGHT[this.severity] || 1;
-    return Math.round(severityScore * this.confidence * 10);
+    return Math.round((SEVERITY_WEIGHT[this.severity] || 1) * this.confidence * 10);
   }
 
   toJSON() {
@@ -155,32 +128,60 @@ export class EvidenceGraphEngine {
   constructor(options = {}) {
     this.nodes = new Map();
     this.edges = [];
+    this.edgeKeys = new Set();
+
     this.options = {
       autoLinkByFile: true,
       autoLinkByRule: true,
       autoLinkByAsset: true,
-      maxAttackChainDepth: 5,
+      maxAttackChainDepth: 3,
+      maxEdges: 2500,
+      maxLinksPerNode: 20,
+      maxExportNodes: 1000,
+      maxExportEdges: 2500,
+      maxSummaryAttackChains: 10,
       ...options
     };
+
+    this.indexes = {
+      byFile: new Map(),
+      byRule: new Map(),
+      byAsset: new Map()
+    };
+  }
+
+  addIndex(map, key, nodeId) {
+    if (!key) return;
+    const safeKey = String(key).toLowerCase().slice(0, 160);
+    if (!safeKey) return;
+
+    if (!map.has(safeKey)) map.set(safeKey, []);
+    map.get(safeKey).push(nodeId);
+  }
+
+  indexNode(node) {
+    this.addIndex(this.indexes.byFile, node.file, node.id);
+    this.addIndex(this.indexes.byRule, node.ruleId, node.id);
+
+    for (const asset of node.assets || []) {
+      this.addIndex(this.indexes.byAsset, asset, node.id);
+    }
   }
 
   addNode(data = {}) {
     const node = data instanceof EvidenceNode ? data : new EvidenceNode(data);
-
     this.nodes.set(node.id, node);
 
     if (this.options.autoLinkByFile || this.options.autoLinkByRule || this.options.autoLinkByAsset) {
       this.autoLinkNode(node);
     }
 
+    this.indexNode(node);
     return node;
   }
 
   addFinding(finding = {}) {
-    return this.addNode({
-      ...finding,
-      type: finding.type || "finding"
-    });
+    return this.addNode({ ...finding, type: finding.type || "finding" });
   }
 
   addAsset(asset = {}) {
@@ -204,12 +205,12 @@ export class EvidenceGraphEngine {
 
   addEdge(from, to, relationship = "related_to", metadata = {}) {
     if (!from || !to || from === to) return null;
+    if (this.edges.length >= this.options.maxEdges) return null;
 
-    const exists = this.edges.some(
-      edge => edge.from === from && edge.to === to && edge.relationship === relationship
-    );
+    const key = `${from}->${to}:${relationship}`;
+    if (this.edgeKeys.has(key)) return null;
 
-    if (exists) return null;
+    this.edgeKeys.add(key);
 
     const edge = new EvidenceEdge(from, to, relationship, metadata);
     this.edges.push(edge);
@@ -217,22 +218,35 @@ export class EvidenceGraphEngine {
   }
 
   autoLinkNode(node) {
-    for (const existing of this.nodes.values()) {
-      if (existing.id === node.id) continue;
+    let links = 0;
 
-      if (this.options.autoLinkByFile && node.file && existing.file === node.file) {
-        this.addEdge(existing.id, node.id, "same_file", { file: node.file });
+    const tryLinkIds = (ids = [], relationship, metadataBuilder) => {
+      for (const existingId of ids) {
+        if (links >= this.options.maxLinksPerNode) break;
+        if (existingId === node.id) continue;
+
+        const metadata = metadataBuilder ? metadataBuilder() : {};
+        const edge = this.addEdge(existingId, node.id, relationship, metadata);
+
+        if (edge) links += 1;
       }
+    };
 
-      if (this.options.autoLinkByRule && node.ruleId && existing.ruleId === node.ruleId) {
-        this.addEdge(existing.id, node.id, "same_rule", { ruleId: node.ruleId });
-      }
+    if (this.options.autoLinkByFile && node.file) {
+      const key = String(node.file).toLowerCase().slice(0, 160);
+      tryLinkIds(this.indexes.byFile.get(key), "same_file", () => ({ file: node.file }));
+    }
 
-      if (this.options.autoLinkByAsset) {
-        const sharedAssets = node.assets.filter(asset => existing.assets.includes(asset));
-        if (sharedAssets.length > 0) {
-          this.addEdge(existing.id, node.id, "shared_asset", { assets: sharedAssets });
-        }
+    if (this.options.autoLinkByRule && node.ruleId) {
+      const key = String(node.ruleId).toLowerCase().slice(0, 160);
+      tryLinkIds(this.indexes.byRule.get(key), "same_rule", () => ({ ruleId: node.ruleId }));
+    }
+
+    if (this.options.autoLinkByAsset) {
+      for (const asset of node.assets || []) {
+        if (links >= this.options.maxLinksPerNode) break;
+        const key = String(asset).toLowerCase().slice(0, 160);
+        tryLinkIds(this.indexes.byAsset.get(key), "shared_asset", () => ({ assets: [asset] }));
       }
     }
   }
@@ -254,9 +268,7 @@ export class EvidenceGraphEngine {
       .filter(edge => edge.from === id || edge.to === id)
       .map(edge => (edge.from === id ? edge.to : edge.from));
 
-    return connectedIds
-      .map(nodeId => this.getNode(nodeId))
-      .filter(Boolean);
+    return connectedIds.map(nodeId => this.getNode(nodeId)).filter(Boolean);
   }
 
   getFindingsBySeverity(severity) {
@@ -286,6 +298,7 @@ export class EvidenceGraphEngine {
         score: 0,
         level: "none",
         totalNodes: 0,
+        totalEdges: 0,
         critical: 0,
         high: 0,
         medium: 0,
@@ -294,14 +307,7 @@ export class EvidenceGraphEngine {
       };
     }
 
-    const counts = {
-      critical: 0,
-      high: 0,
-      medium: 0,
-      low: 0,
-      info: 0
-    };
-
+    const counts = { critical: 0, high: 0, medium: 0, low: 0, info: 0 };
     let rawScore = 0;
 
     for (const node of nodes) {
@@ -309,7 +315,7 @@ export class EvidenceGraphEngine {
       rawScore += node.getRiskScore();
     }
 
-    const connectionMultiplier = 1 + Math.min(this.edges.length / 50, 1.5);
+    const connectionMultiplier = 1 + Math.min(this.edges.length / 100, 1.25);
     const score = Math.min(1000, Math.round(rawScore * connectionMultiplier));
 
     let level = "low";
@@ -326,9 +332,25 @@ export class EvidenceGraphEngine {
     };
   }
 
+  buildNeighborMap() {
+    const neighborMap = new Map();
+
+    for (const edge of this.edges) {
+      if (!neighborMap.has(edge.from)) neighborMap.set(edge.from, []);
+      if (!neighborMap.has(edge.to)) neighborMap.set(edge.to, []);
+
+      neighborMap.get(edge.from).push(edge.to);
+      neighborMap.get(edge.to).push(edge.from);
+    }
+
+    return neighborMap;
+  }
+
   findAttackChains(options = {}) {
     const maxDepth = options.maxDepth || this.options.maxAttackChainDepth;
+    const limit = options.limit || this.options.maxSummaryAttackChains;
     const chains = [];
+    const neighborMap = this.buildNeighborMap();
 
     const highValueTypes = new Set([
       "secret",
@@ -341,21 +363,34 @@ export class EvidenceGraphEngine {
       "critical_finding"
     ]);
 
-    const startNodes = this.getNodes().filter(node =>
-      node.type === "route" ||
-      node.category.includes("exposure") ||
-      node.attackSurface.includes("public") ||
-      node.attackSurface.includes("web") ||
-      node.attackSurface.includes("api")
-    );
+    const startNodes = this.getNodes()
+      .filter(node =>
+        node.type === "route" ||
+        node.category.includes("exposure") ||
+        node.attackSurface.includes("public") ||
+        node.attackSurface.includes("web") ||
+        node.attackSurface.includes("api")
+      )
+      .slice(0, 25);
+
+    let explored = 0;
+    const maxExplore = 250;
 
     const walk = (node, path, visited, depth) => {
-      if (depth > maxDepth) return;
+      if (depth >= maxDepth) return;
+      if (chains.length >= limit) return;
+      if (explored >= maxExplore) return;
 
-      const connected = this.getConnectedNodes(node.id);
+      explored += 1;
 
-      for (const next of connected) {
-        if (visited.has(next.id)) continue;
+      const connectedIds = (neighborMap.get(node.id) || []).slice(0, 15);
+
+      for (const nextId of connectedIds) {
+        if (chains.length >= limit) break;
+        if (visited.has(nextId)) continue;
+
+        const next = this.getNode(nextId);
+        if (!next) continue;
 
         const nextPath = [...path, next];
         const nextVisited = new Set(visited);
@@ -376,12 +411,12 @@ export class EvidenceGraphEngine {
     };
 
     for (const start of startNodes) {
+      if (chains.length >= limit) break;
+      if (explored >= maxExplore) break;
       walk(start, [start], new Set([start.id]), 1);
     }
 
-    return chains
-      .sort((a, b) => b.chainScore - a.chainScore)
-      .slice(0, options.limit || 25);
+    return chains.sort((a, b) => b.chainScore - a.chainScore).slice(0, limit);
   }
 
   scoreAttackChain(path = []) {
@@ -424,10 +459,11 @@ export class EvidenceGraphEngine {
   buildSummary() {
     const risk = this.calculateGraphRiskScore();
     const topNodes = this.getHighestRiskNodes(10).map(node => node.toJSON());
-    const attackChains = this.findAttackChains({ limit: 10 });
+    const attackChains = this.findAttackChains({ limit: this.options.maxSummaryAttackChains });
 
     return {
       engine: "evidenceGraphEngine",
+      optimized: true,
       generatedAt: new Date().toISOString(),
       risk,
       topNodes,
@@ -463,9 +499,15 @@ export class EvidenceGraphEngine {
   }
 
   exportGraph() {
+    const nodes = this.getNodes();
+    const edges = this.edges;
+
     return {
-      nodes: this.getNodes().map(node => node.toJSON()),
-      edges: this.edges.map(edge => edge.toJSON()),
+      nodes: nodes.slice(0, this.options.maxExportNodes).map(node => node.toJSON()),
+      edges: edges.slice(0, this.options.maxExportEdges).map(edge => edge.toJSON()),
+      truncated: nodes.length > this.options.maxExportNodes || edges.length > this.options.maxExportEdges,
+      totalNodesBeforeExportLimit: nodes.length,
+      totalEdgesBeforeExportLimit: edges.length,
       summary: this.buildSummary()
     };
   }
@@ -486,6 +528,12 @@ export class EvidenceGraphEngine {
   reset() {
     this.nodes.clear();
     this.edges = [];
+    this.edgeKeys.clear();
+    this.indexes = {
+      byFile: new Map(),
+      byRule: new Map(),
+      byAsset: new Map()
+    };
   }
 }
 
