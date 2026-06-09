@@ -13,6 +13,27 @@ const inputTarget = process.argv[2] ?? "src";
 let targetDirectory = inputTarget;
 let clonedRepo = null;
 
+const scanOptions = {
+  maxEvidenceItems: 100,
+  attackChain: {
+    maxDepth: 3,
+    limit: 25,
+    maxNodes: 250,
+    maxEdges: 750,
+    maxStarts: 50,
+    maxNeighborsPerNode: 20,
+    maxChainsToExplore: 500
+  }
+};
+
+const safeWriteJson = (fileName, data) => {
+  fs.writeFileSync(fileName, JSON.stringify(data ?? {}, null, 2), "utf8");
+};
+
+const safeWriteText = (fileName, data) => {
+  fs.writeFileSync(fileName, data ?? "", "utf8");
+};
+
 console.log("Quantum Shield Trinity");
 console.log("----------------------");
 
@@ -35,15 +56,7 @@ try {
   console.log(`Resolved directory: ${targetDirectory}`);
   console.log("");
 
-  const report = runQuantumShieldScan(targetDirectory);
-
-  const safeWriteJson = (fileName, data) => {
-    fs.writeFileSync(fileName, JSON.stringify(data ?? {}, null, 2), "utf8");
-  };
-
-  const safeWriteText = (fileName, data) => {
-    fs.writeFileSync(fileName, data ?? "", "utf8");
-  };
+  const report = runQuantumShieldScan(targetDirectory, scanOptions);
 
   safeWriteJson("report.json", report);
   safeWriteText("report.html", report.htmlReport);
