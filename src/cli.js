@@ -19,6 +19,7 @@ import { quantumAttackSimulationEngine } from "./engines/quantumAttackSimulation
 import { quantumExposureForecastEngine } from "./engines/quantumExposureForecastEngine.js";
 import { rootCauseEngine } from "./engines/rootCauseEngine.js";
 import { securityAssessmentEngine } from "./engines/securityAssessmentEngine.js";
+import { securityAuditLoopEngine } from "./engines/securityAuditLoopEngine.js";
 import { codeFlowScannerEngine } from "./engines/codeFlowScannerEngine.js";
 import { routeExposureEngine } from "./engines/routeExposureEngine.js";
 import { trustBoundaryEngine } from "./engines/trustBoundaryEngine.js";
@@ -449,6 +450,31 @@ addEvidenceItems(routeExposureReport.findings, "routeExposureEngine", "route_exp
 addEvidenceItems(trustBoundaryReport.findings, "trustBoundaryEngine", "trust_boundary");
 addEvidenceItems(rootCauseReport.rootCauses, "rootCauseEngine", "root_cause");
 addEvidenceItems(attackChainBuilderReport.attackChains, "attackChainBuilderEngine", "attack_chain_builder");
+addEvidenceItems(
+  [
+    {
+      id: "security-audit-loop",
+      type: "security_audit_loop",
+      category: "tamper_evident_audit",
+      title: "Security Audit Loop Verification",
+      description: securityAuditLoopReport.alert,
+      severity: securityAuditLoopReport.verified ? "low" : "critical",
+      confidence: 0.95,
+      recommendation: securityAuditLoopReport.verified
+        ? "Store the audit hash and use it as the previous hash on the next audit cycle."
+        : "Investigate possible report tampering or state mismatch.",
+      remediation: [
+        securityAuditLoopReport.verified
+          ? "Store the audit hash and use it as the previous hash on the next audit cycle."
+          : "Investigate possible report tampering or state mismatch."
+      ],
+      assets: ["audit_log", "report_integrity", "hash_chain"],
+      metadata: securityAuditLoopReport
+    }
+  ],
+  "securityAuditLoopEngine",
+  "tamper_evident_audit"
+);
 
 addEvidenceItems(exploitSimulationReport.simulations, "exploitSimulationEngine", "exploit_simulation");
 addEvidenceItems(remediationReport.remediationItems, "remediationEngine", "remediation");
@@ -469,7 +495,7 @@ const executiveReportEngineReport = executiveReportEngine({
     summary: summaryFormatter(report)
   },
   assessmentReport: report.securityAssessmentReport ?? report.assessmentReport ?? {},
-  auditReport: report.securityAuditReport ?? report.auditReport ?? smartContractAuditReport,
+  auditReport: { smartContractAuditReport, securityAuditLoopReport },
   riskProfile: {
     wallet: report.walletRiskReport ?? {},
     inventory: {
@@ -533,13 +559,15 @@ const jsonExportReport = jsonExportEngine({
       quantumAttackEstimatedImpact: quantumAttackSimulationReport.estimatedImpact,
       securityAssessmentRiskLevel: securityAssessmentReport.riskLevel,
       securityAssessmentScore: securityAssessmentReport.totalScore,
+      auditLoopVerified: securityAuditLoopReport.verified,
+      auditHash: securityAuditLoopReport.auditHash,
       rootCauseCriticalCount: rootCauseReport.criticalRootCauses,
       rootCauseHighCount: rootCauseReport.highRootCauses,
       evidenceGraphRiskLevel: evidenceGraphReport.summary?.risk?.level
     }
   },
   assessmentReport: securityAssessmentReport,
-  auditReport: report.securityAuditReport ?? report.auditReport ?? smartContractAuditReport,
+  auditReport: { smartContractAuditReport, securityAuditLoopReport },
   walletReport: report.walletRiskReport ?? {},
   inventoryReport: cryptoInventoryReport,
   migrationReport: { quantumReadinessReport, migrationShieldReport },
@@ -582,6 +610,7 @@ fs.writeFileSync("quantum-exposure-forecast-report.json", JSON.stringify(quantum
 fs.writeFileSync("quantum-attack-simulation-report.json", JSON.stringify(quantumAttackSimulationReport, null, 2), "utf8");
 fs.writeFileSync("root-cause-report.json", JSON.stringify(rootCauseReport, null, 2), "utf8");
 fs.writeFileSync("security-assessment-report.json", JSON.stringify(securityAssessmentReport, null, 2), "utf8");
+fs.writeFileSync("security-audit-loop-report.json", JSON.stringify(securityAuditLoopReport, null, 2), "utf8");
 fs.writeFileSync("code-flow-report.json", JSON.stringify(codeFlowReport, null, 2), "utf8");
 fs.writeFileSync("route-exposure-report.json", JSON.stringify(routeExposureReport, null, 2), "utf8");
 fs.writeFileSync("trust-boundary-report.json", JSON.stringify(trustBoundaryReport, null, 2), "utf8");
@@ -605,6 +634,7 @@ fs.writeFileSync(
       quantumExposureForecastReport,
       quantumAttackSimulationReport,
       securityAssessmentReport,
+      securityAuditLoopReport,
       rootCauseReport,
       dependencyRiskReport,
       codeFlowReport,
@@ -797,6 +827,16 @@ if (securityAssessmentReport.recommendedNextSteps?.length > 0) {
   });
   console.log("");
 }
+
+console.log("Security Audit Loop");
+console.log("-------------------");
+console.log(`Mode: ${securityAuditLoopReport.mode}`);
+console.log(`Verified: ${securityAuditLoopReport.verified}`);
+console.log(`Previous Hash: ${securityAuditLoopReport.previousHash}`);
+console.log(`Audit Hash: ${securityAuditLoopReport.auditHash}`);
+console.log(`Alert: ${securityAuditLoopReport.alert}`);
+console.log(`Timestamp: ${securityAuditLoopReport.auditTimestamp}`);
+console.log("");
 
 console.log("Root Cause Analysis");
 console.log("-------------------");
@@ -1116,6 +1156,7 @@ console.log("Quantum Exposure Forecast Report: quantum-exposure-forecast-report.
 console.log("Quantum Attack Simulation Report: quantum-attack-simulation-report.json");
 console.log("Root Cause Report: root-cause-report.json");
 console.log("Security Assessment Report: security-assessment-report.json");
+console.log("Security Audit Loop Report: security-audit-loop-report.json");
 console.log("SARIF Report: report.sarif");
 console.log("Security Badge SVG: badge.svg");
 console.log("Security Badge HTML: badge.html");
