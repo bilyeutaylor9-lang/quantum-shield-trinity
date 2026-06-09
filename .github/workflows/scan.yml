@@ -56,9 +56,23 @@ jobs:
         id: target
         shell: bash
         run: |
-          TARGET="${{ github.event.inputs.scan_target || 'src' }}"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TARGET="${{ github.event.inputs.scan_target }}"
+          else
+            TARGET="src"
+          fi
+
+          if [ -z "$TARGET" ]; then
+            TARGET="src"
+          fi
+
           echo "target=$TARGET" >> "$GITHUB_OUTPUT"
           echo "Scan target: $TARGET"
+
+      - name: Debug scan target
+        shell: bash
+        run: |
+          echo "Final target is: ${{ steps.target.outputs.target }}"
 
       - name: Run Quantum Shield Trinity Scan
         shell: bash
