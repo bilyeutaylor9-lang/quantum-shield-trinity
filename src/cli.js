@@ -16,6 +16,7 @@ import { executiveReportEngine } from "./engines/executiveReportEngine.js";
 import { jsonExportEngine } from "./engines/jsonExportEngine.js";
 import { migrationShieldEngine } from "./engines/migrationShieldEngine.js";
 import { quantumAttackSimulationEngine } from "./engines/quantumAttackSimulationEngine.js";
+import { quantumExposureForecastEngine } from "./engines/quantumExposureForecastEngine.js";
 import { codeFlowScannerEngine } from "./engines/codeFlowScannerEngine.js";
 import { routeExposureEngine } from "./engines/routeExposureEngine.js";
 import { trustBoundaryEngine } from "./engines/trustBoundaryEngine.js";
@@ -91,15 +92,24 @@ const migrationShieldReport = migrationShieldEngine(
   cryptoInventoryReport
 );
 
+const quantumExposureForecastReport = quantumExposureForecastEngine({
+  walletReport: walletMigrationProfile,
+  inventoryReport: {
+    ...cryptoInventoryReport,
+    score:
+      cryptoInventoryReport.score ??
+      cryptoInventoryReport.inventorySecurityScore ??
+      cryptoInventoryReport.inventoryRiskScore ??
+      0
+  },
+  migrationReport: migrationShieldReport
+});
+
 const quantumAttackSimulationReport = quantumAttackSimulationEngine({
   walletReport: walletMigrationProfile,
   inventoryReport: cryptoInventoryReport,
   migrationReport: migrationShieldReport,
-  forecastReport:
-    report.quantumExposureForecastReport ??
-    report.forecastReport ??
-    report.quantumForecastReport ??
-    {}
+  forecastReport: quantumExposureForecastReport
 });
 
 // Deep Scan X engines
@@ -119,6 +129,8 @@ report.cryptoInventoryReport = cryptoInventoryReport;
 report.inventoryReport = cryptoInventoryReport;
 report.migrationShieldReport = migrationShieldReport;
 report.migrationReport = migrationShieldReport;
+report.quantumExposureForecastReport = quantumExposureForecastReport;
+report.forecastReport = quantumExposureForecastReport;
 report.quantumAttackSimulationReport = quantumAttackSimulationReport;
 report.simulationReport = quantumAttackSimulationReport;
 report.codeFlowReport = codeFlowReport;
@@ -137,6 +149,7 @@ const securityScoreReport = securityScoreEngine({
   quantumReadinessReport,
   cryptoInventoryReport,
   migrationShieldReport,
+  quantumExposureForecastReport,
   quantumAttackSimulationReport,
   codeFlowReport,
   routeExposureReport,
@@ -280,6 +293,32 @@ addEvidenceItems(
 );
 
 addEvidenceItems(
+  [
+    {
+      id: "quantum-exposure-forecast",
+      type: "quantum_exposure_forecast",
+      category: "quantum_exposure_forecast",
+      title: "Quantum Exposure Forecast",
+      description: quantumExposureForecastReport.businessImpact,
+      severity:
+        quantumExposureForecastReport.qDayExposure === "CRITICAL"
+          ? "critical"
+          : quantumExposureForecastReport.qDayExposure === "HIGH"
+            ? "high"
+            : quantumExposureForecastReport.qDayExposure === "MEDIUM"
+              ? "medium"
+              : "low",
+      confidence: 0.8,
+      recommendation: `Migration urgency: ${quantumExposureForecastReport.migrationUrgency}`,
+      remediation: [`Migration urgency: ${quantumExposureForecastReport.migrationUrgency}`],
+      assets: ["quantum_exposure", "forecast", "crypto_agility"]
+    }
+  ],
+  "quantumExposureForecastEngine",
+  "quantum_exposure_forecast"
+);
+
+addEvidenceItems(
   quantumAttackSimulationReport.attackPath.map((step, index) => ({
     id: `quantum-attack-simulation-${index + 1}`,
     type: "quantum_attack_simulation",
@@ -376,6 +415,8 @@ const jsonExportReport = jsonExportEngine({
       readinessScore: quantumReadinessReport.quantumReadinessScore,
       recommendedPath: quantumReadinessReport.recommendedMigrationPath,
       shieldReady: migrationShieldReport.migrationReady,
+      forecastQDayExposure: quantumExposureForecastReport.qDayExposure,
+      forecastMigrationUrgency: quantumExposureForecastReport.migrationUrgency,
       shieldRecommendations: migrationShieldReport.recommendations
     },
     dependencyRisk: {
@@ -387,6 +428,8 @@ const jsonExportReport = jsonExportEngine({
       routeExposureRiskLevel: routeExposureReport.routeExposureRiskLevel,
       trustBoundaryRiskLevel: trustBoundaryReport.trustBoundaryRiskLevel,
       attackChainRiskLevel: attackChainBuilderReport.attackChainRiskLevel,
+      quantumForecastExposure: quantumExposureForecastReport.qDayExposure,
+      quantumForecastScore: quantumExposureForecastReport.score,
       quantumAttackBusinessRisk: quantumAttackSimulationReport.businessRisk,
       quantumAttackEstimatedImpact: quantumAttackSimulationReport.estimatedImpact,
       evidenceGraphRiskLevel: evidenceGraphReport.summary?.risk?.level
@@ -397,7 +440,7 @@ const jsonExportReport = jsonExportEngine({
   walletReport: report.walletRiskReport ?? {},
   inventoryReport: cryptoInventoryReport,
   migrationReport: { quantumReadinessReport, migrationShieldReport },
-  forecastReport: report.quantumExposureForecastReport ?? {},
+  forecastReport: quantumExposureForecastReport,
   simulationReport: { exploitSimulationReport, quantumAttackSimulationReport }
 });
 
@@ -432,6 +475,7 @@ fs.writeFileSync("dependency-risk-report.json", JSON.stringify(dependencyRiskRep
 fs.writeFileSync("executive-summary.json", JSON.stringify(executiveReportEngineReport, null, 2), "utf8");
 fs.writeFileSync("quantum-risk-export.json", JSON.stringify(jsonExportReport, null, 2), "utf8");
 fs.writeFileSync("migration-shield-report.json", JSON.stringify(migrationShieldReport, null, 2), "utf8");
+fs.writeFileSync("quantum-exposure-forecast-report.json", JSON.stringify(quantumExposureForecastReport, null, 2), "utf8");
 fs.writeFileSync("quantum-attack-simulation-report.json", JSON.stringify(quantumAttackSimulationReport, null, 2), "utf8");
 fs.writeFileSync("code-flow-report.json", JSON.stringify(codeFlowReport, null, 2), "utf8");
 fs.writeFileSync("route-exposure-report.json", JSON.stringify(routeExposureReport, null, 2), "utf8");
@@ -453,6 +497,7 @@ fs.writeFileSync(
       quantumReadinessReport,
       cryptoInventoryReport,
       migrationShieldReport,
+      quantumExposureForecastReport,
       quantumAttackSimulationReport,
       dependencyRiskReport,
       codeFlowReport,
@@ -604,6 +649,15 @@ console.log(`Recommendations: ${migrationShieldReport.recommendations.length}`);
 migrationShieldReport.recommendations.forEach((item, index) => {
   console.log(`${index + 1}. ${item}`);
 });
+console.log("");
+
+console.log("Quantum Exposure Forecast");
+console.log("-------------------------");
+console.log(`Forecast Score: ${quantumExposureForecastReport.score}/100`);
+console.log(`Q-Day Exposure: ${quantumExposureForecastReport.qDayExposure}`);
+console.log(`Harvest Now Decrypt Later Risk: ${quantumExposureForecastReport.harvestNowDecryptLaterRisk}`);
+console.log(`Migration Urgency: ${quantumExposureForecastReport.migrationUrgency}`);
+console.log(`Business Impact: ${quantumExposureForecastReport.businessImpact}`);
 console.log("");
 
 console.log("Quantum Attack Simulation");
@@ -910,6 +964,7 @@ console.log("Executive Report: executive-report.json");
 console.log("Executive Summary: executive-summary.json");
 console.log("Quantum Risk Export: quantum-risk-export.json");
 console.log("Migration Shield Report: migration-shield-report.json");
+console.log("Quantum Exposure Forecast Report: quantum-exposure-forecast-report.json");
 console.log("Quantum Attack Simulation Report: quantum-attack-simulation-report.json");
 console.log("SARIF Report: report.sarif");
 console.log("Security Badge SVG: badge.svg");
