@@ -21,6 +21,7 @@ import { rootCauseEngine } from "./engines/rootCauseEngine.js";
 import { securityAssessmentEngine } from "./engines/securityAssessmentEngine.js";
 import { securityAuditLoopEngine } from "./engines/securityAuditLoopEngine.js";
 import { securityCopilotEngine } from "./engines/securityCopilotEngine.js";
+import { smartContractContextEngine } from "./engines/smartContractContextEngine.js";
 import { codeFlowScannerEngine } from "./engines/codeFlowScannerEngine.js";
 import { routeExposureEngine } from "./engines/routeExposureEngine.js";
 import { trustBoundaryEngine } from "./engines/trustBoundaryEngine.js";
@@ -177,6 +178,94 @@ const buildSecurityCopilotReport = (findingGroups = []) => {
   };
 };
 
+const buildSmartContractContextReport = (files = []) => {
+  const supportedExtensions = [".sol", ".vy", ".js", ".ts", ".tsx", ".jsx"];
+  const contexts = [];
+
+  files.forEach((file) => {
+    const fileName = file.path ?? file.file ?? file.name ?? file.filename ?? "unknown";
+    const lowerFileName = String(fileName).toLowerCase();
+    const isSupported = supportedExtensions.some(ext => lowerFileName.endsWith(ext));
+
+    if (!isSupported) return;
+
+    const content = file.content ?? file.text ?? file.source ?? "";
+    if (!content) return;
+
+    const lines = String(content).split("\n");
+
+    lines.forEach((line, index) => {
+      const trimmed = line.trim();
+      if (!trimmed) return;
+
+      const context = smartContractContextEngine(trimmed, fileName);
+
+      // Keep all meaningful smart-contract contexts, but avoid flooding with generic JS/TS lines.
+      const shouldKeep =
+        context.contextType !== "General Smart Contract Context" ||
+        lowerFileName.endsWith(".sol") ||
+        lowerFileName.endsWith(".vy");
+
+      if (!shouldKeep) return;
+
+      contexts.push({
+        id: `smart-contract-context-${contexts.length + 1}`,
+        type: "smart_contract_context",
+        category: context.contextType,
+        title: context.contextType,
+        description: context.note,
+        severity:
+          context.exploitability === "CRITICAL"
+            ? "critical"
+            : context.exploitability === "HIGH"
+              ? "high"
+              : context.exploitability === "MEDIUM"
+                ? "medium"
+                : "low",
+        confidence: 0.78,
+        file: fileName,
+        line: index + 1,
+        riskWeight: context.riskWeight,
+        exploitability: context.exploitability,
+        reviewPriority: context.reviewPriority,
+        note: context.note,
+        recommendation:
+          context.reviewPriority <= 2
+            ? "Prioritize immediate manual smart contract review."
+            : "Review this smart contract context during audit triage.",
+        remediation: [
+          context.reviewPriority <= 2
+            ? "Prioritize immediate manual smart contract review."
+            : "Review this smart contract context during audit triage."
+        ],
+        evidence: {
+          snippet: trimmed.slice(0, 260),
+          matchedText: trimmed.slice(0, 260),
+          source: "smartContractContextEngine"
+        },
+        attackSurface: ["smart_contract"],
+        assets: [fileName, context.contextType],
+        metadata: context
+      });
+    });
+  });
+
+  const sortedContexts = [...contexts].sort(
+    (a, b) => (a.reviewPriority ?? 99) - (b.reviewPriority ?? 99)
+  );
+
+  return {
+    engine: "Smart Contract Context Engine",
+    generatedAt: new Date().toISOString(),
+    totalContexts: sortedContexts.length,
+    criticalContexts: sortedContexts.filter(item => item.exploitability === "CRITICAL").length,
+    highContexts: sortedContexts.filter(item => item.exploitability === "HIGH").length,
+    mediumContexts: sortedContexts.filter(item => item.exploitability === "MEDIUM").length,
+    topContexts: sortedContexts.slice(0, 10),
+    contexts: sortedContexts
+  };
+};
+
 
 console.log("Quantum Shield Trinity");
 console.log("----------------------");
@@ -194,6 +283,7 @@ const attackSurfaceReport = attackSurfaceEngine(scanResult.files);
 const smartContractAuditReport = smartContractAuditEngine(scanResult.files);
 const quantumReadinessReport = quantumReadinessEngine(scanResult.files);
 const cryptoInventoryReport = cryptoInventoryEngine(scanResult.files);
+const smartContractContextReport = buildSmartContractContextReport(scanResult.files);
 
 const walletMigrationProfile = report.walletRiskReport ?? report.walletReport ?? {
   score: report.walletRiskScore ?? 0,
@@ -256,6 +346,7 @@ report.dependencyReport = dependencyReport;
 report.dependencyRiskReport = dependencyRiskReport;
 report.attackSurfaceReport = attackSurfaceReport;
 report.smartContractAuditReport = smartContractAuditReport;
+report.smartContractContextReport = smartContractContextReport;
 report.quantumReadinessReport = quantumReadinessReport;
 report.cryptoInventoryReport = cryptoInventoryReport;
 report.inventoryReport = cryptoInventoryReport;
@@ -279,6 +370,7 @@ const securityScoreReport = securityScoreEngine({
   dependencyRiskReport,
   attackSurfaceReport,
   smartContractAuditReport,
+  smartContractContextReport,
   exploitSimulationReport,
   quantumReadinessReport,
   cryptoInventoryReport,
@@ -504,6 +596,7 @@ addEvidenceItems(dependencyReport.dependencyFindings, "dependencyIntelligenceEng
 addEvidenceItems(dependencyRiskReport.findings, "dependencyRiskEngine", "dependency_risk");
 addEvidenceItems(attackSurfaceReport.attackFindings, "attackSurfaceEngine", "attack_surface");
 addEvidenceItems(smartContractAuditReport.auditFindings, "smartContractAuditEngine", "smart_contract_audit");
+addEvidenceItems(smartContractContextReport.contexts, "smartContractContextEngine", "smart_contract_context");
 
 // Deep Scan X evidence
 addEvidenceItems(codeFlowReport.findings, "codeFlowScannerEngine", "code_flow");
@@ -621,6 +714,8 @@ const jsonExportReport = jsonExportEngine({
       quantumAttackEstimatedImpact: quantumAttackSimulationReport.estimatedImpact,
       securityAssessmentRiskLevel: securityAssessmentReport.riskLevel,
       securityAssessmentScore: securityAssessmentReport.totalScore,
+      smartContractContextCriticalCount: smartContractContextReport.criticalContexts,
+      smartContractContextHighCount: smartContractContextReport.highContexts,
       auditLoopVerified: securityAuditLoopReport.verified,
       auditHash: securityAuditLoopReport.auditHash,
       copilotGuidanceItems: securityCopilotReport.totalGuidanceItems,
@@ -670,6 +765,7 @@ fs.writeFileSync("dependency-risk-report.json", JSON.stringify(dependencyRiskRep
 fs.writeFileSync("executive-summary.json", JSON.stringify(executiveReportEngineReport, null, 2), "utf8");
 fs.writeFileSync("quantum-risk-export.json", JSON.stringify(jsonExportReport, null, 2), "utf8");
 fs.writeFileSync("migration-shield-report.json", JSON.stringify(migrationShieldReport, null, 2), "utf8");
+fs.writeFileSync("smart-contract-context-report.json", JSON.stringify(smartContractContextReport, null, 2), "utf8");
 fs.writeFileSync("quantum-exposure-forecast-report.json", JSON.stringify(quantumExposureForecastReport, null, 2), "utf8");
 fs.writeFileSync("quantum-attack-simulation-report.json", JSON.stringify(quantumAttackSimulationReport, null, 2), "utf8");
 fs.writeFileSync("root-cause-report.json", JSON.stringify(rootCauseReport, null, 2), "utf8");
@@ -695,6 +791,7 @@ fs.writeFileSync(
       remediationReport,
       quantumReadinessReport,
       cryptoInventoryReport,
+      smartContractContextReport,
       migrationShieldReport,
       quantumExposureForecastReport,
       quantumAttackSimulationReport,
@@ -1003,6 +1100,27 @@ console.log(`High Audit Findings: ${smartContractAuditReport.highFindings}`);
 console.log(`Medium Audit Findings: ${smartContractAuditReport.mediumFindings}`);
 console.log("");
 
+console.log("Smart Contract Context");
+console.log("----------------------");
+console.log(`Total Contexts: ${smartContractContextReport.totalContexts}`);
+console.log(`Critical Contexts: ${smartContractContextReport.criticalContexts}`);
+console.log(`High Contexts: ${smartContractContextReport.highContexts}`);
+console.log(`Medium Contexts: ${smartContractContextReport.mediumContexts}`);
+console.log("");
+
+if (smartContractContextReport.topContexts.length > 0) {
+  console.log("Top Smart Contract Contexts");
+  console.log("---------------------------");
+  smartContractContextReport.topContexts.slice(0, 5).forEach((item, index) => {
+    console.log(`${index + 1}. ${item.contextType ?? item.category} (${item.exploitability})`);
+    console.log(` File: ${item.file}`);
+    console.log(` Line: ${item.line}`);
+    console.log(` Review Priority: ${item.reviewPriority}`);
+    console.log(` Note: ${item.note}`);
+    console.log("");
+  });
+}
+
 console.log("Exploit Simulation");
 console.log("------------------");
 console.log(`Simulation Risk Level: ${exploitSimulationReport.simulationRiskLevel}`);
@@ -1241,6 +1359,7 @@ console.log("Executive Report: executive-report.json");
 console.log("Executive Summary: executive-summary.json");
 console.log("Quantum Risk Export: quantum-risk-export.json");
 console.log("Migration Shield Report: migration-shield-report.json");
+console.log("Smart Contract Context Report: smart-contract-context-report.json");
 console.log("Quantum Exposure Forecast Report: quantum-exposure-forecast-report.json");
 console.log("Quantum Attack Simulation Report: quantum-attack-simulation-report.json");
 console.log("Root Cause Report: root-cause-report.json");
