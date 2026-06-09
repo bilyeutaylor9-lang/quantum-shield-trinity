@@ -20,6 +20,7 @@ import { quantumExposureForecastEngine } from "./engines/quantumExposureForecast
 import { rootCauseEngine } from "./engines/rootCauseEngine.js";
 import { securityAssessmentEngine } from "./engines/securityAssessmentEngine.js";
 import { securityAuditLoopEngine } from "./engines/securityAuditLoopEngine.js";
+import { securityCopilotEngine } from "./engines/securityCopilotEngine.js";
 import { codeFlowScannerEngine } from "./engines/codeFlowScannerEngine.js";
 import { routeExposureEngine } from "./engines/routeExposureEngine.js";
 import { trustBoundaryEngine } from "./engines/trustBoundaryEngine.js";
@@ -113,6 +114,66 @@ const buildRootCauseReport = (findingGroups = []) => {
     mediumRootCauses: rootCauses.filter(item => item.exploitability === "MEDIUM").length,
     topRootCauses: prioritySorted.slice(0, 10),
     rootCauses: prioritySorted
+  };
+};
+
+const buildSecurityCopilotReport = (findingGroups = []) => {
+  const allFindings = [];
+
+  findingGroups.forEach(({ items = [], engine = "unknown" }) => {
+    if (!Array.isArray(items)) return;
+
+    items.forEach((item, index) => {
+      allFindings.push({
+        ...item,
+        id: item.id ?? `copilot-source-${engine}-${index + 1}`,
+        sourceEngine: engine,
+        type:
+          item.type ??
+          item.findingType ??
+          item.dependency ??
+          item.simulationName ??
+          item.title ??
+          "Unknown",
+        severity: item.severity ?? item.riskLevel ?? item.exploitability ?? "LOW",
+        category: item.category ?? item.sourceEngine ?? engine,
+        file: item.file ?? item.path ?? null,
+        line: item.line ?? null,
+        confidence: item.confidence ?? "MEDIUM",
+        recommendation:
+          item.recommendation ??
+          item.recommendedDefense ??
+          item.howToFix ??
+          item.rootCause?.reason ??
+          "Review manually."
+      });
+    });
+  });
+
+  const guidance = securityCopilotEngine(allFindings);
+
+  const severityRank = value => {
+    const s = String(value ?? "").toUpperCase();
+    if (s === "CRITICAL") return 5;
+    if (s === "HIGH") return 4;
+    if (s === "MEDIUM") return 3;
+    if (s === "LOW") return 2;
+    return 1;
+  };
+
+  const sortedGuidance = [...guidance].sort(
+    (a, b) => severityRank(b.severity) - severityRank(a.severity)
+  );
+
+  return {
+    engine: "Security Copilot Engine",
+    generatedAt: new Date().toISOString(),
+    totalGuidanceItems: sortedGuidance.length,
+    criticalGuidanceItems: sortedGuidance.filter(item => String(item.severity).toUpperCase() === "CRITICAL").length,
+    highGuidanceItems: sortedGuidance.filter(item => String(item.severity).toUpperCase() === "HIGH").length,
+    mediumGuidanceItems: sortedGuidance.filter(item => String(item.severity).toUpperCase() === "MEDIUM").length,
+    topGuidance: sortedGuidance.slice(0, 10),
+    guidance: sortedGuidance
   };
 };
 
@@ -449,6 +510,7 @@ addEvidenceItems(codeFlowReport.findings, "codeFlowScannerEngine", "code_flow");
 addEvidenceItems(routeExposureReport.findings, "routeExposureEngine", "route_exposure");
 addEvidenceItems(trustBoundaryReport.findings, "trustBoundaryEngine", "trust_boundary");
 addEvidenceItems(rootCauseReport.rootCauses, "rootCauseEngine", "root_cause");
+addEvidenceItems(securityCopilotReport.guidance, "securityCopilotEngine", "security_copilot");
 addEvidenceItems(attackChainBuilderReport.attackChains, "attackChainBuilderEngine", "attack_chain_builder");
 addEvidenceItems(
   [
@@ -561,6 +623,8 @@ const jsonExportReport = jsonExportEngine({
       securityAssessmentScore: securityAssessmentReport.totalScore,
       auditLoopVerified: securityAuditLoopReport.verified,
       auditHash: securityAuditLoopReport.auditHash,
+      copilotGuidanceItems: securityCopilotReport.totalGuidanceItems,
+      copilotHighGuidanceItems: securityCopilotReport.highGuidanceItems,
       rootCauseCriticalCount: rootCauseReport.criticalRootCauses,
       rootCauseHighCount: rootCauseReport.highRootCauses,
       evidenceGraphRiskLevel: evidenceGraphReport.summary?.risk?.level
@@ -611,6 +675,7 @@ fs.writeFileSync("quantum-attack-simulation-report.json", JSON.stringify(quantum
 fs.writeFileSync("root-cause-report.json", JSON.stringify(rootCauseReport, null, 2), "utf8");
 fs.writeFileSync("security-assessment-report.json", JSON.stringify(securityAssessmentReport, null, 2), "utf8");
 fs.writeFileSync("security-audit-loop-report.json", JSON.stringify(securityAuditLoopReport, null, 2), "utf8");
+fs.writeFileSync("security-copilot-report.json", JSON.stringify(securityCopilotReport, null, 2), "utf8");
 fs.writeFileSync("code-flow-report.json", JSON.stringify(codeFlowReport, null, 2), "utf8");
 fs.writeFileSync("route-exposure-report.json", JSON.stringify(routeExposureReport, null, 2), "utf8");
 fs.writeFileSync("trust-boundary-report.json", JSON.stringify(trustBoundaryReport, null, 2), "utf8");
@@ -635,6 +700,7 @@ fs.writeFileSync(
       quantumAttackSimulationReport,
       securityAssessmentReport,
       securityAuditLoopReport,
+      securityCopilotReport,
       rootCauseReport,
       dependencyRiskReport,
       codeFlowReport,
@@ -837,6 +903,29 @@ console.log(`Audit Hash: ${securityAuditLoopReport.auditHash}`);
 console.log(`Alert: ${securityAuditLoopReport.alert}`);
 console.log(`Timestamp: ${securityAuditLoopReport.auditTimestamp}`);
 console.log("");
+
+console.log("Security Copilot");
+console.log("----------------");
+console.log(`Total Guidance Items: ${securityCopilotReport.totalGuidanceItems}`);
+console.log(`Critical Guidance Items: ${securityCopilotReport.criticalGuidanceItems}`);
+console.log(`High Guidance Items: ${securityCopilotReport.highGuidanceItems}`);
+console.log(`Medium Guidance Items: ${securityCopilotReport.mediumGuidanceItems}`);
+console.log("");
+
+if (securityCopilotReport.topGuidance.length > 0) {
+  console.log("Top Security Copilot Guidance");
+  console.log("-----------------------------");
+  securityCopilotReport.topGuidance.slice(0, 5).forEach((item, index) => {
+    console.log(`${index + 1}. ${item.type} (${item.severity})`);
+    console.log(` File: ${item.file ?? "N/A"}`);
+    console.log(` Line: ${item.line ?? "N/A"}`);
+    console.log(` Risk: ${item.risk}`);
+    console.log(` Business Impact: ${item.businessImpact}`);
+    console.log(` Recommendation: ${item.recommendation}`);
+    console.log(` Estimated Effort: ${item.estimatedEffort}`);
+    console.log("");
+  });
+}
 
 console.log("Root Cause Analysis");
 console.log("-------------------");
@@ -1157,6 +1246,7 @@ console.log("Quantum Attack Simulation Report: quantum-attack-simulation-report.
 console.log("Root Cause Report: root-cause-report.json");
 console.log("Security Assessment Report: security-assessment-report.json");
 console.log("Security Audit Loop Report: security-audit-loop-report.json");
+console.log("Security Copilot Report: security-copilot-report.json");
 console.log("SARIF Report: report.sarif");
 console.log("Security Badge SVG: badge.svg");
 console.log("Security Badge HTML: badge.html");
