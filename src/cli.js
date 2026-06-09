@@ -11,6 +11,8 @@ import { cryptoInventoryEngine } from "./engines/cryptoInventoryEngine.js";
 import { autoFixEngine } from "./engines/autoFixEngine.js";
 import { attackPathGeneratorEngine } from "./engines/attackPathGeneratorEngine.js";
 import { complianceMappingEngine } from "./engines/complianceMappingEngine.js";
+import { codeFlowScannerEngine } from "./engines/codeFlowScannerEngine.js";
+import { routeExposureEngine } from "./engines/routeExposureEngine.js";
 import { createEvidenceGraph } from "./engines/evidenceGraphEngine.js";
 import { htmlReportGenerator } from "./reporters/htmlReportGenerator.js";
 import { sarifReportGenerator } from "./reporters/sarifReportGenerator.js";
@@ -35,12 +37,18 @@ const smartContractAuditReport = smartContractAuditEngine(scanResult.files);
 const quantumReadinessReport = quantumReadinessEngine(scanResult.files);
 const cryptoInventoryReport = cryptoInventoryEngine(scanResult.files);
 
+// Deep Scan X engines
+const codeFlowReport = codeFlowScannerEngine(scanResult.files);
+const routeExposureReport = routeExposureEngine(scanResult.files);
+
 report.dependencyReport = dependencyReport;
 report.attackSurfaceReport = attackSurfaceReport;
 report.smartContractAuditReport = smartContractAuditReport;
 report.quantumReadinessReport = quantumReadinessReport;
 report.cryptoInventoryReport = cryptoInventoryReport;
 report.inventoryReport = cryptoInventoryReport;
+report.codeFlowReport = codeFlowReport;
+report.routeExposureReport = routeExposureReport;
 
 const exploitSimulationReport = exploitSimulationEngine(report);
 report.exploitSimulationReport = exploitSimulationReport;
@@ -52,6 +60,8 @@ const securityScoreReport = securityScoreEngine({
   exploitSimulationReport,
   quantumReadinessReport,
   cryptoInventoryReport,
+  codeFlowReport,
+  routeExposureReport,
   repositoryReport: report
 });
 
@@ -77,7 +87,7 @@ const evidenceGraph = createEvidenceGraph({
   autoLinkByFile: true,
   autoLinkByRule: true,
   autoLinkByAsset: true,
-  maxAttackChainDepth: 5
+  maxAttackChainDepth: 6
 });
 
 const addEvidenceItems = (items = [], engine = "unknown", fallbackCategory = "general") => {
@@ -96,7 +106,12 @@ const addEvidenceItems = (items = [], engine = "unknown", fallbackCategory = "ge
         item.potentialImpact ??
         item.recommendation ??
         "",
-      severity: item.severity ?? item.riskLevel ?? "info",
+      severity:
+        item.severity ??
+        item.riskLevel ??
+        item.routeExposureRiskLevel ??
+        item.riskLevel ??
+        "info",
       confidence: item.confidence ?? item.likelihood ?? 0.75,
       file: item.file ?? item.path ?? null,
       line: item.line ?? null,
@@ -107,20 +122,36 @@ const addEvidenceItems = (items = [], engine = "unknown", fallbackCategory = "ge
         item.owaspSmartContractTop10,
         item.owaspWebTop10
       ].filter(Boolean),
-      snippet: item.snippet ?? item.code ?? item.evidence ?? "",
-      attackSurface: item.attackSurface ?? item.affectedArea ?? [],
+      snippet:
+        item.snippet ??
+        item.code ??
+        item.evidence?.snippet ??
+        item.evidence ??
+        "",
+      matchedText: item.evidence?.matchedText ?? item.matchedText ?? "",
+      attackSurface:
+        item.attackSurface ??
+        item.affectedArea ??
+        item.method ??
+        [],
       assets: [
         item.dependency,
         item.asset,
         item.contract,
-        item.file
+        item.file,
+        item.path,
+        item.route,
+        item.method,
+        item.sink?.label,
+        item.source?.label
       ].filter(Boolean),
       remediation: [
         item.recommendation,
         item.howToFix,
         item.recommendedFix,
         item.recommendedDefense,
-        item.migrationPath
+        item.migrationPath,
+        ...(Array.isArray(item.remediation) ? item.remediation : [])
       ].filter(Boolean),
       metadata: item
     });
@@ -132,6 +163,11 @@ addEvidenceItems(quantumReadinessReport.findings, "quantumReadinessEngine", "qua
 addEvidenceItems(dependencyReport.dependencyFindings, "dependencyIntelligenceEngine", "dependency_risk");
 addEvidenceItems(attackSurfaceReport.attackFindings, "attackSurfaceEngine", "attack_surface");
 addEvidenceItems(smartContractAuditReport.auditFindings, "smartContractAuditEngine", "smart_contract_audit");
+
+// Deep Scan X evidence
+addEvidenceItems(codeFlowReport.findings, "codeFlowScannerEngine", "code_flow");
+addEvidenceItems(routeExposureReport.findings, "routeExposureEngine", "route_exposure");
+
 addEvidenceItems(exploitSimulationReport.simulations, "exploitSimulationEngine", "exploit_simulation");
 addEvidenceItems(remediationReport.remediationItems, "remediationEngine", "remediation");
 addEvidenceItems(autoFixReport.fixes, "autoFixEngine", "auto_fix");
@@ -166,19 +202,23 @@ const securityBadgeReport = securityBadgeGenerator(report);
 fs.writeFileSync("report.json", JSON.stringify(report, null, 2), "utf8");
 fs.writeFileSync("report.html", htmlReport, "utf8");
 fs.writeFileSync("evidence-graph.json", JSON.stringify(evidenceGraphReport, null, 2), "utf8");
+fs.writeFileSync("code-flow-report.json", JSON.stringify(codeFlowReport, null, 2), "utf8");
+fs.writeFileSync("route-exposure-report.json", JSON.stringify(routeExposureReport, null, 2), "utf8");
 
 fs.writeFileSync(
   "executive-report.json",
   JSON.stringify(
     {
       platform: "Quantum Shield Trinity",
-      version: "2.0.0",
+      version: "2.1.0",
       summary,
       markdownReport,
       securityScoreReport,
       remediationReport,
       quantumReadinessReport,
       cryptoInventoryReport,
+      codeFlowReport,
+      routeExposureReport,
       autoFixReport,
       attackPathReport,
       complianceMappingReport,
@@ -201,6 +241,10 @@ fs.writeFileSync(
   "utf8"
 );
 
+//============================================================================
+// CONSOLE OUTPUT
+//============================================================================
+
 console.log("Executive Summary");
 console.log("-----------------");
 console.log(`Risk Level: ${summary.repositoryRiskLevel}`);
@@ -209,6 +253,24 @@ console.log(`Scanned Files: ${summary.scannedFiles}`);
 console.log(`Critical Findings: ${summary.criticalFindings}`);
 console.log(`High Findings: ${summary.highFindings}`);
 console.log(`Medium Findings: ${summary.mediumFindings}`);
+console.log("");
+
+console.log("Deep Scan X");
+console.log("-----------");
+console.log(`Code Flow Risk Level: ${codeFlowReport.riskLevel}`);
+console.log(`Code Flow Score: ${codeFlowReport.score}/100`);
+console.log(`Total Source/Sink Flows: ${codeFlowReport.totalFlows}`);
+console.log(`Critical Flows: ${codeFlowReport.criticalFlows}`);
+console.log(`High Flows: ${codeFlowReport.highFlows}`);
+console.log(`Medium Flows: ${codeFlowReport.mediumFlows}`);
+console.log("");
+console.log(`Route Exposure Risk Level: ${routeExposureReport.routeExposureRiskLevel}`);
+console.log(`Route Exposure Score: ${routeExposureReport.routeExposureScore}/100`);
+console.log(`Total Routes: ${routeExposureReport.totalRoutes}`);
+console.log(`Public Routes: ${routeExposureReport.publicRoutes}`);
+console.log(`Sensitive Routes: ${routeExposureReport.sensitiveRoutes}`);
+console.log(`Critical Routes: ${routeExposureReport.criticalRoutes}`);
+console.log(`High Routes: ${routeExposureReport.highRoutes}`);
 console.log("");
 
 console.log("Evidence Graph");
@@ -346,6 +408,32 @@ attackPathReport.attackPaths.slice(0, 5).forEach((item, index) => {
   console.log("");
 });
 
+console.log("Code Flow Findings");
+console.log("------------------");
+codeFlowReport.findings.slice(0, 10).forEach((item, index) => {
+  console.log(`${index + 1}. ${item.title} (${item.severity})`);
+  console.log(` File: ${item.file}`);
+  console.log(` Line: ${item.line}`);
+  console.log(` Source: ${item.source?.label ?? "Unknown"}`);
+  console.log(` Sink: ${item.sink?.label ?? "Unknown"}`);
+  console.log(` Sanitized Nearby: ${item.sanitized}`);
+  console.log(` Recommendation: ${item.recommendation}`);
+  console.log("");
+});
+
+console.log("Route Exposure Findings");
+console.log("-----------------------");
+routeExposureReport.findings.slice(0, 10).forEach((item, index) => {
+  console.log(`${index + 1}. ${item.method} ${item.path} (${item.severity})`);
+  console.log(` File: ${item.file}`);
+  console.log(` Line: ${item.line}`);
+  console.log(` Framework: ${item.framework}`);
+  console.log(` Auth Detected: ${item.hasAuth}`);
+  console.log(` Validation Detected: ${item.hasValidation}`);
+  console.log(` Recommendation: ${item.recommendation}`);
+  console.log("");
+});
+
 console.log("CWE / OWASP Mapping");
 console.log("-------------------");
 console.log(`Mapped Findings: ${complianceMappingReport.totalMappedFindings}`);
@@ -464,6 +552,8 @@ console.log(`Markdown Report: ${markdownReport.outputPath}`);
 console.log("HTML Report: report.html");
 console.log("JSON Report: report.json");
 console.log("Evidence Graph: evidence-graph.json");
+console.log("Code Flow Report: code-flow-report.json");
+console.log("Route Exposure Report: route-exposure-report.json");
 console.log("Executive Report: executive-report.json");
 console.log("SARIF Report: report.sarif");
 console.log("Security Badge SVG: badge.svg");
