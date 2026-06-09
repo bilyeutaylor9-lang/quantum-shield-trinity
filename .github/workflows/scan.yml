@@ -8,6 +8,11 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      scan_target:
+        description: "Directory path or GitHub repository URL to scan"
+        required: false
+        default: "src"
 
 permissions:
   contents: write
@@ -15,13 +20,13 @@ permissions:
   security-events: write
 
 concurrency:
-  group: quantum-shield-${{ github.ref }}
+  group: quantum-shield-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   scan:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
 
     env:
       NODE_OPTIONS: "--max-old-space-size=12288"
@@ -36,6 +41,9 @@ jobs:
           node-version: 20
           cache: npm
 
+      - name: Verify Git
+        run: git --version
+
       - name: Install dependencies
         run: npm install
 
@@ -44,30 +52,44 @@ jobs:
           echo "NODE_OPTIONS=$NODE_OPTIONS"
           node -e "console.log('Heap Limit MB:', require('v8').getHeapStatistics().heap_size_limit / 1024 / 1024)"
 
-      - name: Run Quantum Shield Trinity Scan
+      - name: Determine scan target
+        id: target
+        shell: bash
         run: |
-          npm run scan -- src 2>&1 | tee quantum-shield-report.txt
+          TARGET="${{ github.event.inputs.scan_target || 'src' }}"
+          echo "target=$TARGET" >> "$GITHUB_OUTPUT"
+          echo "Scan target: $TARGET"
+
+      - name: Run Quantum Shield Trinity Scan
+        shell: bash
+        run: |
+          npm run scan -- "${{ steps.target.outputs.target }}" 2>&1 | tee quantum-shield-report.txt
 
       - name: Verify generated reports
         if: always()
+        shell: bash
         run: |
           echo "=== Current files ==="
           ls -lah
 
+          echo ""
           echo "=== Scan output ==="
           cat quantum-shield-report.txt || true
 
+          echo ""
           echo "=== Report files found ==="
-          find . -maxdepth 3 \( -name "*.json" -o -name "*.html" -o -name "*.sarif" \) -print || true
+          find . -maxdepth 3 \( -name "*.json" -o -name "*.html" -o -name "*.sarif" -o -name "*.svg" \) -print || true
 
       - name: Publish latest HTML report to docs
         if: github.event_name != 'pull_request' && hashFiles('report.html') != ''
+        shell: bash
         run: |
           mkdir -p docs/results
           cp report.html docs/results/index.html
 
       - name: Commit latest public report
         if: github.event_name != 'pull_request' && hashFiles('docs/results/index.html') != ''
+        shell: bash
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
@@ -75,7 +97,7 @@ jobs:
           git commit -m "Publish latest Quantum Shield Trinity report" || echo "No report changes to commit"
           git push
 
-      - name: Upload Scan Artifacts
+      - name: Upload scan artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -87,10 +109,27 @@ jobs:
             report.html
             report.json
             executive-report.json
+            executive-summary.json
             report.sarif
             badge.svg
             badge.html
             badge.json
+            evidence-graph.json
+            wallet-risk-report.json
+            dependency-risk-report.json
+            migration-shield-report.json
+            quantum-risk-export.json
+            smart-contract-context-report.json
+            quantum-exposure-forecast-report.json
+            quantum-attack-simulation-report.json
+            root-cause-report.json
+            security-assessment-report.json
+            security-audit-loop-report.json
+            security-copilot-report.json
+            code-flow-report.json
+            route-exposure-report.json
+            trust-boundary-report.json
+            attack-chain-builder-report.json
 
       - name: Upload SARIF to GitHub Code Scanning
         if: hashFiles('report.sarif') != ''
@@ -98,13 +137,22 @@ jobs:
         with:
           sarif_file: report.sarif
 
-      - name: Skip SARIF Upload Notice
+      - name: Skip SARIF upload notice
         if: hashFiles('report.sarif') == ''
+        shell: bash
         run: echo "report.sarif was not found, so SARIF upload was skipped."
 
-      - name: Scan Summary
+      - name: Scan summary
         if: always()
+        shell: bash
         run: |
-          echo "Quantum Shield Trinity Scan Complete"
-          ls -1 *.json 2>/dev/null || true
-          
+          echo "# Quantum Shield Trinity Scan Complete" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "## JSON Reports" >> "$GITHUB_STEP_SUMMARY"
+          ls -1 *.json 2>/dev/null >> "$GITHUB_STEP_SUMMARY" || true
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "## HTML Reports" >> "$GITHUB_STEP_SUMMARY"
+          ls -1 *.html 2>/dev/null >> "$GITHUB_STEP_SUMMARY" || true
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "## SARIF Reports" >> "$GITHUB_STEP_SUMMARY"
+          ls -1 *.sarif 2>/dev/null >> "$GITHUB_STEP_SUMMARY" || true
