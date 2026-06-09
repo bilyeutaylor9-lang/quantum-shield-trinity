@@ -14,6 +14,7 @@ import { attackPathGeneratorEngine } from "./engines/attackPathGeneratorEngine.j
 import { complianceMappingEngine } from "./engines/complianceMappingEngine.js";
 import { executiveReportEngine } from "./engines/executiveReportEngine.js";
 import { jsonExportEngine } from "./engines/jsonExportEngine.js";
+import { migrationShieldEngine } from "./engines/migrationShieldEngine.js";
 import { codeFlowScannerEngine } from "./engines/codeFlowScannerEngine.js";
 import { routeExposureEngine } from "./engines/routeExposureEngine.js";
 import { trustBoundaryEngine } from "./engines/trustBoundaryEngine.js";
@@ -79,6 +80,16 @@ const smartContractAuditReport = smartContractAuditEngine(scanResult.files);
 const quantumReadinessReport = quantumReadinessEngine(scanResult.files);
 const cryptoInventoryReport = cryptoInventoryEngine(scanResult.files);
 
+const walletMigrationProfile = report.walletRiskReport ?? report.walletReport ?? {
+  score: report.walletRiskScore ?? 0,
+  riskLevel: report.walletRiskLevel ?? "UNKNOWN"
+};
+
+const migrationShieldReport = migrationShieldEngine(
+  walletMigrationProfile,
+  cryptoInventoryReport
+);
+
 // Deep Scan X engines
 const codeFlowReport = codeFlowScannerEngine(scanResult.files);
 const routeExposureReport = routeExposureEngine(scanResult.files);
@@ -94,6 +105,8 @@ report.smartContractAuditReport = smartContractAuditReport;
 report.quantumReadinessReport = quantumReadinessReport;
 report.cryptoInventoryReport = cryptoInventoryReport;
 report.inventoryReport = cryptoInventoryReport;
+report.migrationShieldReport = migrationShieldReport;
+report.migrationReport = migrationShieldReport;
 report.codeFlowReport = codeFlowReport;
 report.routeExposureReport = routeExposureReport;
 report.trustBoundaryReport = trustBoundaryReport;
@@ -109,6 +122,7 @@ const securityScoreReport = securityScoreEngine({
   exploitSimulationReport,
   quantumReadinessReport,
   cryptoInventoryReport,
+  migrationShieldReport,
   codeFlowReport,
   routeExposureReport,
   trustBoundaryReport,
@@ -233,6 +247,22 @@ const addEvidenceItems = (items = [], engine = "unknown", fallbackCategory = "ge
 };
 
 addEvidenceItems(cryptoInventoryReport.assets, "cryptoInventoryEngine", "crypto_inventory");
+addEvidenceItems(
+  migrationShieldReport.recommendations.map((recommendation, index) => ({
+    id: `migration-shield-${index + 1}`,
+    type: "migration_recommendation",
+    category: "migration_shield",
+    title: "Migration Shield Recommendation",
+    description: recommendation,
+    severity: migrationShieldReport.migrationReady ? "low" : "medium",
+    confidence: 0.8,
+    recommendation,
+    remediation: [recommendation],
+    assets: ["migration", "crypto_agility"]
+  })),
+  "migrationShieldEngine",
+  "migration_shield"
+);
 addEvidenceItems(quantumReadinessReport.findings, "quantumReadinessEngine", "quantum_readiness");
 addEvidenceItems(dependencyReport.dependencyFindings, "dependencyIntelligenceEngine", "dependency_intelligence");
 addEvidenceItems(dependencyRiskReport.findings, "dependencyRiskEngine", "dependency_risk");
@@ -303,10 +333,13 @@ const jsonExportReport = jsonExportEngine({
     },
     migration: {
       ready:
+        migrationShieldReport.migrationReady === true ||
         quantumReadinessReport.migrationReadiness === "READY" ||
         quantumReadinessReport.migrationReady === true,
       readinessScore: quantumReadinessReport.quantumReadinessScore,
-      recommendedPath: quantumReadinessReport.recommendedMigrationPath
+      recommendedPath: quantumReadinessReport.recommendedMigrationPath,
+      shieldReady: migrationShieldReport.migrationReady,
+      shieldRecommendations: migrationShieldReport.recommendations
     },
     dependencyRisk: {
       riskLevel: dependencyRiskReport.riskLevel,
@@ -324,7 +357,7 @@ const jsonExportReport = jsonExportEngine({
   auditReport: report.securityAuditReport ?? report.auditReport ?? smartContractAuditReport,
   walletReport: report.walletRiskReport ?? {},
   inventoryReport: cryptoInventoryReport,
-  migrationReport: quantumReadinessReport,
+  migrationReport: { quantumReadinessReport, migrationShieldReport },
   forecastReport: report.quantumExposureForecastReport ?? {},
   simulationReport: exploitSimulationReport
 });
@@ -359,6 +392,7 @@ fs.writeFileSync("evidence-graph.json", JSON.stringify(evidenceGraphReport, null
 fs.writeFileSync("dependency-risk-report.json", JSON.stringify(dependencyRiskReport, null, 2), "utf8");
 fs.writeFileSync("executive-summary.json", JSON.stringify(executiveReportEngineReport, null, 2), "utf8");
 fs.writeFileSync("quantum-risk-export.json", JSON.stringify(jsonExportReport, null, 2), "utf8");
+fs.writeFileSync("migration-shield-report.json", JSON.stringify(migrationShieldReport, null, 2), "utf8");
 fs.writeFileSync("code-flow-report.json", JSON.stringify(codeFlowReport, null, 2), "utf8");
 fs.writeFileSync("route-exposure-report.json", JSON.stringify(routeExposureReport, null, 2), "utf8");
 fs.writeFileSync("trust-boundary-report.json", JSON.stringify(trustBoundaryReport, null, 2), "utf8");
@@ -378,6 +412,7 @@ fs.writeFileSync(
       remediationReport,
       quantumReadinessReport,
       cryptoInventoryReport,
+      migrationShieldReport,
       dependencyRiskReport,
       codeFlowReport,
       routeExposureReport,
@@ -519,6 +554,15 @@ console.log(`Quantum Risk Level: ${quantumReadinessReport.quantumRiskLevel}`);
 console.log(`Quantum Findings: ${quantumReadinessReport.totalQuantumFindings}`);
 console.log(`Migration Readiness: ${quantumReadinessReport.migrationReadiness}`);
 console.log(`Recommended Path: ${quantumReadinessReport.recommendedMigrationPath}`);
+console.log("");
+
+console.log("Migration Shield");
+console.log("----------------");
+console.log(`Migration Ready: ${migrationShieldReport.migrationReady}`);
+console.log(`Recommendations: ${migrationShieldReport.recommendations.length}`);
+migrationShieldReport.recommendations.forEach((item, index) => {
+  console.log(`${index + 1}. ${item}`);
+});
 console.log("");
 
 console.log("Dependency Intelligence");
@@ -811,6 +855,7 @@ console.log("Attack Chain Builder Report: attack-chain-builder-report.json");
 console.log("Executive Report: executive-report.json");
 console.log("Executive Summary: executive-summary.json");
 console.log("Quantum Risk Export: quantum-risk-export.json");
+console.log("Migration Shield Report: migration-shield-report.json");
 console.log("SARIF Report: report.sarif");
 console.log("Security Badge SVG: badge.svg");
 console.log("Security Badge HTML: badge.html");
