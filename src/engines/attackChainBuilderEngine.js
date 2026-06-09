@@ -4,21 +4,11 @@
  * Quantum Shield Trinity
  * Attack Chain Builder Engine
  *
- * Purpose:
- * Builds multi-step exploit chains by connecting evidence across:
- * - route exposure
- * - code flow
- * - trust boundaries
- * - dependency risk
- * - crypto inventory
- * - smart contract audit
- * - exploit simulation
- * - attack surface
- *
- * It is dependency-free and designed to complement evidenceGraphEngine.
- *
- * Usage:
- *   const attackChainBuilderReport = attackChainBuilderEngine(report);
+ * Optimized:
+ * - Prevents O(n²) edge explosion from hanging GitHub Actions
+ * - Adds hard caps for nodes, edges, starts, neighbors, and chains
+ * - Builds indexed relationships instead of comparing every finding to every other finding
+ * - Keeps the same report shape your index.js expects
  */
 
 const SEVERITY_WEIGHT = {
@@ -53,6 +43,16 @@ const CATEGORY_WEIGHT = {
   ci_to_deployment: 9
 };
 
+const DEFAULT_OPTIONS = {
+  maxDepth: 3,
+  limit: 25,
+  maxNodes: 250,
+  maxEdges: 750,
+  maxStarts: 50,
+  maxNeighborsPerNode: 20,
+  maxChainsToExplore: 500
+};
+
 function safeArray(value) {
   if (!value) return [];
   return Array.isArray(value) ? value : [value];
@@ -66,6 +66,10 @@ function categoryRank(category = "general") {
   return CATEGORY_WEIGHT[String(category).toLowerCase()] || 3;
 }
 
+function normalizeText(value = "") {
+  return String(value).trim().toLowerCase();
+}
+
 function normalizeFinding(item = {}, sourceEngine = "unknown", fallbackCategory = "general") {
   const type = item.type ?? item.dependency ?? item.simulationName ?? fallbackCategory;
   const category = item.category ?? fallbackCategory;
@@ -73,7 +77,9 @@ function normalizeFinding(item = {}, sourceEngine = "unknown", fallbackCategory 
   const severity = String(item.severity ?? item.riskLevel ?? "info").toLowerCase();
 
   return {
-    id: item.id ?? `${sourceEngine}-${title}-${item.file ?? item.path ?? "unknown"}-${item.line ?? 0}`.replace(/[^a-zA-Z0-9_-]/g, "_"),
+    id: item.id ?? `${sourceEngine}-${title}-${item.file ?? item.path ?? "unknown"}-${item.line ?? 0}`
+      .replace(/[^a-zA-Z0-9_-]/g, "_")
+      .slice(0, 180),
     sourceEngine,
     type,
     category,
@@ -90,9 +96,9 @@ function normalizeFinding(item = {}, sourceEngine = "unknown", fallbackCategory 
     file: item.file ?? item.path ?? null,
     line: item.line ?? null,
     ruleId: item.ruleId ?? item.rule ?? item.cwe ?? null,
-    attackSurface: safeArray(item.attackSurface ?? item.affectedArea),
+    attackSurface: safeArray(item.attackSurface ?? item.affectedArea).map(normalizeText).filter(Boolean),
     assets: [
-      ...(safeArray(item.assets)),
+      ...safeArray(item.assets),
       item.dependency,
       item.asset,
       item.contract,
@@ -102,10 +108,10 @@ function normalizeFinding(item = {}, sourceEngine = "unknown", fallbackCategory 
       item.method,
       item.sink?.label,
       item.source?.label
-    ].filter(Boolean),
-    tags: safeArray(item.tags),
+    ].filter(Boolean).map(String),
+    tags: safeArray(item.tags).map(normalizeText).filter(Boolean),
     remediation: [
-      ...(safeArray(item.remediation)),
+      ...safeArray(item.remediation),
       item.recommendation,
       item.howToFix,
       item.recommendedFix,
@@ -117,7 +123,21 @@ function normalizeFinding(item = {}, sourceEngine = "unknown", fallbackCategory 
   };
 }
 
-function collectFindings(report = {}) {
+function dedupeFindings(findings = []) {
+  const seen = new Set();
+  const output = [];
+
+  for (const item of findings) {
+    const key = `${item.sourceEngine}:${item.file}:${item.line}:${item.title}:${item.category}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    output.push(item);
+  }
+
+  return output;
+}
+
+function collectFindings(report = {}, options = {}) {
   const findings = [];
 
   const add = (items, engine, category) => {
@@ -136,46 +156,82 @@ function collectFindings(report = {}) {
   add(report.dependencyReport?.dependencyFindings, "dependencyIntelligenceEngine", "dependency_risk");
   add(report.exploitSimulationReport?.simulations, "exploitSimulationEngine", "exploit_simulation");
 
-  // If evidence graph already exists, pull graph nodes in too.
   for (const node of report.evidenceGraphReport?.nodes || []) {
     findings.push(normalizeFinding(node, "evidenceGraphEngine", node.category ?? "evidence_graph"));
   }
 
-  return dedupeFindings(findings);
+  return dedupeFindings(findings)
+    .sort((a, b) => {
+      const aScore = severityRank(a.severity) + categoryRank(a.category);
+      const bScore = severityRank(b.severity) + categoryRank(b.category);
+      return bScore - aScore;
+    })
+    .slice(0, options.maxNodes);
 }
 
-function dedupeFindings(findings = []) {
+function addIndex(index, key, node) {
+  if (!key) return;
+
+  const normalized = normalizeText(key);
+  if (!normalized) return;
+
+  if (!index.has(normalized)) {
+    index.set(normalized, []);
+  }
+
+  index.get(normalized).push(node);
+}
+
+function buildIndexes(findings = []) {
+  const byFile = new Map();
+  const byAsset = new Map();
+  const bySurface = new Map();
+  const byCategory = new Map();
+
+  for (const node of findings) {
+    addIndex(byFile, node.file, node);
+
+    for (const asset of node.assets || []) {
+      const assetText = String(asset);
+      if (assetText.length > 120) continue;
+      addIndex(byAsset, assetText, node);
+    }
+
+    for (const surface of node.attackSurface || []) {
+      addIndex(bySurface, surface, node);
+    }
+
+    addIndex(byCategory, node.category, node);
+  }
+
+  return {
+    byFile,
+    byAsset,
+    bySurface,
+    byCategory
+  };
+}
+
+function uniqueNodes(nodes = [], selfId = null, limit = 20) {
   const seen = new Set();
   const output = [];
 
-  for (const item of findings) {
-    const key = `${item.sourceEngine}:${item.file}:${item.line}:${item.title}:${item.category}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    output.push(item);
+  for (const node of nodes) {
+    if (!node || node.id === selfId || seen.has(node.id)) continue;
+
+    seen.add(node.id);
+    output.push(node);
+
+    if (output.length >= limit) break;
   }
 
   return output;
 }
 
-function sharesFile(a, b) {
-  return a.file && b.file && a.file === b.file;
-}
-
-function sharesAsset(a, b) {
-  const aAssets = new Set(a.assets || []);
-  return (b.assets || []).some(asset => aAssets.has(asset));
-}
-
-function sharesAttackSurface(a, b) {
-  const aSurface = new Set(a.attackSurface || []);
-  return (b.attackSurface || []).some(surface => aSurface.has(surface));
-}
-
 function routeToBoundary(a, b) {
   return a.category === "route_exposure" && (
     b.category === "trust_boundary" ||
-    b.category?.includes("user_input") ||
+    String(b.category).includes("user_input") ||
     b.category === "code_flow"
   );
 }
@@ -222,12 +278,76 @@ function smartContractToCrypto(a, b) {
   );
 }
 
+function connectionReason(a, b) {
+  if (a.file && b.file && a.file === b.file) return "same_file";
+
+  const aAssets = new Set(a.assets || []);
+  if ((b.assets || []).some(asset => aAssets.has(asset))) return "shared_asset";
+
+  const aSurface = new Set(a.attackSurface || []);
+  if ((b.attackSurface || []).some(surface => aSurface.has(surface))) return "shared_attack_surface";
+
+  if (routeToBoundary(a, b)) return "route_to_boundary";
+  if (boundaryToHighValue(a, b)) return "boundary_to_high_value_asset";
+  if (dependencyToExploit(a, b)) return "dependency_to_exploit";
+  if (smartContractToCrypto(a, b)) return "contract_to_crypto_risk";
+
+  return "related";
+}
+
+function buildTargetedCandidates(node, indexes, options) {
+  const candidates = [];
+
+  if (node.file) {
+    candidates.push(...(indexes.byFile.get(normalizeText(node.file)) || []));
+  }
+
+  for (const asset of node.assets || []) {
+    const assetText = String(asset);
+    if (assetText.length > 120) continue;
+    candidates.push(...(indexes.byAsset.get(normalizeText(assetText)) || []));
+  }
+
+  for (const surface of node.attackSurface || []) {
+    candidates.push(...(indexes.bySurface.get(normalizeText(surface)) || []));
+  }
+
+  if (node.category === "route_exposure") {
+    candidates.push(...(indexes.byCategory.get("trust_boundary") || []));
+    candidates.push(...(indexes.byCategory.get("code_flow") || []));
+  }
+
+  if (node.category === "trust_boundary" || String(node.category).includes("user_input") || node.category === "code_flow") {
+    candidates.push(...(indexes.byCategory.get("crypto_inventory") || []));
+    candidates.push(...(indexes.byCategory.get("smart_contract_audit") || []));
+    candidates.push(...(indexes.byCategory.get("exploit_simulation") || []));
+  }
+
+  if (node.category === "dependency_risk") {
+    candidates.push(...(indexes.byCategory.get("exploit_simulation") || []));
+    candidates.push(...(indexes.byCategory.get("attack_surface") || []));
+    candidates.push(...(indexes.byCategory.get("code_flow") || []));
+  }
+
+  if (node.category === "smart_contract_audit") {
+    candidates.push(...(indexes.byCategory.get("crypto_inventory") || []));
+    candidates.push(...(indexes.byCategory.get("quantum_readiness") || []));
+  }
+
+  return uniqueNodes(candidates, node.id, options.maxNeighborsPerNode);
+}
+
 function shouldConnect(a, b) {
   if (!a || !b || a.id === b.id) return false;
 
-  if (sharesFile(a, b)) return true;
-  if (sharesAsset(a, b)) return true;
-  if (sharesAttackSurface(a, b)) return true;
+  if (a.file && b.file && a.file === b.file) return true;
+
+  const aAssets = new Set(a.assets || []);
+  if ((b.assets || []).some(asset => aAssets.has(asset))) return true;
+
+  const aSurface = new Set(a.attackSurface || []);
+  if ((b.attackSurface || []).some(surface => aSurface.has(surface))) return true;
+
   if (routeToBoundary(a, b)) return true;
   if (boundaryToHighValue(a, b)) return true;
   if (dependencyToExploit(a, b)) return true;
@@ -236,35 +356,31 @@ function shouldConnect(a, b) {
   return false;
 }
 
-function connectionReason(a, b) {
-  if (sharesFile(a, b)) return "same_file";
-  if (sharesAsset(a, b)) return "shared_asset";
-  if (sharesAttackSurface(a, b)) return "shared_attack_surface";
-  if (routeToBoundary(a, b)) return "route_to_boundary";
-  if (boundaryToHighValue(a, b)) return "boundary_to_high_value_asset";
-  if (dependencyToExploit(a, b)) return "dependency_to_exploit";
-  if (smartContractToCrypto(a, b)) return "contract_to_crypto_risk";
-  return "related";
-}
-
-function buildGraph(findings = []) {
+function buildGraph(findings = [], options = {}) {
+  const indexes = buildIndexes(findings);
   const edges = [];
+  const seenEdges = new Set();
 
-  for (let i = 0; i < findings.length; i++) {
-    for (let j = 0; j < findings.length; j++) {
-      if (i === j) continue;
+  for (const node of findings) {
+    const candidates = buildTargetedCandidates(node, indexes, options);
 
-      const a = findings[i];
-      const b = findings[j];
+    for (const candidate of candidates) {
+      if (edges.length >= options.maxEdges) break;
+      if (!shouldConnect(node, candidate)) continue;
 
-      if (!shouldConnect(a, b)) continue;
+      const key = `${node.id}->${candidate.id}`;
+      if (seenEdges.has(key)) continue;
+
+      seenEdges.add(key);
 
       edges.push({
-        from: a.id,
-        to: b.id,
-        relationship: connectionReason(a, b)
+        from: node.id,
+        to: candidate.id,
+        relationship: connectionReason(node, candidate)
       });
     }
+
+    if (edges.length >= options.maxEdges) break;
   }
 
   return {
@@ -273,14 +389,22 @@ function buildGraph(findings = []) {
   };
 }
 
-function getNeighbors(graph, nodeId) {
-  const ids = graph.edges
-    .filter(edge => edge.from === nodeId)
-    .map(edge => edge.to);
+function buildNeighborMap(graph) {
+  const nodeById = new Map(graph.nodes.map(node => [node.id, node]));
+  const neighbors = new Map();
 
-  return ids
-    .map(id => graph.nodes.find(node => node.id === id))
-    .filter(Boolean);
+  for (const edge of graph.edges) {
+    if (!neighbors.has(edge.from)) {
+      neighbors.set(edge.from, []);
+    }
+
+    const target = nodeById.get(edge.to);
+    if (target) {
+      neighbors.get(edge.from).push(target);
+    }
+  }
+
+  return neighbors;
 }
 
 function isEntryNode(node) {
@@ -315,11 +439,11 @@ function scoreChain(path = []) {
   const severityScore = path.reduce((sum, node) => sum + severityRank(node.severity), 0);
   const categoryScore = path.reduce((sum, node) => sum + categoryRank(node.category), 0);
   const confidenceAvg =
-    path.reduce((sum, node) => sum + Number(node.confidence || 0.5), 0) / Math.max(path.length, 1);
+    path.reduce((sum, node) => sum + Number(node.confidence || 0.5), 0) /
+    Math.max(path.length, 1);
 
   const lengthBonus = Math.min(20, path.length * 4);
   const raw = (severityScore * 1.4 + categoryScore * 0.9) * confidenceAvg + lengthBonus;
-
   const score = Math.max(1, Math.min(100, Math.round(raw)));
 
   let severity = "low";
@@ -339,9 +463,42 @@ function scoreChain(path = []) {
   };
 }
 
+function summarizeChain(path = []) {
+  if (path.length === 0) return "No attack chain path available.";
+
+  const entry = path[0];
+  const end = path[path.length - 1];
+
+  return `Potential chain from ${entry.title} to ${end.title}. This suggests an attacker may be able to move across ${path.length} connected risk nodes.`;
+}
+
+function buildChainRecommendations(path = []) {
+  const recs = [];
+
+  const hasRoute = path.some(node => node.category === "route_exposure");
+  const hasBoundary = path.some(node => node.category === "trust_boundary" || String(node.category).includes("user_input"));
+  const hasSigning = path.some(node => /sign|wallet|private/i.test(`${node.category} ${node.title} ${node.assets.join(" ")}`));
+  const hasCommand = path.some(node => /command|execution|exec/i.test(`${node.category} ${node.title}`));
+  const hasCi = path.some(node => /ci|deployment|supply/i.test(`${node.category} ${node.title}`));
+
+  if (hasRoute) recs.push("Add explicit authentication, authorization, validation, and rate limiting at the route entry point.");
+  if (hasBoundary) recs.push("Add trust-boundary controls before sensitive sinks and document the boundary owner.");
+  if (hasSigning) recs.push("Require explicit user consent, transaction simulation, chain validation, and signing limits.");
+  if (hasCommand) recs.push("Remove command execution or isolate it with strict allowlists and non-shell execution.");
+  if (hasCi) recs.push("Restrict CI/CD permissions, protect environments, and require approval before deployment/publishing.");
+
+  if (recs.length === 0) {
+    recs.push("Break the chain by remediating the earliest high-severity node first.");
+  }
+
+  return recs;
+}
+
 function buildChainObject(path = [], graph) {
   const scored = scoreChain(path);
-  const chainId = `CHAIN-${path.map(node => node.id).join("-")}`.replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 180);
+  const chainId = `CHAIN-${path.map(node => node.id).join("-")}`
+    .replace(/[^a-zA-Z0-9_-]/g, "_")
+    .slice(0, 180);
 
   const relationships = [];
 
@@ -385,50 +542,49 @@ function buildChainObject(path = [], graph) {
   };
 }
 
-function summarizeChain(path = []) {
-  if (path.length === 0) return "No attack chain path available.";
+function dedupeChains(chains = []) {
+  const seen = new Set();
+  const output = [];
 
-  const entry = path[0];
-  const end = path[path.length - 1];
-
-  return `Potential chain from ${entry.title} to ${end.title}. This suggests an attacker may be able to move across ${path.length} connected risk nodes.`;
-}
-
-function buildChainRecommendations(path = []) {
-  const recs = [];
-
-  const hasRoute = path.some(node => node.category === "route_exposure");
-  const hasBoundary = path.some(node => node.category === "trust_boundary" || String(node.category).includes("user_input"));
-  const hasSigning = path.some(node => /sign|wallet|private/i.test(`${node.category} ${node.title} ${node.assets.join(" ")}`));
-  const hasCommand = path.some(node => /command|execution|exec/i.test(`${node.category} ${node.title}`));
-  const hasCi = path.some(node => /ci|deployment|supply/i.test(`${node.category} ${node.title}`));
-
-  if (hasRoute) recs.push("Add explicit authentication, authorization, validation, and rate limiting at the route entry point.");
-  if (hasBoundary) recs.push("Add trust-boundary controls before sensitive sinks and document the boundary owner.");
-  if (hasSigning) recs.push("Require explicit user consent, transaction simulation, chain validation, and signing limits.");
-  if (hasCommand) recs.push("Remove command execution or isolate it with strict allowlists and non-shell execution.");
-  if (hasCi) recs.push("Restrict CI/CD permissions, protect environments, and require approval before deployment/publishing.");
-
-  if (recs.length === 0) {
-    recs.push("Break the chain by remediating the earliest high-severity node first.");
+  for (const chain of chains) {
+    const key = chain.path.map(node => node.id).join(">");
+    if (seen.has(key)) continue;
+    seen.add(key);
+    output.push(chain);
   }
 
-  return recs;
+  return output;
 }
 
 function findChains(graph, options = {}) {
-  const maxDepth = options.maxDepth || 5;
-  const limit = options.limit || 50;
+  const maxDepth = options.maxDepth;
+  const limit = options.limit;
   const chains = [];
+  const neighborMap = buildNeighborMap(graph);
 
-  const starts = graph.nodes.filter(isEntryNode);
+  const starts = graph.nodes
+    .filter(isEntryNode)
+    .sort((a, b) => {
+      const aScore = severityRank(a.severity) + categoryRank(a.category);
+      const bScore = severityRank(b.severity) + categoryRank(b.category);
+      return bScore - aScore;
+    })
+    .slice(0, options.maxStarts);
+
+  let explored = 0;
 
   const walk = (node, path, visited, depth) => {
-    if (depth > maxDepth) return;
+    if (depth >= maxDepth) return;
+    if (chains.length >= limit) return;
+    if (explored >= options.maxChainsToExplore) return;
 
-    const neighbors = getNeighbors(graph, node.id);
+    explored += 1;
+
+    const neighbors = (neighborMap.get(node.id) || [])
+      .slice(0, options.maxNeighborsPerNode);
 
     for (const next of neighbors) {
+      if (chains.length >= limit) break;
       if (visited.has(next.id)) continue;
 
       const nextPath = [...path, next];
@@ -444,26 +600,15 @@ function findChains(graph, options = {}) {
   };
 
   for (const start of starts) {
+    if (chains.length >= limit) break;
+    if (explored >= options.maxChainsToExplore) break;
+
     walk(start, [start], new Set([start.id]), 1);
   }
 
   return dedupeChains(chains)
     .sort((a, b) => b.chainScore - a.chainScore)
     .slice(0, limit);
-}
-
-function dedupeChains(chains = []) {
-  const seen = new Set();
-  const output = [];
-
-  for (const chain of chains) {
-    const key = chain.path.map(node => node.id).join(">");
-    if (seen.has(key)) continue;
-    seen.add(key);
-    output.push(chain);
-  }
-
-  return output;
 }
 
 function summarizeChains(chains = []) {
@@ -514,6 +659,7 @@ function buildTopRecommendations(chains = []) {
   const signing = chains.find(chain =>
     chain.assets.some(asset => /wallet|private|sign/i.test(String(asset)))
   );
+
   if (signing) {
     recommendations.push({
       severity: "critical",
@@ -526,6 +672,7 @@ function buildTopRecommendations(chains = []) {
     chain.assets.some(asset => /deploy|pipeline|ci/i.test(String(asset))) ||
     chain.attackSurface.some(surface => /ci|supply/i.test(String(surface)))
   );
+
   if (ci) {
     recommendations.push({
       severity: "high",
@@ -545,16 +692,20 @@ function buildTopRecommendations(chains = []) {
 }
 
 export function attackChainBuilderEngine(report = {}, options = {}) {
-  const findings = collectFindings(report);
-  const graph = buildGraph(findings);
-  const chains = findChains(graph, {
-    maxDepth: options.maxDepth || 5,
-    limit: options.limit || 50
-  });
+  const config = {
+    ...DEFAULT_OPTIONS,
+    ...options
+  };
+
+  const findings = collectFindings(report, config);
+  const graph = buildGraph(findings, config);
+  const chains = findChains(graph, config);
   const summary = summarizeChains(chains);
 
   return {
     engine: "attackChainBuilderEngine",
+    optimized: true,
+    limits: config,
     totalEvidenceNodes: graph.nodes.length,
     totalEvidenceEdges: graph.edges.length,
     totalAttackChains: chains.length,
