@@ -90,6 +90,11 @@ const timedStep = (label, fn) => {
   }
 };
 
+const limitEvidenceItems = (items = [], limit = 100) => {
+  if (!Array.isArray(items)) return [];
+  return items.slice(0, limit);
+};
+
 const findPackageJson = (files = []) => {
   const packageFile = files.find((file) => {
     const filePath = file.path ?? file.file ?? file.name ?? file.filename ?? "";
@@ -256,6 +261,7 @@ const buildRootCauseReport = (findingGroups = []) => {
           finding.recommendation ??
           finding.recommendedDefense ??
           finding.howToFix ??
+          rootCause.recommendation ??
           "Review root cause and apply targeted remediation."
       });
     });
@@ -455,7 +461,6 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
   );
 
   const walletInput = options.wallet ?? buildWalletInputFromReports(report, cryptoInventoryReport);
-
   const walletReport = timedStep("walletRiskEngine", () => walletRiskEngine(walletInput));
 
   const migrationShieldReport = timedStep("migrationShieldEngine", () =>
@@ -528,7 +533,6 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
     targetDirectory,
     scannedAt: new Date().toISOString(),
     scannedFiles: scanResult.files.length,
-
     dependencyReport,
     dependencyRiskReport,
     attackSurfaceReport,
@@ -627,8 +631,13 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
 
   const attackChainBuilderReport = timedStep("attackChainBuilderEngine", () =>
     attackChainBuilderEngine(report, {
-      maxDepth: 5,
-      limit: 50
+      maxDepth: 3,
+      limit: 25,
+      maxNodes: 250,
+      maxEdges: 750,
+      maxStarts: 50,
+      maxNeighborsPerNode: 20,
+      maxChainsToExplore: 500
     })
   );
 
@@ -705,7 +714,7 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
       autoLinkByFile: true,
       autoLinkByRule: true,
       autoLinkByAsset: true,
-      maxAttackChainDepth: 6
+      maxAttackChainDepth: 4
     })
   );
 
@@ -740,58 +749,75 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
   );
 
   timedStep("evidenceGraph.add.cryptoInventoryEngine", () =>
-    addEvidenceItemsToGraph(evidenceGraph, cryptoInventoryReport.assets, "cryptoInventoryEngine", "crypto_inventory")
+    addEvidenceItemsToGraph(evidenceGraph, limitEvidenceItems(cryptoInventoryReport.assets, 100), "cryptoInventoryEngine", "crypto_inventory")
   );
+
   timedStep("evidenceGraph.add.quantumReadinessEngine", () =>
-    addEvidenceItemsToGraph(evidenceGraph, quantumReadinessReport.findings, "quantumReadinessEngine", "quantum_readiness")
+    addEvidenceItemsToGraph(evidenceGraph, limitEvidenceItems(quantumReadinessReport.findings, 100), "quantumReadinessEngine", "quantum_readiness")
   );
+
   timedStep("evidenceGraph.add.dependencyIntelligenceEngine", () =>
-    addEvidenceItemsToGraph(evidenceGraph, report.dependencyReport.dependencyFindings, "dependencyIntelligenceEngine", "dependency_intelligence")
+    addEvidenceItemsToGraph(evidenceGraph, limitEvidenceItems(report.dependencyReport.dependencyFindings, 100), "dependencyIntelligenceEngine", "dependency_intelligence")
   );
+
   timedStep("evidenceGraph.add.dependencyRiskEngine", () =>
-    addEvidenceItemsToGraph(evidenceGraph, dependencyRiskReport.findings, "dependencyRiskEngine", "dependency_risk")
+    addEvidenceItemsToGraph(evidenceGraph, limitEvidenceItems(dependencyRiskReport.findings, 100), "dependencyRiskEngine", "dependency_risk")
   );
+
   timedStep("evidenceGraph.add.attackSurfaceEngine", () =>
-    addEvidenceItemsToGraph(evidenceGraph, attackSurfaceReport.attackFindings, "attackSurfaceEngine", "attack_surface")
+    addEvidenceItemsToGraph(evidenceGraph, limitEvidenceItems(attackSurfaceReport.attackFindings, 100), "attackSurfaceEngine", "attack_surface")
   );
+
   timedStep("evidenceGraph.add.smartContractAuditEngine", () =>
-    addEvidenceItemsToGraph(evidenceGraph, smartContractAuditReport.auditFindings, "smartContractAuditEngine", "smart_contract_audit")
+    addEvidenceItemsToGraph(evidenceGraph, limitEvidenceItems(smartContractAuditReport.auditFindings, 100), "smartContractAuditEngine", "smart_contract_audit")
   );
+
   timedStep("evidenceGraph.add.smartContractContextEngine", () =>
-    addEvidenceItemsToGraph(evidenceGraph, smartContractContextReport.contexts, "smartContractContextEngine", "smart_contract_context")
+    addEvidenceItemsToGraph(evidenceGraph, limitEvidenceItems(smartContractContextReport.contexts, 100), "smartContractContextEngine", "smart_contract_context")
   );
+
   timedStep("evidenceGraph.add.codeFlowScannerEngine", () =>
-    addEvidenceItemsToGraph(evidenceGraph, codeFlowReport.findings, "codeFlowScannerEngine", "code_flow")
+    addEvidenceItemsToGraph(evidenceGraph, limitEvidenceItems(codeFlowReport.findings, 100), "codeFlowScannerEngine", "code_flow")
   );
+
   timedStep("evidenceGraph.add.routeExposureEngine", () =>
-    addEvidenceItemsToGraph(evidenceGraph, routeExposureReport.findings, "routeExposureEngine", "route_exposure")
+    addEvidenceItemsToGraph(evidenceGraph, limitEvidenceItems(routeExposureReport.findings, 100), "routeExposureEngine", "route_exposure")
   );
+
   timedStep("evidenceGraph.add.trustBoundaryEngine", () =>
-    addEvidenceItemsToGraph(evidenceGraph, trustBoundaryReport.findings, "trustBoundaryEngine", "trust_boundary")
+    addEvidenceItemsToGraph(evidenceGraph, limitEvidenceItems(trustBoundaryReport.findings, 100), "trustBoundaryEngine", "trust_boundary")
   );
+
   timedStep("evidenceGraph.add.rootCauseEngine", () =>
-    addEvidenceItemsToGraph(evidenceGraph, rootCauseReport.rootCauses, "rootCauseEngine", "root_cause")
+    addEvidenceItemsToGraph(evidenceGraph, limitEvidenceItems(rootCauseReport.rootCauses, 100), "rootCauseEngine", "root_cause")
   );
+
   timedStep("evidenceGraph.add.securityCopilotEngine", () =>
-    addEvidenceItemsToGraph(evidenceGraph, securityCopilotReport.guidance, "securityCopilotEngine", "security_copilot")
+    addEvidenceItemsToGraph(evidenceGraph, limitEvidenceItems(securityCopilotReport.guidance, 100), "securityCopilotEngine", "security_copilot")
   );
+
   timedStep("evidenceGraph.add.attackChainBuilderEngine", () =>
-    addEvidenceItemsToGraph(evidenceGraph, attackChainBuilderReport.attackChains, "attackChainBuilderEngine", "attack_chain_builder")
+    addEvidenceItemsToGraph(evidenceGraph, limitEvidenceItems(attackChainBuilderReport.attackChains, 50), "attackChainBuilderEngine", "attack_chain_builder")
   );
+
   timedStep("evidenceGraph.add.exploitSimulationEngine", () =>
-    addEvidenceItemsToGraph(evidenceGraph, exploitSimulationReport.simulations, "exploitSimulationEngine", "exploit_simulation")
+    addEvidenceItemsToGraph(evidenceGraph, limitEvidenceItems(exploitSimulationReport.simulations, 50), "exploitSimulationEngine", "exploit_simulation")
   );
+
   timedStep("evidenceGraph.add.remediationEngine", () =>
-    addEvidenceItemsToGraph(evidenceGraph, remediationReport.remediationItems, "remediationEngine", "remediation")
+    addEvidenceItemsToGraph(evidenceGraph, limitEvidenceItems(remediationReport.remediationItems, 100), "remediationEngine", "remediation")
   );
+
   timedStep("evidenceGraph.add.autoFixEngine", () =>
-    addEvidenceItemsToGraph(evidenceGraph, autoFixReport.fixes, "autoFixEngine", "auto_fix")
+    addEvidenceItemsToGraph(evidenceGraph, limitEvidenceItems(autoFixReport.fixes, 100), "autoFixEngine", "auto_fix")
   );
+
   timedStep("evidenceGraph.add.attackPathGeneratorEngine", () =>
-    addEvidenceItemsToGraph(evidenceGraph, attackPathReport.attackPaths, "attackPathGeneratorEngine", "attack_path")
+    addEvidenceItemsToGraph(evidenceGraph, limitEvidenceItems(attackPathReport.attackPaths, 50), "attackPathGeneratorEngine", "attack_path")
   );
+
   timedStep("evidenceGraph.add.complianceMappingEngine", () =>
-    addEvidenceItemsToGraph(evidenceGraph, complianceMappingReport.mappedFindings, "complianceMappingEngine", "compliance_mapping")
+    addEvidenceItemsToGraph(evidenceGraph, limitEvidenceItems(complianceMappingReport.mappedFindings, 100), "complianceMappingEngine", "compliance_mapping")
   );
 
   const evidenceGraphReport = timedStep("evidenceGraph.exportGraph", () =>
