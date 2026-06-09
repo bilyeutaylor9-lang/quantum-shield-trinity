@@ -22,6 +22,7 @@ import { securityAssessmentEngine } from "./engines/securityAssessmentEngine.js"
 import { securityAuditLoopEngine } from "./engines/securityAuditLoopEngine.js";
 import { securityCopilotEngine } from "./engines/securityCopilotEngine.js";
 import { smartContractContextEngine } from "./engines/smartContractContextEngine.js";
+import { walletRiskEngine } from "./engines/walletRiskEngine.js";
 import { codeFlowScannerEngine } from "./engines/codeFlowScannerEngine.js";
 import { routeExposureEngine } from "./engines/routeExposureEngine.js";
 import { trustBoundaryEngine } from "./engines/trustBoundaryEngine.js";
@@ -178,6 +179,34 @@ const buildSecurityCopilotReport = (findingGroups = []) => {
   };
 };
 
+
+const buildWalletInputFromReports = (report = {}, cryptoInventoryReport = {}) => {
+  const existingWallet =
+    report.walletRiskReport ??
+    report.walletReport ??
+    report.wallet ??
+    {};
+
+  return {
+    address:
+      existingWallet.address ??
+      existingWallet.walletAddress ??
+      "Unknown",
+    transactionCount:
+      existingWallet.transactionCount ??
+      cryptoInventoryReport.totalCryptoAssets ??
+      cryptoInventoryReport.assets?.length ??
+      0,
+    reusedAddress:
+      existingWallet.reusedAddress ??
+      false,
+    signedMessages:
+      existingWallet.signedMessages ??
+      cryptoInventoryReport.quantumExposedAssets ??
+      0
+  };
+};
+
 const buildSmartContractContextReport = (files = []) => {
   const supportedExtensions = [".sol", ".vy", ".js", ".ts", ".tsx", ".jsx"];
   const contexts = [];
@@ -285,10 +314,9 @@ const quantumReadinessReport = quantumReadinessEngine(scanResult.files);
 const cryptoInventoryReport = cryptoInventoryEngine(scanResult.files);
 const smartContractContextReport = buildSmartContractContextReport(scanResult.files);
 
-const walletMigrationProfile = report.walletRiskReport ?? report.walletReport ?? {
-  score: report.walletRiskScore ?? 0,
-  riskLevel: report.walletRiskLevel ?? "UNKNOWN"
-};
+const walletInput = buildWalletInputFromReports(report, cryptoInventoryReport);
+const walletReport = walletRiskEngine(walletInput);
+const walletMigrationProfile = walletReport;
 
 const migrationShieldReport = migrationShieldEngine(
   walletMigrationProfile,
@@ -350,6 +378,8 @@ report.smartContractContextReport = smartContractContextReport;
 report.quantumReadinessReport = quantumReadinessReport;
 report.cryptoInventoryReport = cryptoInventoryReport;
 report.inventoryReport = cryptoInventoryReport;
+report.walletReport = walletReport;
+report.walletRiskReport = walletReport;
 report.migrationShieldReport = migrationShieldReport;
 report.migrationReport = migrationShieldReport;
 report.quantumExposureForecastReport = quantumExposureForecastReport;
@@ -381,7 +411,6 @@ const securityScoreReport = securityScoreEngine({
   codeFlowReport,
   routeExposureReport,
   trustBoundaryReport,
-  rootCauseReport,
   repositoryReport: report
 });
 
@@ -398,6 +427,52 @@ report.attackPathReport = attackPathReport;
 
 const complianceMappingReport = complianceMappingEngine(report);
 report.complianceMappingReport = complianceMappingReport;
+
+const rootCauseReport = buildRootCauseReport([
+  { engine: "cryptoInventoryEngine", items: cryptoInventoryReport.assets },
+  { engine: "quantumReadinessEngine", items: quantumReadinessReport.findings },
+  { engine: "dependencyIntelligenceEngine", items: dependencyReport.dependencyFindings },
+  { engine: "dependencyRiskEngine", items: dependencyRiskReport.findings },
+  { engine: "attackSurfaceEngine", items: attackSurfaceReport.attackFindings },
+  { engine: "smartContractAuditEngine", items: smartContractAuditReport.auditFindings },
+  { engine: "smartContractContextEngine", items: smartContractContextReport.contexts },
+  { engine: "codeFlowScannerEngine", items: codeFlowReport.findings },
+  { engine: "routeExposureEngine", items: routeExposureReport.findings },
+  { engine: "trustBoundaryEngine", items: trustBoundaryReport.findings },
+  { engine: "exploitSimulationEngine", items: exploitSimulationReport.simulations },
+  { engine: "attackPathGeneratorEngine", items: attackPathReport.attackPaths },
+  { engine: "complianceMappingEngine", items: complianceMappingReport.mappedFindings }
+]);
+
+report.rootCauseReport = rootCauseReport;
+
+const securityCopilotReport = buildSecurityCopilotReport([
+  { engine: "cryptoInventoryEngine", items: cryptoInventoryReport.assets },
+  { engine: "quantumReadinessEngine", items: quantumReadinessReport.findings },
+  { engine: "dependencyIntelligenceEngine", items: dependencyReport.dependencyFindings },
+  { engine: "dependencyRiskEngine", items: dependencyRiskReport.findings },
+  { engine: "attackSurfaceEngine", items: attackSurfaceReport.attackFindings },
+  { engine: "smartContractAuditEngine", items: smartContractAuditReport.auditFindings },
+  { engine: "smartContractContextEngine", items: smartContractContextReport.contexts },
+  { engine: "codeFlowScannerEngine", items: codeFlowReport.findings },
+  { engine: "routeExposureEngine", items: routeExposureReport.findings },
+  { engine: "trustBoundaryEngine", items: trustBoundaryReport.findings },
+  { engine: "exploitSimulationEngine", items: exploitSimulationReport.simulations },
+  { engine: "attackPathGeneratorEngine", items: attackPathReport.attackPaths },
+  { engine: "attackChainBuilderEngine", items: report.attackChainBuilderReport?.attackChains ?? [] },
+  { engine: "rootCauseEngine", items: rootCauseReport.rootCauses },
+  { engine: "securityAssessmentEngine", items: securityAssessmentReport.criticalFindings.map((finding, index) => ({
+    id: `security-assessment-copilot-${index + 1}`,
+    type: "Security Assessment",
+    title: "Security Assessment Finding",
+    description: finding,
+    severity: securityAssessmentReport.riskLevel,
+    category: "Security Assessment",
+    recommendation: securityAssessmentReport.recommendedNextSteps?.[index] ?? "Review assessment finding."
+  })) }
+]);
+
+report.securityCopilotReport = securityCopilotReport;
 
 
 // Merge Dependency Risk Engine findings into dependencyReport for attack-chain correlation.
@@ -416,6 +491,64 @@ const attackChainBuilderReport = attackChainBuilderEngine(report, {
   limit: 50
 });
 report.attackChainBuilderReport = attackChainBuilderReport;
+
+const securityAuditLoopReport = securityAuditLoopEngine({
+  previousHash:
+    process.env.QST_PREVIOUS_AUDIT_HASH ??
+    report.previousAuditHash ??
+    "GENESIS",
+  entropySeed: `${Date.now()}-${targetDirectory}-${scanResult.files.length}`,
+  systemState: {
+    platform: "Quantum Shield Trinity",
+    version: "2.3.0",
+    targetDirectory,
+    scannedFiles: scanResult.files.length,
+    walletRiskLevel: walletReport.riskLevel,
+    walletRiskScore: walletReport.score,
+    securityScore: securityScoreReport.securityScore ?? securityAssessmentReport.totalScore ?? 0,
+    securityRiskLevel: securityScoreReport.riskLevel ?? securityAssessmentReport.riskLevel ?? "UNKNOWN",
+    dependencyRiskLevel: dependencyRiskReport.riskLevel,
+    codeFlowRiskLevel: codeFlowReport.riskLevel,
+    routeExposureRiskLevel: routeExposureReport.routeExposureRiskLevel,
+    trustBoundaryRiskLevel: trustBoundaryReport.trustBoundaryRiskLevel,
+    attackChainRiskLevel: attackChainBuilderReport.attackChainRiskLevel,
+    quantumExposure: quantumExposureForecastReport.qDayExposure,
+    quantumBusinessRisk: quantumAttackSimulationReport.businessRisk,
+    rootCauseCriticalCount: rootCauseReport.criticalRootCauses
+  }
+});
+
+report.securityAuditLoopReport = securityAuditLoopReport;
+report.auditLoopReport = securityAuditLoopReport;
+
+const refreshedSecurityCopilotReport = buildSecurityCopilotReport([
+  { engine: "cryptoInventoryEngine", items: cryptoInventoryReport.assets },
+  { engine: "quantumReadinessEngine", items: quantumReadinessReport.findings },
+  { engine: "dependencyIntelligenceEngine", items: dependencyReport.dependencyFindings },
+  { engine: "dependencyRiskEngine", items: dependencyRiskReport.findings },
+  { engine: "attackSurfaceEngine", items: attackSurfaceReport.attackFindings },
+  { engine: "smartContractAuditEngine", items: smartContractAuditReport.auditFindings },
+  { engine: "smartContractContextEngine", items: smartContractContextReport.contexts },
+  { engine: "codeFlowScannerEngine", items: codeFlowReport.findings },
+  { engine: "routeExposureEngine", items: routeExposureReport.findings },
+  { engine: "trustBoundaryEngine", items: trustBoundaryReport.findings },
+  { engine: "exploitSimulationEngine", items: exploitSimulationReport.simulations },
+  { engine: "attackPathGeneratorEngine", items: attackPathReport.attackPaths },
+  { engine: "attackChainBuilderEngine", items: attackChainBuilderReport.attackChains },
+  { engine: "rootCauseEngine", items: rootCauseReport.rootCauses },
+  { engine: "securityAssessmentEngine", items: securityAssessmentReport.criticalFindings.map((finding, index) => ({
+    id: `security-assessment-copilot-${index + 1}`,
+    type: "Security Assessment",
+    title: "Security Assessment Finding",
+    description: finding,
+    severity: securityAssessmentReport.riskLevel,
+    category: "Security Assessment",
+    recommendation: securityAssessmentReport.recommendedNextSteps?.[index] ?? "Review assessment finding."
+  })) }
+]);
+
+Object.assign(securityCopilotReport, refreshedSecurityCopilotReport);
+report.securityCopilotReport = securityCopilotReport;
 
 //============================================================================
 // EVIDENCE GRAPH INTEGRATION
@@ -502,6 +635,32 @@ const addEvidenceItems = (items = [], engine = "unknown", fallbackCategory = "ge
   });
 };
 
+addEvidenceItems(
+  [
+    {
+      id: "wallet-risk",
+      type: "wallet_risk",
+      category: "wallet_quantum_risk",
+      title: "Wallet Quantum Risk",
+      description: walletReport.recommendation,
+      severity:
+        walletReport.riskLevel === "CRITICAL"
+          ? "critical"
+          : walletReport.riskLevel === "HIGH"
+            ? "high"
+            : walletReport.riskLevel === "MEDIUM"
+              ? "medium"
+              : "low",
+      confidence: 0.8,
+      recommendation: walletReport.recommendation,
+      remediation: [walletReport.recommendation],
+      assets: [walletReport.walletAddress, "wallet", "signing_activity"].filter(Boolean),
+      metadata: walletReport
+    }
+  ],
+  "walletRiskEngine",
+  "wallet_risk"
+);
 addEvidenceItems(cryptoInventoryReport.assets, "cryptoInventoryEngine", "crypto_inventory");
 addEvidenceItems(
   migrationShieldReport.recommendations.map((recommendation, index) => ({
@@ -652,7 +811,7 @@ const executiveReportEngineReport = executiveReportEngine({
   assessmentReport: report.securityAssessmentReport ?? report.assessmentReport ?? {},
   auditReport: { smartContractAuditReport, securityAuditLoopReport },
   riskProfile: {
-    wallet: report.walletRiskReport ?? {},
+    wallet: walletReport,
     inventory: {
       riskLevel:
         cryptoInventoryReport.inventoryRiskLevel ??
@@ -678,7 +837,7 @@ const jsonExportReport = jsonExportEngine({
   version: "2.2.2",
   ...report,
   riskProfile: {
-    wallet: report.walletRiskReport ?? {},
+    wallet: walletReport,
     inventory: {
       riskLevel:
         cryptoInventoryReport.inventoryRiskLevel ??
@@ -727,7 +886,7 @@ const jsonExportReport = jsonExportEngine({
   },
   assessmentReport: securityAssessmentReport,
   auditReport: { smartContractAuditReport, securityAuditLoopReport },
-  walletReport: report.walletRiskReport ?? {},
+  walletReport,
   inventoryReport: cryptoInventoryReport,
   migrationReport: { quantumReadinessReport, migrationShieldReport },
   forecastReport: quantumExposureForecastReport,
@@ -761,6 +920,7 @@ const securityBadgeReport = securityBadgeGenerator(report);
 fs.writeFileSync("report.json", JSON.stringify(report, null, 2), "utf8");
 fs.writeFileSync("report.html", htmlReport, "utf8");
 fs.writeFileSync("evidence-graph.json", JSON.stringify(evidenceGraphReport, null, 2), "utf8");
+fs.writeFileSync("wallet-risk-report.json", JSON.stringify(walletReport, null, 2), "utf8");
 fs.writeFileSync("dependency-risk-report.json", JSON.stringify(dependencyRiskReport, null, 2), "utf8");
 fs.writeFileSync("executive-summary.json", JSON.stringify(executiveReportEngineReport, null, 2), "utf8");
 fs.writeFileSync("quantum-risk-export.json", JSON.stringify(jsonExportReport, null, 2), "utf8");
@@ -790,6 +950,7 @@ fs.writeFileSync(
       jsonExportReport,
       remediationReport,
       quantumReadinessReport,
+      walletReport,
       cryptoInventoryReport,
       smartContractContextReport,
       migrationShieldReport,
@@ -903,6 +1064,17 @@ console.log(`Evidence Edges: ${evidenceGraphReport.edges.length}`);
 console.log(`Graph Risk Score: ${evidenceGraphReport.summary.risk.score}/1000`);
 console.log(`Graph Risk Level: ${evidenceGraphReport.summary.risk.level}`);
 console.log(`Attack Chains Found: ${evidenceGraphReport.summary.attackChains.length}`);
+console.log("");
+
+console.log("Wallet Quantum Risk");
+console.log("-------------------");
+console.log(`Wallet Address: ${walletReport.walletAddress}`);
+console.log(`Transaction Count: ${walletReport.transactionCount}`);
+console.log(`Reused Address: ${walletReport.reusedAddress}`);
+console.log(`Signed Messages: ${walletReport.signedMessages}`);
+console.log(`Risk Score: ${walletReport.score}/100`);
+console.log(`Risk Level: ${walletReport.riskLevel}`);
+console.log(`Recommendation: ${walletReport.recommendation}`);
 console.log("");
 
 console.log("Crypto Inventory");
@@ -1350,6 +1522,7 @@ console.log(`Markdown Report: ${markdownReport.outputPath}`);
 console.log("HTML Report: report.html");
 console.log("JSON Report: report.json");
 console.log("Evidence Graph: evidence-graph.json");
+console.log("Wallet Risk Report: wallet-risk-report.json");
 console.log("Dependency Risk Report: dependency-risk-report.json");
 console.log("Code Flow Report: code-flow-report.json");
 console.log("Route Exposure Report: route-exposure-report.json");
