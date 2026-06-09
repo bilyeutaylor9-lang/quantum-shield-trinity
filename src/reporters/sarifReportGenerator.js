@@ -9,7 +9,7 @@ export function sarifReportGenerator(report = {}) {
         tool: {
           driver: {
             name: "Quantum Shield Trinity",
-            version: report.version ?? "1.3.0",
+            version: report.version ?? "2.3.0",
             informationUri:
               "https://github.com/bilyeutaylor9-lang/quantum-shield-trinity",
             rules: buildRules(findings)
@@ -25,10 +25,22 @@ function collectFindings(report = {}) {
   const findings = [];
 
   addFindings(findings, report.findings, "repository");
-  addFindings(findings, report.dependencyReport?.dependencyFindings, "dependency");
+  addFindings(findings, report.dependencyReport?.dependencyFindings, "dependency-intelligence");
+  addFindings(findings, report.dependencyRiskReport?.findings, "dependency-risk");
   addFindings(findings, report.attackSurfaceReport?.attackFindings, "attack-surface");
   addFindings(findings, report.smartContractAuditReport?.auditFindings, "smart-contract-audit");
+  addFindings(findings, report.smartContractContextReport?.contexts, "smart-contract-context");
+  addFindings(findings, report.cryptoInventoryReport?.assets, "crypto-inventory");
+  addFindings(findings, report.quantumReadinessReport?.findings, "quantum-readiness");
+  addFindings(findings, report.codeFlowReport?.findings, "code-flow");
+  addFindings(findings, report.routeExposureReport?.findings, "route-exposure");
+  addFindings(findings, report.trustBoundaryReport?.findings, "trust-boundary");
+  addFindings(findings, report.rootCauseReport?.rootCauses, "root-cause");
+  addFindings(findings, report.securityCopilotReport?.guidance, "security-copilot");
+  addFindings(findings, report.attackChainBuilderReport?.attackChains, "attack-chain-builder");
+  addFindings(findings, report.attackPathReport?.attackPaths, "attack-path");
   addFindings(findings, report.exploitSimulationReport?.simulations, "exploit-simulation");
+  addFindings(findings, report.complianceMappingReport?.mappedFindings, "compliance-mapping");
   addFindings(findings, report.securityScoreReport?.findings, "security-score");
 
   return findings;
@@ -54,33 +66,60 @@ function buildRules(findings = []) {
     if (!rules.has(ruleId)) {
       rules.set(ruleId, {
         id: ruleId,
-        name: finding.type ?? finding.simulationName ?? finding.category ?? ruleId,
+        name:
+          finding.type ??
+          finding.findingType ??
+          finding.simulationName ??
+          finding.category ??
+          ruleId,
         shortDescription: {
-          text:
+          text: safeText(
             finding.description ??
-            finding.reason ??
-            finding.recommendation ??
-            finding.simulationName ??
-            "Quantum Shield Trinity finding"
+              finding.reason ??
+              finding.recommendation ??
+              finding.summary ??
+              finding.simulationName ??
+              "Quantum Shield Trinity finding"
+          )
         },
         fullDescription: {
-          text:
+          text: safeText(
             finding.recommendation ??
-            finding.description ??
-            finding.reason ??
-            "Review this security finding."
+              finding.description ??
+              finding.reason ??
+              finding.summary ??
+              "Review this security finding."
+          )
         },
         help: {
-          text:
+          text: safeText(
             finding.recommendation ??
-            "Review this finding and apply the recommended remediation."
+              finding.recommendedDefense ??
+              "Review this finding and apply the recommended remediation."
+          )
         },
         properties: {
           category: finding.category ?? finding.affectedArea ?? finding.source ?? "security",
-          severity: finding.severity ?? finding.estimatedImpact ?? "LOW"
+          severity: finding.severity ?? finding.estimatedImpact ?? finding.exploitability ?? "LOW"
         }
       });
     }
+  }
+
+  if (rules.size === 0) {
+    rules.set("QST_NO_FINDINGS", {
+      id: "QST_NO_FINDINGS",
+      name: "No Findings",
+      shortDescription: {
+        text: "No SARIF findings were generated."
+      },
+      fullDescription: {
+        text: "Quantum Shield Trinity completed but produced no SARIF findings."
+      },
+      help: {
+        text: "No action required."
+      }
+    });
   }
 
   return Array.from(rules.values());
@@ -90,32 +129,35 @@ function toSarifResult(finding = {}) {
   return {
     ruleId: getRuleId(finding),
     level: mapSeverityToSarifLevel(
-      finding.severity ?? finding.estimatedImpact
+      finding.severity ?? finding.estimatedImpact ?? finding.exploitability
     ),
     message: {
-      text:
+      text: safeText(
         finding.description ??
-        finding.reason ??
-        finding.recommendation ??
-        finding.simulationName ??
-        finding.type ??
-        "Quantum Shield Trinity finding"
+          finding.reason ??
+          finding.recommendation ??
+          finding.summary ??
+          finding.simulationName ??
+          finding.type ??
+          finding.findingType ??
+          "Quantum Shield Trinity finding"
+      )
     },
     locations: [
       {
         physicalLocation: {
           artifactLocation: {
-            uri: normalizePath(finding.file ?? "unknown")
+            uri: normalizePath(finding.file ?? finding.path ?? "unknown")
           },
           region: {
-            startLine: Number(finding.line ?? 1)
+            startLine: safeLine(finding.line)
           }
         }
       }
     ],
     properties: {
       source: finding.source ?? "unknown",
-      severity: finding.severity ?? finding.estimatedImpact ?? "LOW",
+      severity: finding.severity ?? finding.estimatedImpact ?? finding.exploitability ?? "LOW",
       category: finding.category ?? finding.affectedArea ?? "security",
       confidence: finding.confidence ?? "unknown",
       recommendation:
@@ -132,6 +174,7 @@ function getRuleId(finding = {}) {
     finding.ruleId ??
       finding.id ??
       finding.type ??
+      finding.findingType ??
       finding.simulationName ??
       finding.category ??
       finding.source ??
@@ -139,7 +182,8 @@ function getRuleId(finding = {}) {
   )
     .toUpperCase()
     .replaceAll(" ", "_")
-    .replace(/[^A-Z0-9_]/g, "");
+    .replace(/[^A-Z0-9_]/g, "")
+    .slice(0, 120);
 }
 
 function mapSeverityToSarifLevel(severity = "LOW") {
@@ -158,3 +202,17 @@ function normalizePath(filePath = "") {
     .replaceAll("\\", "/")
     .replace(/^\.?\//, "");
 }
+
+function safeLine(line) {
+  const value = Number(line ?? 1);
+  return Number.isFinite(value) && value > 0 ? Math.floor(value) : 1;
+}
+
+function safeText(value = "") {
+  return String(value)
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 2000);
+}
+
+export default sarifReportGenerator;
