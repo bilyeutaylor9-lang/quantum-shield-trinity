@@ -14,9 +14,17 @@ permissions:
   actions: read
   security-events: write
 
+concurrency:
+  group: quantum-shield-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   scan:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    env:
+      NODE_OPTIONS: "--max-old-space-size=12288"
 
     steps:
       - name: Checkout repository
@@ -26,40 +34,77 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
 
       - name: Install dependencies
         run: npm install
 
-      - name: Run Quantum Shield Trinity scan
-        run: npm run scan -- . > quantum-shield-report.txt
+      - name: Verify Node memory settings
+        run: |
+          echo "NODE_OPTIONS=$NODE_OPTIONS"
+          node -e "console.log('Heap Limit MB:', require('v8').getHeapStatistics().heap_size_limit / 1024 / 1024)"
+
+      - name: Run Quantum Shield Trinity Scan
+        run: |
+          npm run scan -- src 2>&1 | tee quantum-shield-report.txt
+
+      - name: Verify generated reports
+        if: always()
+        run: |
+          echo "=== Current files ==="
+          ls -lah
+
+          echo "=== Scan output ==="
+          cat quantum-shield-report.txt || true
+
+          echo "=== Report files found ==="
+          find . -maxdepth 3 \( -name "*.json" -o -name "*.html" -o -name "*.sarif" \) -print || true
 
       - name: Publish latest HTML report to docs
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && hashFiles('report.html') != ''
         run: |
           mkdir -p docs/results
           cp report.html docs/results/index.html
 
       - name: Commit latest public report
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && hashFiles('docs/results/index.html') != ''
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add docs/results/index.html
-          git commit -m "Publish latest scan report" || echo "No report changes to commit"
+          git commit -m "Publish latest Quantum Shield Trinity report" || echo "No report changes to commit"
           git push
 
-      - name: Upload scan artifacts
+      - name: Upload Scan Artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: quantum-shield-trinity-reports
+          retention-days: 30
+          if-no-files-found: warn
           path: |
             quantum-shield-report.txt
             report.html
             report.json
             executive-report.json
             report.sarif
+            badge.svg
+            badge.html
+            badge.json
 
       - name: Upload SARIF to GitHub Code Scanning
+        if: hashFiles('report.sarif') != ''
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: report.sarif
+
+      - name: Skip SARIF Upload Notice
+        if: hashFiles('report.sarif') == ''
+        run: echo "report.sarif was not found, so SARIF upload was skipped."
+
+      - name: Scan Summary
+        if: always()
+        run: |
+          echo "Quantum Shield Trinity Scan Complete"
+          ls -1 *.json 2>/dev/null || true
+          

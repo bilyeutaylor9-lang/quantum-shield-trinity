@@ -1,12 +1,17 @@
 export function htmlReportGenerator(report = {}) {
   const score = report.securityScoreReport ?? {};
   const executive = report.executiveReport ?? {};
-  const dependency = report.dependencyRiskReport ?? {};
+  const dependency = report.dependencyRiskReport ?? report.dependencyReport ?? {};
   const assessment = report.assessmentReport ?? {};
   const audit = report.smartContractAuditReport ?? {};
   const attackSurface = report.attackSurfaceReport ?? {};
   const simulation = report.exploitSimulationReport ?? {};
   const inventory = report.inventoryReport ?? {};
+  const quantum = report.quantumReadinessReport ?? {};
+  const remediation = report.remediationReport ?? {};
+  const autoFix = report.autoFixReport ?? {};
+  const attackPaths = report.attackPathReport ?? {};
+  const compliance = report.complianceMappingReport ?? {};
 
   const securityScore = score.securityScore ?? 0;
   const riskLevel = score.riskLevel ?? "UNKNOWN";
@@ -58,19 +63,19 @@ export function htmlReportGenerator(report = {}) {
       padding: 32px;
     }
     .container {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: auto;
     }
     .header {
-      padding: 28px;
-      border-radius: 18px;
+      padding: 32px;
+      border-radius: 20px;
       background: linear-gradient(135deg, #1e293b, #111827);
       border: 1px solid #334155;
       margin-bottom: 24px;
     }
     h1 {
       margin: 0 0 8px;
-      font-size: 34px;
+      font-size: 36px;
     }
     .subtitle {
       color: #94a3b8;
@@ -101,6 +106,10 @@ export function htmlReportGenerator(report = {}) {
       font-weight: bold;
       margin-top: 8px;
     }
+    .small {
+      color: #94a3b8;
+      font-size: 13px;
+    }
     .risk-low { color: #22c55e; }
     .risk-medium { color: #f59e0b; }
     .risk-high { color: #fb7185; }
@@ -122,9 +131,19 @@ export function htmlReportGenerator(report = {}) {
       padding: 10px;
       text-align: left;
       vertical-align: top;
+      font-size: 14px;
     }
     th {
       color: #93c5fd;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      font-size: 12px;
+      font-weight: bold;
     }
     .button {
       display: inline-block;
@@ -150,7 +169,7 @@ export function htmlReportGenerator(report = {}) {
     <div class="header">
       <h1>Quantum Shield Trinity</h1>
       <div class="subtitle">
-        Security intelligence for smart contracts, dependencies, attack surfaces, and quantum exposure.
+        Security intelligence for smart contracts, dependencies, attack surfaces, remediation, AutoFix, compliance mapping, and quantum exposure.
       </div>
     </div>
 
@@ -173,6 +192,32 @@ export function htmlReportGenerator(report = {}) {
       <div class="card">
         <div class="label">Version</div>
         <div class="value">${escapeHtml(report.version ?? "N/A")}</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="label">Attack Paths</div>
+        <div class="value">${escapeHtml(attackPaths.totalAttackPaths ?? 0)}</div>
+        <div class="small">Generated exploit routes</div>
+      </div>
+
+      <div class="card">
+        <div class="label">AutoFix Suggestions</div>
+        <div class="value">${escapeHtml(autoFix.totalFixes ?? 0)}</div>
+        <div class="small">${escapeHtml(autoFix.safeAutoFixes ?? 0)} safe fixes</div>
+      </div>
+
+      <div class="card">
+        <div class="label">Remediation Items</div>
+        <div class="value">${escapeHtml(remediation.totalRemediationItems ?? 0)}</div>
+        <div class="small">Prioritized developer fixes</div>
+      </div>
+
+      <div class="card">
+        <div class="label">CWE / OWASP Mapped</div>
+        <div class="value">${escapeHtml(compliance.totalMappedFindings ?? 0)}</div>
+        <div class="small">Compliance references</div>
       </div>
     </div>
 
@@ -216,6 +261,38 @@ export function htmlReportGenerator(report = {}) {
     </div>
 
     <div class="section">
+      <h2>Generated Attack Paths</h2>
+      ${renderAttackPathTable(attackPaths)}
+    </div>
+
+    <div class="section">
+      <h2>AutoFix Suggestions</h2>
+      ${renderAutoFixTable(autoFix)}
+    </div>
+
+    <div class="section">
+      <h2>Remediation Guidance</h2>
+      ${renderRemediationTable(remediation)}
+    </div>
+
+    <div class="section">
+      <h2>CWE / OWASP Mapping</h2>
+      ${renderComplianceTable(compliance)}
+    </div>
+
+    <div class="section">
+      <h2>Quantum Readiness</h2>
+      ${renderSimpleMetricsTable({
+        "Quantum Readiness Score": `${quantum.quantumReadinessScore ?? "N/A"}/100`,
+        "Quantum Risk Level": quantum.quantumRiskLevel ?? "N/A",
+        "Quantum Findings": quantum.totalQuantumFindings ?? 0,
+        "Migration Readiness": quantum.migrationReadiness ?? "N/A",
+        "Recommended Migration Path": quantum.recommendedMigrationPath ?? "N/A"
+      })}
+      ${renderQuantumFindingsTable(quantum)}
+    </div>
+
+    <div class="section">
       <h2>Attack Surface Intelligence</h2>
       ${renderSimpleMetricsTable({
         "Risk Level": attackSurface.attackSurfaceRiskLevel ?? "N/A",
@@ -248,7 +325,7 @@ export function htmlReportGenerator(report = {}) {
       ${renderSimpleMetricsTable({
         "Inventory Risk": inventory.riskLevel ?? inventory.inventoryRiskLevel ?? "N/A",
         "Detected Items": inventory.detectedItems?.length ?? inventory.totalItems ?? 0,
-        "Quantum Exposure": inventory.quantumExposure ?? "Review Required"
+        "Quantum Exposure": inventory.quantumExposure ?? quantum.quantumRiskLevel ?? "Review Required"
       })}
     </div>
 
@@ -292,28 +369,23 @@ export function htmlReportGenerator(report = {}) {
           <td>✓</td>
         </tr>
         <tr>
-          <td>Executive Report</td>
-          <td>✗</td>
+          <td>Attack Path Analysis</td>
+          <td>Limited</td>
           <td>✓</td>
         </tr>
         <tr>
-          <td>Exploit Simulation Analysis</td>
-          <td>✗</td>
+          <td>AutoFix Suggestions</td>
+          <td>Limited</td>
           <td>✓</td>
         </tr>
         <tr>
-          <td>Dependency Intelligence</td>
-          <td>✗</td>
+          <td>CWE / OWASP Mapping</td>
+          <td>Limited</td>
           <td>✓</td>
         </tr>
         <tr>
           <td>Quantum Migration Guidance</td>
-          <td>✗</td>
-          <td>✓</td>
-        </tr>
-        <tr>
-          <td>AI Remediation Recommendations</td>
-          <td>✗</td>
+          <td>Limited</td>
           <td>✓</td>
         </tr>
       </table>
@@ -323,7 +395,8 @@ export function htmlReportGenerator(report = {}) {
       <p>
         Receive a complete security assessment including remediation guidance,
         attack-path analysis, smart contract findings, dependency risk analysis,
-        quantum readiness evaluation, SARIF exports, and executive-ready reporting.
+        quantum readiness evaluation, SARIF exports, AutoFix recommendations,
+        CWE/OWASP mapping, and executive-ready reporting.
       </p>
 
       <p><strong>Coming Soon</strong></p>
@@ -354,7 +427,7 @@ function renderSmartContractTable(audit = {}) {
     .slice(0, 12)
     .map(
       finding => `<tr>
-        <td>${escapeHtml(finding.severity)}</td>
+        <td>${severityBadge(finding.severity)}</td>
         <td>${escapeHtml(finding.type)}</td>
         <td>${escapeHtml(finding.file)}</td>
         <td>${escapeHtml(finding.line)}</td>
@@ -364,6 +437,183 @@ function renderSmartContractTable(audit = {}) {
     .join("");
 
   return `<table>
+    <thead>
+      <tr>
+        <th>Severity</th>
+        <th>Finding</th>
+        <th>File</th>
+        <th>Line</th>
+        <th>Recommendation</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function renderAttackPathTable(report = {}) {
+  const paths = report.attackPaths ?? [];
+
+  if (!paths.length) {
+    return "<p>No generated attack paths detected.</p>";
+  }
+
+  const rows = paths
+    .slice(0, 10)
+    .map(
+      item => `<tr>
+        <td>${severityBadge(item.severity)}</td>
+        <td>${escapeHtml(item.title)}</td>
+        <td>${escapeHtml(item.entryPoint)}</td>
+        <td>${escapeHtml(item.potentialImpact)}</td>
+        <td>${escapeHtml(item.likelihood)}</td>
+        <td>${escapeHtml(item.recommendedDefense)}</td>
+      </tr>`
+    )
+    .join("");
+
+  return `<table>
+    <thead>
+      <tr>
+        <th>Severity</th>
+        <th>Attack Path</th>
+        <th>Entry Point</th>
+        <th>Impact</th>
+        <th>Likelihood</th>
+        <th>Defense</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function renderAutoFixTable(report = {}) {
+  const fixes = report.fixes ?? [];
+
+  if (!fixes.length) {
+    return "<p>No AutoFix suggestions generated.</p>";
+  }
+
+  const rows = fixes
+    .slice(0, 10)
+    .map(
+      item => `<tr>
+        <td>${severityBadge(item.severity)}</td>
+        <td>${escapeHtml(item.type)}</td>
+        <td>${escapeHtml(item.file)}</td>
+        <td>${escapeHtml(item.line)}</td>
+        <td>${escapeHtml(item.confidence)}</td>
+        <td>${escapeHtml(item.recommendedFix)}</td>
+      </tr>`
+    )
+    .join("");
+
+  return `<table>
+    <thead>
+      <tr>
+        <th>Severity</th>
+        <th>Fix Type</th>
+        <th>File</th>
+        <th>Line</th>
+        <th>Confidence</th>
+        <th>Recommended Fix</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function renderRemediationTable(report = {}) {
+  const items = report.remediationItems ?? [];
+
+  if (!items.length) {
+    return "<p>No remediation guidance generated.</p>";
+  }
+
+  const rows = items
+    .slice(0, 10)
+    .map(
+      item => `<tr>
+        <td>${severityBadge(item.severity)}</td>
+        <td>${escapeHtml(item.type)}</td>
+        <td>${escapeHtml(item.priority)}</td>
+        <td>${escapeHtml(item.estimatedEffort)}</td>
+        <td>${escapeHtml(item.howToFix)}</td>
+      </tr>`
+    )
+    .join("");
+
+  return `<table>
+    <thead>
+      <tr>
+        <th>Severity</th>
+        <th>Issue</th>
+        <th>Priority</th>
+        <th>Effort</th>
+        <th>How To Fix</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function renderComplianceTable(report = {}) {
+  const findings = report.mappedFindings ?? [];
+
+  if (!findings.length) {
+    return "<p>No CWE or OWASP mappings generated.</p>";
+  }
+
+  const rows = findings
+    .slice(0, 12)
+    .map(
+      item => `<tr>
+        <td>${severityBadge(item.severity)}</td>
+        <td>${escapeHtml(item.type)}</td>
+        <td>${escapeHtml(item.cwe)}</td>
+        <td>${escapeHtml(item.owaspSmartContractTop10)}</td>
+        <td>${escapeHtml(item.owaspWebTop10)}</td>
+        <td>${escapeHtml(item.recommendedControl)}</td>
+      </tr>`
+    )
+    .join("");
+
+  return `<table>
+    <thead>
+      <tr>
+        <th>Severity</th>
+        <th>Finding</th>
+        <th>CWE</th>
+        <th>OWASP Smart Contract</th>
+        <th>OWASP Web</th>
+        <th>Control</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>`;
+}
+
+function renderQuantumFindingsTable(report = {}) {
+  const findings = report.findings ?? [];
+
+  if (!findings.length) {
+    return "<p>No quantum readiness findings detected.</p>";
+  }
+
+  const rows = findings
+    .slice(0, 10)
+    .map(
+      item => `<tr>
+        <td>${severityBadge(item.severity)}</td>
+        <td>${escapeHtml(item.type)}</td>
+        <td>${escapeHtml(item.file)}</td>
+        <td>${escapeHtml(item.line)}</td>
+        <td>${escapeHtml(item.recommendation)}</td>
+      </tr>`
+    )
+    .join("");
+
+  return `<h3>Top Quantum Findings</h3>
+  <table>
     <thead>
       <tr>
         <th>Severity</th>
@@ -390,7 +640,7 @@ function renderDependencyTable(dependency = {}) {
       finding => `<tr>
         <td>${escapeHtml(finding.dependency ?? "N/A")}</td>
         <td>${escapeHtml(finding.version ?? "N/A")}</td>
-        <td>${escapeHtml(finding.severity ?? "N/A")}</td>
+        <td>${severityBadge(finding.severity ?? "N/A")}</td>
         <td>${escapeHtml(finding.category ?? finding.risk ?? "N/A")}</td>
         <td>${escapeHtml(finding.recommendation ?? "Review dependency risk.")}</td>
       </tr>`
@@ -424,6 +674,11 @@ function renderSimpleMetricsTable(metrics = {}) {
   return `<table>
     <tbody>${rows}</tbody>
   </table>`;
+}
+
+function severityBadge(severity = "") {
+  const value = String(severity || "N/A").toUpperCase();
+  return `<span class="badge ${riskClass(value)}">${escapeHtml(value)}</span>`;
 }
 
 function riskClass(riskLevel = "") {

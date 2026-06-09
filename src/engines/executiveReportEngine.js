@@ -50,8 +50,12 @@ export function executiveReportEngine(report = {}) {
       assessment.criticalFindings?.length > 0
         ? assessment.criticalFindings
         : securityScoreReport.findingCounts?.critical > 0
-          ? ["Critical security findings detected. Review full report for remediation details."]
-          : ["No critical findings identified."],
+          ? [
+              "Critical security findings detected. Review full report for remediation details."
+            ]
+          : [
+              "No critical findings identified."
+            ],
 
     recommendedActions:
       assessment.recommendedNextSteps?.length > 0
@@ -67,3 +71,5 @@ export function executiveReportEngine(report = {}) {
       "This report is designed for security planning and does not replace a professional security audit."
   };
 }
+
+export default executiveReportEngine;

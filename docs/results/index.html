@@ -12,19 +12,19 @@
       padding: 32px;
     }
     .container {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: auto;
     }
     .header {
-      padding: 28px;
-      border-radius: 18px;
+      padding: 32px;
+      border-radius: 20px;
       background: linear-gradient(135deg, #1e293b, #111827);
       border: 1px solid #334155;
       margin-bottom: 24px;
     }
     h1 {
       margin: 0 0 8px;
-      font-size: 34px;
+      font-size: 36px;
     }
     .subtitle {
       color: #94a3b8;
@@ -55,6 +55,10 @@
       font-weight: bold;
       margin-top: 8px;
     }
+    .small {
+      color: #94a3b8;
+      font-size: 13px;
+    }
     .risk-low { color: #22c55e; }
     .risk-medium { color: #f59e0b; }
     .risk-high { color: #fb7185; }
@@ -76,9 +80,19 @@
       padding: 10px;
       text-align: left;
       vertical-align: top;
+      font-size: 14px;
     }
     th {
       color: #93c5fd;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      font-size: 12px;
+      font-weight: bold;
     }
     .button {
       display: inline-block;
@@ -104,7 +118,7 @@
     <div class="header">
       <h1>Quantum Shield Trinity</h1>
       <div class="subtitle">
-        Security intelligence for smart contracts, dependencies, attack surfaces, and quantum exposure.
+        Security intelligence for smart contracts, dependencies, attack surfaces, remediation, AutoFix, compliance mapping, and quantum exposure.
       </div>
     </div>
 
@@ -130,6 +144,32 @@
       </div>
     </div>
 
+    <div class="grid">
+      <div class="card">
+        <div class="label">Attack Paths</div>
+        <div class="value">25</div>
+        <div class="small">Generated exploit routes</div>
+      </div>
+
+      <div class="card">
+        <div class="label">AutoFix Suggestions</div>
+        <div class="value">50</div>
+        <div class="small">15 safe fixes</div>
+      </div>
+
+      <div class="card">
+        <div class="label">Remediation Items</div>
+        <div class="value">25</div>
+        <div class="small">Prioritized developer fixes</div>
+      </div>
+
+      <div class="card">
+        <div class="label">CWE / OWASP Mapped</div>
+        <div class="value">100</div>
+        <div class="small">Compliance references</div>
+      </div>
+    </div>
+
     <div class="section">
       <h2>Executive Summary</h2>
 
@@ -140,19 +180,19 @@
         </tr>
         <tr>
           <td>Files Scanned</td>
-          <td>45</td>
+          <td>56</td>
         </tr>
         <tr>
           <td>Critical Findings</td>
-          <td class="risk-critical">48</td>
+          <td class="risk-critical">94</td>
         </tr>
         <tr>
           <td>High Findings</td>
-          <td class="risk-high">194</td>
+          <td class="risk-high">356</td>
         </tr>
         <tr>
           <td>Medium Findings</td>
-          <td class="risk-medium">84</td>
+          <td class="risk-medium">132</td>
         </tr>
         <tr>
           <td>Low Findings</td>
@@ -177,65 +217,511 @@
       </tr>
     </thead>
     <tbody><tr>
-        <td>CRITICAL</td>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
         <td>Reentrancy Risk</td>
         <td>examples/vulnerable-contract.sol</td>
         <td>19</td>
         <td>Review external calls for reentrancy. Apply checks-effects-interactions and consider ReentrancyGuard.</td>
       </tr><tr>
-        <td>HIGH</td>
+        <td><span class="badge risk-high">HIGH</span></td>
         <td>Unchecked External Call</td>
         <td>examples/vulnerable-contract.sol</td>
         <td>19</td>
         <td>Validate call success values and protect external calls against reentrancy.</td>
       </tr><tr>
-        <td>CRITICAL</td>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
         <td>tx.origin Authorization</td>
         <td>examples/vulnerable-contract.sol</td>
         <td>9</td>
         <td>Do not use tx.origin for authorization. Use msg.sender with proper access control.</td>
       </tr><tr>
-        <td>CRITICAL</td>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
         <td>tx.origin Authorization</td>
         <td>examples/vulnerable-contract.sol</td>
         <td>26</td>
         <td>Do not use tx.origin for authorization. Use msg.sender with proper access control.</td>
       </tr><tr>
-        <td>CRITICAL</td>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
         <td>Delegatecall Usage</td>
         <td>examples/vulnerable-contract.sol</td>
         <td>32</td>
         <td>Review delegatecall carefully. Ensure target contracts are trusted and upgrade paths are access-controlled.</td>
       </tr><tr>
-        <td>CRITICAL</td>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
         <td>Selfdestruct Usage</td>
         <td>examples/vulnerable-contract.sol</td>
         <td>27</td>
         <td>Avoid selfdestruct unless required. Restrict with strict access control and document the risk.</td>
       </tr><tr>
-        <td>MEDIUM</td>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
         <td>Missing Access Control Review</td>
         <td>examples/vulnerable-contract.sol</td>
         <td>12</td>
         <td>Review public/external functions for required access control, input validation, and rate limits.</td>
       </tr><tr>
-        <td>MEDIUM</td>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
         <td>Missing Access Control Review</td>
         <td>examples/vulnerable-contract.sol</td>
         <td>16</td>
         <td>Review public/external functions for required access control, input validation, and rate limits.</td>
       </tr><tr>
-        <td>MEDIUM</td>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
         <td>Missing Access Control Review</td>
         <td>examples/vulnerable-contract.sol</td>
         <td>25</td>
         <td>Review public/external functions for required access control, input validation, and rate limits.</td>
       </tr><tr>
-        <td>MEDIUM</td>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
         <td>Missing Access Control Review</td>
         <td>examples/vulnerable-contract.sol</td>
         <td>30</td>
         <td>Review public/external functions for required access control, input validation, and rate limits.</td>
+      </tr></tbody>
+  </table>
+    </div>
+
+    <div class="section">
+      <h2>Generated Attack Paths</h2>
+      <table>
+    <thead>
+      <tr>
+        <th>Severity</th>
+        <th>Attack Path</th>
+        <th>Entry Point</th>
+        <th>Impact</th>
+        <th>Likelihood</th>
+        <th>Defense</th>
+      </tr>
+    </thead>
+    <tbody><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Reentrancy Risk Attack Path</td>
+        <td>External payable or withdrawal function</td>
+        <td>Potential fund drain or repeated state manipulation.</td>
+        <td>High</td>
+        <td>Use checks-effects-interactions, update state before external calls, and add ReentrancyGuard.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>Unchecked External Call Attack Path</td>
+        <td>Public or externally reachable code path</td>
+        <td>Potential security, reliability, or operational risk.</td>
+        <td>Medium-High</td>
+        <td>Review the affected path, add validation, reduce privileges, and re-run the scan.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>tx.origin Authorization Attack Path</td>
+        <td>Authorization check using tx.origin</td>
+        <td>Potential authorization bypass through phishing-style contract calls.</td>
+        <td>High</td>
+        <td>Replace tx.origin with msg.sender and enforce explicit role-based access control.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>tx.origin Authorization Attack Path</td>
+        <td>Authorization check using tx.origin</td>
+        <td>Potential authorization bypass through phishing-style contract calls.</td>
+        <td>High</td>
+        <td>Replace tx.origin with msg.sender and enforce explicit role-based access control.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Usage Attack Path</td>
+        <td>Low-level delegatecall execution path</td>
+        <td>Potential storage takeover, privilege escalation, or arbitrary logic execution.</td>
+        <td>High</td>
+        <td>Restrict delegatecall targets, require trusted implementations, and protect upgrade controls.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Selfdestruct Usage Attack Path</td>
+        <td>Destructive contract function</td>
+        <td>Potential permanent contract disruption or forced asset movement.</td>
+        <td>High</td>
+        <td>Remove selfdestruct or protect it with strict authorization, timelocks, and emergency governance.</td>
+      </tr><tr>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
+        <td>Missing Access Control Review Attack Path</td>
+        <td>Public or externally reachable code path</td>
+        <td>Potential security, reliability, or operational risk.</td>
+        <td>Medium</td>
+        <td>Review the affected path, add validation, reduce privileges, and re-run the scan.</td>
+      </tr><tr>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
+        <td>Missing Access Control Review Attack Path</td>
+        <td>Public or externally reachable code path</td>
+        <td>Potential security, reliability, or operational risk.</td>
+        <td>Medium</td>
+        <td>Review the affected path, add validation, reduce privileges, and re-run the scan.</td>
+      </tr><tr>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
+        <td>Missing Access Control Review Attack Path</td>
+        <td>Public or externally reachable code path</td>
+        <td>Potential security, reliability, or operational risk.</td>
+        <td>Medium</td>
+        <td>Review the affected path, add validation, reduce privileges, and re-run the scan.</td>
+      </tr><tr>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
+        <td>Missing Access Control Review Attack Path</td>
+        <td>Public or externally reachable code path</td>
+        <td>Potential security, reliability, or operational risk.</td>
+        <td>Medium</td>
+        <td>Review the affected path, add validation, reduce privileges, and re-run the scan.</td>
+      </tr></tbody>
+  </table>
+    </div>
+
+    <div class="section">
+      <h2>AutoFix Suggestions</h2>
+      <table>
+    <thead>
+      <tr>
+        <th>Severity</th>
+        <th>Fix Type</th>
+        <th>File</th>
+        <th>Line</th>
+        <th>Confidence</th>
+        <th>Recommended Fix</th>
+      </tr>
+    </thead>
+    <tbody><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Reentrancy Risk</td>
+        <td>examples/vulnerable-contract.sol</td>
+        <td>19</td>
+        <td>MEDIUM</td>
+        <td>Apply checks-effects-interactions and add ReentrancyGuard where appropriate.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>Unchecked External Call</td>
+        <td>examples/vulnerable-contract.sol</td>
+        <td>19</td>
+        <td>HIGH</td>
+        <td>Check the returned success value and revert when the call fails.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>tx.origin Authorization</td>
+        <td>examples/vulnerable-contract.sol</td>
+        <td>9</td>
+        <td>HIGH</td>
+        <td>Replace tx.origin authorization with msg.sender and enforce explicit role-based access control.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>tx.origin Authorization</td>
+        <td>examples/vulnerable-contract.sol</td>
+        <td>26</td>
+        <td>HIGH</td>
+        <td>Replace tx.origin authorization with msg.sender and enforce explicit role-based access control.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Usage</td>
+        <td>examples/vulnerable-contract.sol</td>
+        <td>32</td>
+        <td>LOW</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict target implementations and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Selfdestruct Usage</td>
+        <td>examples/vulnerable-contract.sol</td>
+        <td>27</td>
+        <td>LOW</td>
+        <td>Remove selfdestruct or protect it with strict authorization, timelocks, and emergency governance.</td>
+      </tr><tr>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
+        <td>Missing Access Control Review</td>
+        <td>examples/vulnerable-contract.sol</td>
+        <td>12</td>
+        <td>MEDIUM</td>
+        <td>Review the affected code path, reduce privileges, add validation, and re-run the scan.</td>
+      </tr><tr>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
+        <td>Missing Access Control Review</td>
+        <td>examples/vulnerable-contract.sol</td>
+        <td>16</td>
+        <td>MEDIUM</td>
+        <td>Review the affected code path, reduce privileges, add validation, and re-run the scan.</td>
+      </tr><tr>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
+        <td>Missing Access Control Review</td>
+        <td>examples/vulnerable-contract.sol</td>
+        <td>25</td>
+        <td>MEDIUM</td>
+        <td>Review the affected code path, reduce privileges, add validation, and re-run the scan.</td>
+      </tr><tr>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
+        <td>Missing Access Control Review</td>
+        <td>examples/vulnerable-contract.sol</td>
+        <td>30</td>
+        <td>MEDIUM</td>
+        <td>Review the affected code path, reduce privileges, add validation, and re-run the scan.</td>
+      </tr></tbody>
+  </table>
+    </div>
+
+    <div class="section">
+      <h2>Remediation Guidance</h2>
+      <table>
+    <thead>
+      <tr>
+        <th>Severity</th>
+        <th>Issue</th>
+        <th>Priority</th>
+        <th>Effort</th>
+        <th>How To Fix</th>
+      </tr>
+    </thead>
+    <tbody><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Reentrancy Risk</td>
+        <td>Immediate</td>
+        <td>1-3 days</td>
+        <td>Move state updates before external calls, use checks-effects-interactions, and add a ReentrancyGuard where appropriate.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>Unchecked External Call</td>
+        <td>High</td>
+        <td>4-8 hours</td>
+        <td>Review the affected code path, add validation, reduce privileges, improve error handling, and re-run the scan after remediation.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>tx.origin Authorization</td>
+        <td>Immediate</td>
+        <td>1-3 days</td>
+        <td>Replace tx.origin authorization with msg.sender and enforce explicit role-based or owner-based access control.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>tx.origin Authorization</td>
+        <td>Immediate</td>
+        <td>1-3 days</td>
+        <td>Replace tx.origin authorization with msg.sender and enforce explicit role-based or owner-based access control.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Usage</td>
+        <td>Immediate</td>
+        <td>1-3 days</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict targets, validate implementation addresses, and protect upgrade functions.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Selfdestruct Usage</td>
+        <td>Immediate</td>
+        <td>1-3 days</td>
+        <td>Remove selfdestruct where possible or protect it with strict authorization, timelocks, and documented emergency procedures.</td>
+      </tr><tr>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
+        <td>Missing Access Control Review</td>
+        <td>Medium</td>
+        <td>1-4 hours</td>
+        <td>Review the affected code path, add validation, reduce privileges, improve error handling, and re-run the scan after remediation.</td>
+      </tr><tr>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
+        <td>Missing Access Control Review</td>
+        <td>Medium</td>
+        <td>1-4 hours</td>
+        <td>Review the affected code path, add validation, reduce privileges, improve error handling, and re-run the scan after remediation.</td>
+      </tr><tr>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
+        <td>Missing Access Control Review</td>
+        <td>Medium</td>
+        <td>1-4 hours</td>
+        <td>Review the affected code path, add validation, reduce privileges, improve error handling, and re-run the scan after remediation.</td>
+      </tr><tr>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
+        <td>Missing Access Control Review</td>
+        <td>Medium</td>
+        <td>1-4 hours</td>
+        <td>Review the affected code path, add validation, reduce privileges, improve error handling, and re-run the scan after remediation.</td>
+      </tr></tbody>
+  </table>
+    </div>
+
+    <div class="section">
+      <h2>CWE / OWASP Mapping</h2>
+      <table>
+    <thead>
+      <tr>
+        <th>Severity</th>
+        <th>Finding</th>
+        <th>CWE</th>
+        <th>OWASP Smart Contract</th>
+        <th>OWASP Web</th>
+        <th>Control</th>
+      </tr>
+    </thead>
+    <tbody><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Reentrancy Risk</td>
+        <td>CWE-841</td>
+        <td>SC05: Reentrancy</td>
+        <td>A01: Broken Access Control</td>
+        <td>Use checks-effects-interactions, update state before external calls, and apply ReentrancyGuard.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>Unchecked External Call</td>
+        <td>CWE-252</td>
+        <td>SC06: Unchecked External Calls</td>
+        <td>A04: Insecure Design</td>
+        <td>Check success return values and revert on failure.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>tx.origin Authorization</td>
+        <td>CWE-346</td>
+        <td>SC01: Access Control Vulnerabilities</td>
+        <td>A01: Broken Access Control</td>
+        <td>Use msg.sender and explicit role-based or owner-based access control.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>tx.origin Authorization</td>
+        <td>CWE-346</td>
+        <td>SC01: Access Control Vulnerabilities</td>
+        <td>A01: Broken Access Control</td>
+        <td>Use msg.sender and explicit role-based or owner-based access control.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Usage</td>
+        <td>CWE-829</td>
+        <td>SC06: Unchecked External Calls</td>
+        <td>A08: Software and Data Integrity Failures</td>
+        <td>Restrict delegatecall targets, validate implementations, and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Selfdestruct Usage</td>
+        <td>CWE-284</td>
+        <td>SC01: Access Control Vulnerabilities</td>
+        <td>A01: Broken Access Control</td>
+        <td>Remove selfdestruct where possible or protect it with strict authorization and timelocks.</td>
+      </tr><tr>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
+        <td>Missing Access Control Review</td>
+        <td>CWE-693</td>
+        <td>SC03: Logic Errors</td>
+        <td>A04: Insecure Design</td>
+        <td>Review the affected code, reduce privileges, add validation, and re-run the scan.</td>
+      </tr><tr>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
+        <td>Missing Access Control Review</td>
+        <td>CWE-693</td>
+        <td>SC03: Logic Errors</td>
+        <td>A04: Insecure Design</td>
+        <td>Review the affected code, reduce privileges, add validation, and re-run the scan.</td>
+      </tr><tr>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
+        <td>Missing Access Control Review</td>
+        <td>CWE-693</td>
+        <td>SC03: Logic Errors</td>
+        <td>A04: Insecure Design</td>
+        <td>Review the affected code, reduce privileges, add validation, and re-run the scan.</td>
+      </tr><tr>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
+        <td>Missing Access Control Review</td>
+        <td>CWE-693</td>
+        <td>SC03: Logic Errors</td>
+        <td>A04: Insecure Design</td>
+        <td>Review the affected code, reduce privileges, add validation, and re-run the scan.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>CWE-829</td>
+        <td>SC06: Unchecked External Calls</td>
+        <td>A08: Software and Data Integrity Failures</td>
+        <td>Restrict delegatecall targets, validate implementations, and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>tx.origin Risk</td>
+        <td>CWE-346</td>
+        <td>SC01: Access Control Vulnerabilities</td>
+        <td>A01: Broken Access Control</td>
+        <td>Use msg.sender and explicit role-based or owner-based access control.</td>
+      </tr></tbody>
+  </table>
+    </div>
+
+    <div class="section">
+      <h2>Quantum Readiness</h2>
+      <table>
+    <tbody><tr>
+        <td>Quantum Readiness Score</td>
+        <td>0/100</td>
+      </tr><tr>
+        <td>Quantum Risk Level</td>
+        <td>CRITICAL</td>
+      </tr><tr>
+        <td>Quantum Findings</td>
+        <td>246</td>
+      </tr><tr>
+        <td>Migration Readiness</td>
+        <td>Migration planning required</td>
+      </tr><tr>
+        <td>Recommended Migration Path</td>
+        <td>Prioritize RSA, ECC, ECDSA, and secp256k1 inventory. Prepare migration roadmap toward ML-KEM, ML-DSA, and SLH-DSA where applicable.</td>
+      </tr></tbody>
+  </table>
+      <h3>Top Quantum Findings</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Severity</th>
+        <th>Finding</th>
+        <th>File</th>
+        <th>Line</th>
+        <th>Recommendation</th>
+      </tr>
+    </thead>
+    <tbody><tr>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
+        <td>TLS / HTTPS Usage</td>
+        <td>README.md</td>
+        <td>2</td>
+        <td>Inventory TLS endpoints and certificates. Track post-quantum TLS support as standards mature.</td>
+      </tr><tr>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
+        <td>TLS / HTTPS Usage</td>
+        <td>README.md</td>
+        <td>3</td>
+        <td>Inventory TLS endpoints and certificates. Track post-quantum TLS support as standards mature.</td>
+      </tr><tr>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
+        <td>TLS / HTTPS Usage</td>
+        <td>README.md</td>
+        <td>4</td>
+        <td>Inventory TLS endpoints and certificates. Track post-quantum TLS support as standards mature.</td>
+      </tr><tr>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
+        <td>TLS / HTTPS Usage</td>
+        <td>README.md</td>
+        <td>5</td>
+        <td>Inventory TLS endpoints and certificates. Track post-quantum TLS support as standards mature.</td>
+      </tr><tr>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
+        <td>TLS / HTTPS Usage</td>
+        <td>README.md</td>
+        <td>6</td>
+        <td>Inventory TLS endpoints and certificates. Track post-quantum TLS support as standards mature.</td>
+      </tr><tr>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
+        <td>TLS / HTTPS Usage</td>
+        <td>README.md</td>
+        <td>7</td>
+        <td>Inventory TLS endpoints and certificates. Track post-quantum TLS support as standards mature.</td>
+      </tr><tr>
+        <td><span class="badge risk-medium">MEDIUM</span></td>
+        <td>TLS / HTTPS Usage</td>
+        <td>README.md</td>
+        <td>12</td>
+        <td>Inventory TLS endpoints and certificates. Track post-quantum TLS support as standards mature.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>RSA Usage</td>
+        <td>src/data/quantumRules.js</td>
+        <td>3</td>
+        <td>Inventory RSA usage and plan migration to ML-KEM for key establishment or ML-DSA / SLH-DSA for signatures.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>RSA Usage</td>
+        <td>src/data/quantumRules.js</td>
+        <td>4</td>
+        <td>Inventory RSA usage and plan migration to ML-KEM for key establishment or ML-DSA / SLH-DSA for signatures.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>RSA Usage</td>
+        <td>src/data/quantumRules.js</td>
+        <td>8</td>
+        <td>Inventory RSA usage and plan migration to ML-KEM for key establishment or ML-DSA / SLH-DSA for signatures.</td>
       </tr></tbody>
   </table>
     </div>
@@ -251,16 +737,16 @@
         <td>100/100</td>
       </tr><tr>
         <td>Total Attack Findings</td>
-        <td>49</td>
+        <td>126</td>
       </tr><tr>
         <td>Critical Attack Paths</td>
-        <td>6</td>
+        <td>25</td>
       </tr><tr>
         <td>High Attack Paths</td>
-        <td>33</td>
+        <td>73</td>
       </tr><tr>
         <td>Medium Attack Paths</td>
-        <td>10</td>
+        <td>28</td>
       </tr></tbody>
   </table>
     </div>
@@ -297,13 +783,13 @@
       <table>
     <tbody><tr>
         <td>Inventory Risk</td>
-        <td>N/A</td>
+        <td>CRITICAL</td>
       </tr><tr>
         <td>Detected Items</td>
         <td>0</td>
       </tr><tr>
         <td>Quantum Exposure</td>
-        <td>Review Required</td>
+        <td>CRITICAL</td>
       </tr></tbody>
   </table>
     </div>
@@ -348,28 +834,23 @@
           <td>✓</td>
         </tr>
         <tr>
-          <td>Executive Report</td>
-          <td>✗</td>
+          <td>Attack Path Analysis</td>
+          <td>Limited</td>
           <td>✓</td>
         </tr>
         <tr>
-          <td>Exploit Simulation Analysis</td>
-          <td>✗</td>
+          <td>AutoFix Suggestions</td>
+          <td>Limited</td>
           <td>✓</td>
         </tr>
         <tr>
-          <td>Dependency Intelligence</td>
-          <td>✗</td>
+          <td>CWE / OWASP Mapping</td>
+          <td>Limited</td>
           <td>✓</td>
         </tr>
         <tr>
           <td>Quantum Migration Guidance</td>
-          <td>✗</td>
-          <td>✓</td>
-        </tr>
-        <tr>
-          <td>AI Remediation Recommendations</td>
-          <td>✗</td>
+          <td>Limited</td>
           <td>✓</td>
         </tr>
       </table>
@@ -379,7 +860,8 @@
       <p>
         Receive a complete security assessment including remediation guidance,
         attack-path analysis, smart contract findings, dependency risk analysis,
-        quantum readiness evaluation, SARIF exports, and executive-ready reporting.
+        quantum readiness evaluation, SARIF exports, AutoFix recommendations,
+        CWE/OWASP mapping, and executive-ready reporting.
       </p>
 
       <p><strong>Coming Soon</strong></p>
