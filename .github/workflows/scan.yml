@@ -14,9 +14,18 @@ permissions:
   actions: read
   security-events: write
 
+concurrency:
+  group: quantum-shield-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   scan:
     runs-on: ubuntu-latest
+
+    timeout-minutes: 60
+
+    env:
+      NODE_OPTIONS: "--max-old-space-size=12288"
 
     steps:
       - name: Checkout repository
@@ -26,12 +35,25 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
 
       - name: Install dependencies
         run: npm install
 
-      - name: Run Quantum Shield Trinity scan
-        run: npm run scan -- . > quantum-shield-report.txt
+      - name: Verify Node memory settings
+        run: |
+          echo "NODE_OPTIONS=$NODE_OPTIONS"
+          node -e "console.log('Heap Limit (MB):', require('v8').getHeapStatistics().heap_size_limit / 1024 / 1024)"
+
+      - name: Run Quantum Shield Trinity Scan
+        run: |
+          npm run scan -- src > quantum-shield-report.txt
+
+      - name: Verify generated reports
+        run: |
+          ls -lah
+          test -f report.json
+          test -f report.html
 
       - name: Publish latest HTML report to docs
         if: github.event_name != 'pull_request'
@@ -44,22 +66,62 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
+
           git add docs/results/index.html
-          git commit -m "Publish latest scan report" || echo "No report changes to commit"
+
+          git commit -m "Publish latest Quantum Shield Trinity report" \
+          || echo "No report changes to commit"
+
           git push
 
-      - name: Upload scan artifacts
+      - name: Upload Scan Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: quantum-shield-trinity-reports
+          retention-days: 30
           path: |
             quantum-shield-report.txt
             report.html
             report.json
             executive-report.json
+            executive-summary.json
+            quantum-risk-export.json
+            evidence-graph.json
+            dependency-risk-report.json
+            migration-shield-report.json
+            smart-contract-context-report.json
+            quantum-exposure-forecast-report.json
+            quantum-attack-simulation-report.json
+            root-cause-report.json
+            security-assessment-report.json
+            security-audit-loop-report.json
+            security-copilot-report.json
+            code-flow-report.json
+            route-exposure-report.json
+            trust-boundary-report.json
+            attack-chain-builder-report.json
             report.sarif
+            badge.svg
+            badge.html
+            badge.json
 
       - name: Upload SARIF to GitHub Code Scanning
+        if: always()
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: report.sarif
+
+      - name: Scan Summary
+        if: always()
+        run: |
+          echo "===================================="
+          echo "Quantum Shield Trinity Scan Complete"
+          echo "===================================="
+          echo "Reports Generated:"
+          ls -1 *.json 2>/dev/null || true
+          echo ""
+          echo "HTML Report: report.html"
+          echo "SARIF Report: report.sarif"
+          echo "Evidence Graph: evidence-graph.json"
+          echo "Executive Report: executive-report.json"
+          echo "===================================="
