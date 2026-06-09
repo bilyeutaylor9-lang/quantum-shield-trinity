@@ -235,7 +235,7 @@ fs.writeFileSync(
   JSON.stringify(
     {
       platform: "Quantum Shield Trinity",
-      version: "2.2.0",
+      version: "2.2.1",
       summary,
       markdownReport,
       securityScoreReport,
