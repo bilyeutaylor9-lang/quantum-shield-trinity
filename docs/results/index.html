@@ -125,17 +125,17 @@
     <div class="grid">
       <div class="card">
         <div class="label">Security Score</div>
-        <div class="value">100/100</div>
+        <div class="value">0/100</div>
       </div>
 
       <div class="card">
         <div class="label">Risk Level</div>
-        <div class="value risk-low">LOW</div>
+        <div class="value risk-critical">CRITICAL</div>
       </div>
 
       <div class="card">
         <div class="label">Grade</div>
-        <div class="value">A+</div>
+        <div class="value">F</div>
       </div>
 
       <div class="card">
@@ -147,25 +147,25 @@
     <div class="grid">
       <div class="card">
         <div class="label">Attack Paths</div>
-        <div class="value">0</div>
+        <div class="value">25</div>
         <div class="small">Generated exploit routes</div>
       </div>
 
       <div class="card">
         <div class="label">AutoFix Suggestions</div>
-        <div class="value">0</div>
-        <div class="small">0 safe fixes</div>
+        <div class="value">50</div>
+        <div class="small">16 safe fixes</div>
       </div>
 
       <div class="card">
         <div class="label">Remediation Items</div>
-        <div class="value">0</div>
+        <div class="value">25</div>
         <div class="small">Prioritized developer fixes</div>
       </div>
 
       <div class="card">
         <div class="label">CWE / OWASP Mapped</div>
-        <div class="value">0</div>
+        <div class="value">100</div>
         <div class="small">Compliance references</div>
       </div>
     </div>
@@ -180,19 +180,19 @@
         </tr>
         <tr>
           <td>Files Scanned</td>
-          <td>0</td>
+          <td>50</td>
         </tr>
         <tr>
           <td>Critical Findings</td>
-          <td class="risk-critical">0</td>
+          <td class="risk-critical">90</td>
         </tr>
         <tr>
           <td>High Findings</td>
-          <td class="risk-high">0</td>
+          <td class="risk-high">346</td>
         </tr>
         <tr>
           <td>Medium Findings</td>
-          <td class="risk-medium">0</td>
+          <td class="risk-medium">124</td>
         </tr>
         <tr>
           <td>Low Findings</td>
@@ -201,7 +201,7 @@
       </table>
 
       <h3>Top Priority</h3>
-      <p>Maintain current security posture and continue monitoring.</p>
+      <p>Immediately address critical findings before deployment.</p>
     </div>
 
     <div class="section">
@@ -211,22 +211,353 @@
 
     <div class="section">
       <h2>Generated Attack Paths</h2>
-      <p>No generated attack paths detected.</p>
+      <table>
+    <thead>
+      <tr>
+        <th>Severity</th>
+        <th>Attack Path</th>
+        <th>Entry Point</th>
+        <th>Impact</th>
+        <th>Likelihood</th>
+        <th>Defense</th>
+      </tr>
+    </thead>
+    <tbody><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk Attack Path</td>
+        <td>Low-level delegatecall execution path</td>
+        <td>Potential storage takeover, privilege escalation, or arbitrary logic execution.</td>
+        <td>High</td>
+        <td>Restrict delegatecall targets, require trusted implementations, and protect upgrade controls.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk Attack Path</td>
+        <td>Low-level delegatecall execution path</td>
+        <td>Potential storage takeover, privilege escalation, or arbitrary logic execution.</td>
+        <td>High</td>
+        <td>Restrict delegatecall targets, require trusted implementations, and protect upgrade controls.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk Attack Path</td>
+        <td>Low-level delegatecall execution path</td>
+        <td>Potential storage takeover, privilege escalation, or arbitrary logic execution.</td>
+        <td>High</td>
+        <td>Restrict delegatecall targets, require trusted implementations, and protect upgrade controls.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk Attack Path</td>
+        <td>Low-level delegatecall execution path</td>
+        <td>Potential storage takeover, privilege escalation, or arbitrary logic execution.</td>
+        <td>High</td>
+        <td>Restrict delegatecall targets, require trusted implementations, and protect upgrade controls.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk Attack Path</td>
+        <td>Low-level delegatecall execution path</td>
+        <td>Potential storage takeover, privilege escalation, or arbitrary logic execution.</td>
+        <td>High</td>
+        <td>Restrict delegatecall targets, require trusted implementations, and protect upgrade controls.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk Attack Path</td>
+        <td>Low-level delegatecall execution path</td>
+        <td>Potential storage takeover, privilege escalation, or arbitrary logic execution.</td>
+        <td>High</td>
+        <td>Restrict delegatecall targets, require trusted implementations, and protect upgrade controls.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk Attack Path</td>
+        <td>Low-level delegatecall execution path</td>
+        <td>Potential storage takeover, privilege escalation, or arbitrary logic execution.</td>
+        <td>High</td>
+        <td>Restrict delegatecall targets, require trusted implementations, and protect upgrade controls.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>tx.origin Risk Attack Path</td>
+        <td>Authorization check using tx.origin</td>
+        <td>Potential authorization bypass through phishing-style contract calls.</td>
+        <td>Medium-High</td>
+        <td>Replace tx.origin with msg.sender and enforce explicit role-based access control.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>tx.origin Risk Attack Path</td>
+        <td>Authorization check using tx.origin</td>
+        <td>Potential authorization bypass through phishing-style contract calls.</td>
+        <td>Medium-High</td>
+        <td>Replace tx.origin with msg.sender and enforce explicit role-based access control.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>tx.origin Risk Attack Path</td>
+        <td>Authorization check using tx.origin</td>
+        <td>Potential authorization bypass through phishing-style contract calls.</td>
+        <td>Medium-High</td>
+        <td>Replace tx.origin with msg.sender and enforce explicit role-based access control.</td>
+      </tr></tbody>
+  </table>
     </div>
 
     <div class="section">
       <h2>AutoFix Suggestions</h2>
-      <p>No AutoFix suggestions generated.</p>
+      <table>
+    <thead>
+      <tr>
+        <th>Severity</th>
+        <th>Fix Type</th>
+        <th>File</th>
+        <th>Line</th>
+        <th>Confidence</th>
+        <th>Recommended Fix</th>
+      </tr>
+    </thead>
+    <tbody><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>src/engines/attackPathGeneratorEngine.js</td>
+        <td>52</td>
+        <td>LOW</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict target implementations and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>src/engines/attackPathGeneratorEngine.js</td>
+        <td>75</td>
+        <td>LOW</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict target implementations and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>src/engines/attackPathGeneratorEngine.js</td>
+        <td>77</td>
+        <td>LOW</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict target implementations and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>src/engines/attackPathGeneratorEngine.js</td>
+        <td>142</td>
+        <td>LOW</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict target implementations and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>src/engines/attackPathGeneratorEngine.js</td>
+        <td>168</td>
+        <td>LOW</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict target implementations and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>src/engines/attackPathGeneratorEngine.js</td>
+        <td>181</td>
+        <td>LOW</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict target implementations and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>src/engines/attackPathGeneratorEngine.js</td>
+        <td>182</td>
+        <td>LOW</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict target implementations and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>tx.origin Risk</td>
+        <td>src/engines/attackPathGeneratorEngine.js</td>
+        <td>53</td>
+        <td>HIGH</td>
+        <td>Replace tx.origin authorization with msg.sender and enforce explicit role-based access control.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>tx.origin Risk</td>
+        <td>src/engines/attackPathGeneratorEngine.js</td>
+        <td>84</td>
+        <td>HIGH</td>
+        <td>Replace tx.origin authorization with msg.sender and enforce explicit role-based access control.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>tx.origin Risk</td>
+        <td>src/engines/attackPathGeneratorEngine.js</td>
+        <td>88</td>
+        <td>HIGH</td>
+        <td>Replace tx.origin authorization with msg.sender and enforce explicit role-based access control.</td>
+      </tr></tbody>
+  </table>
     </div>
 
     <div class="section">
       <h2>Remediation Guidance</h2>
-      <p>No remediation guidance generated.</p>
+      <table>
+    <thead>
+      <tr>
+        <th>Severity</th>
+        <th>Issue</th>
+        <th>Priority</th>
+        <th>Effort</th>
+        <th>How To Fix</th>
+      </tr>
+    </thead>
+    <tbody><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>Immediate</td>
+        <td>1-3 days</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict targets, validate implementation addresses, and protect upgrade functions.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>Immediate</td>
+        <td>1-3 days</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict targets, validate implementation addresses, and protect upgrade functions.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>Immediate</td>
+        <td>1-3 days</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict targets, validate implementation addresses, and protect upgrade functions.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>Immediate</td>
+        <td>1-3 days</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict targets, validate implementation addresses, and protect upgrade functions.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>Immediate</td>
+        <td>1-3 days</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict targets, validate implementation addresses, and protect upgrade functions.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>Immediate</td>
+        <td>1-3 days</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict targets, validate implementation addresses, and protect upgrade functions.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>Immediate</td>
+        <td>1-3 days</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict targets, validate implementation addresses, and protect upgrade functions.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>tx.origin Risk</td>
+        <td>High</td>
+        <td>4-8 hours</td>
+        <td>Replace tx.origin authorization with msg.sender and enforce explicit role-based or owner-based access control.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>tx.origin Risk</td>
+        <td>High</td>
+        <td>4-8 hours</td>
+        <td>Replace tx.origin authorization with msg.sender and enforce explicit role-based or owner-based access control.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>tx.origin Risk</td>
+        <td>High</td>
+        <td>4-8 hours</td>
+        <td>Replace tx.origin authorization with msg.sender and enforce explicit role-based or owner-based access control.</td>
+      </tr></tbody>
+  </table>
     </div>
 
     <div class="section">
       <h2>CWE / OWASP Mapping</h2>
-      <p>No CWE or OWASP mappings generated.</p>
+      <table>
+    <thead>
+      <tr>
+        <th>Severity</th>
+        <th>Finding</th>
+        <th>CWE</th>
+        <th>OWASP Smart Contract</th>
+        <th>OWASP Web</th>
+        <th>Control</th>
+      </tr>
+    </thead>
+    <tbody><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>CWE-829</td>
+        <td>SC06: Unchecked External Calls</td>
+        <td>A08: Software and Data Integrity Failures</td>
+        <td>Restrict delegatecall targets, validate implementations, and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>CWE-829</td>
+        <td>SC06: Unchecked External Calls</td>
+        <td>A08: Software and Data Integrity Failures</td>
+        <td>Restrict delegatecall targets, validate implementations, and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>CWE-829</td>
+        <td>SC06: Unchecked External Calls</td>
+        <td>A08: Software and Data Integrity Failures</td>
+        <td>Restrict delegatecall targets, validate implementations, and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>CWE-829</td>
+        <td>SC06: Unchecked External Calls</td>
+        <td>A08: Software and Data Integrity Failures</td>
+        <td>Restrict delegatecall targets, validate implementations, and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>CWE-829</td>
+        <td>SC06: Unchecked External Calls</td>
+        <td>A08: Software and Data Integrity Failures</td>
+        <td>Restrict delegatecall targets, validate implementations, and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>CWE-829</td>
+        <td>SC06: Unchecked External Calls</td>
+        <td>A08: Software and Data Integrity Failures</td>
+        <td>Restrict delegatecall targets, validate implementations, and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>CWE-829</td>
+        <td>SC06: Unchecked External Calls</td>
+        <td>A08: Software and Data Integrity Failures</td>
+        <td>Restrict delegatecall targets, validate implementations, and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>tx.origin Risk</td>
+        <td>CWE-346</td>
+        <td>SC01: Access Control Vulnerabilities</td>
+        <td>A01: Broken Access Control</td>
+        <td>Use msg.sender and explicit role-based or owner-based access control.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>tx.origin Risk</td>
+        <td>CWE-346</td>
+        <td>SC01: Access Control Vulnerabilities</td>
+        <td>A01: Broken Access Control</td>
+        <td>Use msg.sender and explicit role-based or owner-based access control.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>tx.origin Risk</td>
+        <td>CWE-346</td>
+        <td>SC01: Access Control Vulnerabilities</td>
+        <td>A01: Broken Access Control</td>
+        <td>Use msg.sender and explicit role-based or owner-based access control.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>tx.origin Risk</td>
+        <td>CWE-346</td>
+        <td>SC01: Access Control Vulnerabilities</td>
+        <td>A01: Broken Access Control</td>
+        <td>Use msg.sender and explicit role-based or owner-based access control.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>tx.origin Risk</td>
+        <td>CWE-346</td>
+        <td>SC01: Access Control Vulnerabilities</td>
+        <td>A01: Broken Access Control</td>
+        <td>Use msg.sender and explicit role-based or owner-based access control.</td>
+      </tr></tbody>
+  </table>
     </div>
 
     <div class="section">
@@ -234,22 +565,94 @@
       <table>
     <tbody><tr>
         <td>Quantum Readiness Score</td>
-        <td>100/100</td>
+        <td>0/100</td>
       </tr><tr>
         <td>Quantum Risk Level</td>
-        <td>LOW</td>
+        <td>CRITICAL</td>
       </tr><tr>
         <td>Quantum Findings</td>
-        <td>0</td>
+        <td>243</td>
       </tr><tr>
         <td>Migration Readiness</td>
-        <td>Monitor and maintain crypto-agility</td>
+        <td>Migration planning required</td>
       </tr><tr>
         <td>Recommended Migration Path</td>
-        <td>Maintain cryptographic inventory and monitor post-quantum standards adoption.</td>
+        <td>Prioritize RSA, ECC, ECDSA, and secp256k1 inventory. Prepare migration roadmap toward ML-KEM, ML-DSA, and SLH-DSA where applicable.</td>
       </tr></tbody>
   </table>
-      <p>No quantum readiness findings detected.</p>
+      <h3>Top Quantum Findings</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Severity</th>
+        <th>Finding</th>
+        <th>File</th>
+        <th>Line</th>
+        <th>Recommendation</th>
+      </tr>
+    </thead>
+    <tbody><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>RSA Usage</td>
+        <td>src/data/quantumRules.js</td>
+        <td>3</td>
+        <td>Inventory RSA usage and plan migration to ML-KEM for key establishment or ML-DSA / SLH-DSA for signatures.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>RSA Usage</td>
+        <td>src/data/quantumRules.js</td>
+        <td>4</td>
+        <td>Inventory RSA usage and plan migration to ML-KEM for key establishment or ML-DSA / SLH-DSA for signatures.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>RSA Usage</td>
+        <td>src/data/quantumRules.js</td>
+        <td>8</td>
+        <td>Inventory RSA usage and plan migration to ML-KEM for key establishment or ML-DSA / SLH-DSA for signatures.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>RSA Usage</td>
+        <td>src/data/quantumRules.js</td>
+        <td>9</td>
+        <td>Inventory RSA usage and plan migration to ML-KEM for key establishment or ML-DSA / SLH-DSA for signatures.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>ECC Usage</td>
+        <td>src/data/quantumRules.js</td>
+        <td>12</td>
+        <td>Inventory elliptic-curve usage and plan migration toward post-quantum signature and key-establishment algorithms.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>ECDSA Signature Usage</td>
+        <td>src/data/quantumRules.js</td>
+        <td>12</td>
+        <td>Review ECDSA and EIP-712 signature flows for replay protection and long-term post-quantum migration.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>ECC Usage</td>
+        <td>src/data/quantumRules.js</td>
+        <td>13</td>
+        <td>Inventory elliptic-curve usage and plan migration toward post-quantum signature and key-establishment algorithms.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>ECDSA Signature Usage</td>
+        <td>src/data/quantumRules.js</td>
+        <td>13</td>
+        <td>Review ECDSA and EIP-712 signature flows for replay protection and long-term post-quantum migration.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>secp256k1 Usage</td>
+        <td>src/data/quantumRules.js</td>
+        <td>14</td>
+        <td>Review secp256k1 wallet/signature dependencies and prepare a post-quantum migration roadmap.</td>
+      </tr><tr>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>ECC Usage</td>
+        <td>src/data/quantumRules.js</td>
+        <td>17</td>
+        <td>Inventory elliptic-curve usage and plan migration toward post-quantum signature and key-establishment algorithms.</td>
+      </tr></tbody>
+  </table>
     </div>
 
     <div class="section">
@@ -257,22 +660,22 @@
       <table>
     <tbody><tr>
         <td>Risk Level</td>
-        <td>LOW</td>
+        <td>CRITICAL</td>
       </tr><tr>
         <td>Attack Surface Score</td>
-        <td>0/100</td>
+        <td>100/100</td>
       </tr><tr>
         <td>Total Attack Findings</td>
-        <td>0</td>
+        <td>121</td>
       </tr><tr>
         <td>Critical Attack Paths</td>
-        <td>0</td>
+        <td>24</td>
       </tr><tr>
         <td>High Attack Paths</td>
-        <td>0</td>
+        <td>69</td>
       </tr><tr>
         <td>Medium Attack Paths</td>
-        <td>0</td>
+        <td>28</td>
       </tr></tbody>
   </table>
     </div>
@@ -282,19 +685,19 @@
       <table>
     <tbody><tr>
         <td>Simulation Risk Level</td>
-        <td>LOW</td>
+        <td>CRITICAL</td>
       </tr><tr>
         <td>Simulation Score</td>
-        <td>0/100</td>
+        <td>100/100</td>
       </tr><tr>
         <td>Total Simulations</td>
-        <td>0</td>
+        <td>4</td>
       </tr><tr>
         <td>Critical Simulations</td>
-        <td>0</td>
+        <td>1</td>
       </tr><tr>
         <td>High Simulations</td>
-        <td>0</td>
+        <td>3</td>
       </tr></tbody>
   </table>
     </div>
@@ -309,13 +712,13 @@
       <table>
     <tbody><tr>
         <td>Inventory Risk</td>
-        <td>LOW</td>
+        <td>CRITICAL</td>
       </tr><tr>
         <td>Detected Items</td>
         <td>0</td>
       </tr><tr>
         <td>Quantum Exposure</td>
-        <td>LOW</td>
+        <td>CRITICAL</td>
       </tr></tbody>
   </table>
     </div>
