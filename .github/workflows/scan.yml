@@ -2,11 +2,11 @@ name: Quantum Shield Trinity Scan
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+    paths-ignore:
+      - "docs/results/**"
   pull_request:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
     inputs:
       scan_target:
@@ -25,6 +25,7 @@ concurrency:
 
 jobs:
   scan:
+    name: Run Quantum Shield Trinity
     runs-on: ubuntu-latest
     timeout-minutes: 90
 
@@ -34,6 +35,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -41,38 +44,27 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Verify Git
-        run: git --version
+      - name: Verify environment
+        run: |
+          node --version
+          npm --version
+          git --version
+          echo "NODE_OPTIONS=$NODE_OPTIONS"
+          node -e "console.log('Heap Limit MB:', Math.round(require('v8').getHeapStatistics().heap_size_limit / 1024 / 1024))"
 
       - name: Install dependencies
-        run: npm install
-
-      - name: Verify Node memory settings
-        run: |
-          echo "NODE_OPTIONS=$NODE_OPTIONS"
-          node -e "console.log('Heap Limit MB:', require('v8').getHeapStatistics().heap_size_limit / 1024 / 1024)"
+        run: npm ci || npm install
 
       - name: Determine scan target
         id: target
         shell: bash
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            TARGET="${{ github.event.inputs.scan_target }}"
-          else
-            TARGET="src"
-          fi
-
+          TARGET="${{ github.event.inputs.scan_target || 'src' }}"
           if [ -z "$TARGET" ]; then
             TARGET="src"
           fi
-
           echo "target=$TARGET" >> "$GITHUB_OUTPUT"
           echo "Scan target: $TARGET"
-
-      - name: Debug scan target
-        shell: bash
-        run: |
-          echo "Final target is: ${{ steps.target.outputs.target }}"
 
       - name: Run Quantum Shield Trinity Scan
         shell: bash
@@ -87,12 +79,8 @@ jobs:
           ls -lah
 
           echo ""
-          echo "=== Scan output ==="
-          cat quantum-shield-report.txt || true
-
-          echo ""
           echo "=== Report files found ==="
-          find . -maxdepth 3 \( -name "*.json" -o -name "*.html" -o -name "*.sarif" -o -name "*.svg" \) -print || true
+          find . -maxdepth 3 \( -name "*.json" -o -name "*.html" -o -name "*.sarif" -o -name "*.svg" -o -name "*.txt" \) -print || true
 
       - name: Publish latest HTML report to docs
         if: github.event_name != 'pull_request' && hashFiles('report.html') != ''
@@ -101,15 +89,28 @@ jobs:
           mkdir -p docs/results
           cp report.html docs/results/index.html
 
+          if [ -f badge.svg ]; then
+            cp badge.svg docs/results/badge.svg
+          fi
+
+          if [ -f report.json ]; then
+            cp report.json docs/results/report.json
+          fi
+
       - name: Commit latest public report
         if: github.event_name != 'pull_request' && hashFiles('docs/results/index.html') != ''
         shell: bash
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add docs/results/index.html
-          git commit -m "Publish latest Quantum Shield Trinity report" || echo "No report changes to commit"
-          git push
+          git add docs/results
+
+          if git diff --cached --quiet; then
+            echo "No report changes to commit"
+          else
+            git commit -m "Publish latest Quantum Shield Trinity report [skip ci]"
+            git push
+          fi
 
       - name: Upload scan artifacts
         if: always()
@@ -151,22 +152,25 @@ jobs:
         with:
           sarif_file: report.sarif
 
-      - name: Skip SARIF upload notice
-        if: hashFiles('report.sarif') == ''
-        shell: bash
-        run: echo "report.sarif was not found, so SARIF upload was skipped."
-
       - name: Scan summary
         if: always()
         shell: bash
         run: |
           echo "# Quantum Shield Trinity Scan Complete" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "## JSON Reports" >> "$GITHUB_STEP_SUMMARY"
-          ls -1 *.json 2>/dev/null >> "$GITHUB_STEP_SUMMARY" || true
+          echo "**Target:** \`${{ steps.target.outputs.target }}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "## HTML Reports" >> "$GITHUB_STEP_SUMMARY"
-          ls -1 *.html 2>/dev/null >> "$GITHUB_STEP_SUMMARY" || true
+
+          echo "## Reports Generated" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "## SARIF Reports" >> "$GITHUB_STEP_SUMMARY"
-          ls -1 *.sarif 2>/dev/null >> "$GITHUB_STEP_SUMMARY" || true
+
+          echo "### JSON" >> "$GITHUB_STEP_SUMMARY"
+          ls -1 *.json 2>/dev/null >> "$GITHUB_STEP_SUMMARY" || echo "No JSON reports found." >> "$GITHUB_STEP_SUMMARY"
+
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "### HTML" >> "$GITHUB_STEP_SUMMARY"
+          ls -1 *.html 2>/dev/null >> "$GITHUB_STEP_SUMMARY" || echo "No HTML reports found." >> "$GITHUB_STEP_SUMMARY"
+
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "### SARIF" >> "$GITHUB_STEP_SUMMARY"
+          ls -1 *.sarif 2>/dev/null >> "$GITHUB_STEP_SUMMARY" || echo "No SARIF report found." >> "$GITHUB_STEP_SUMMARY"
