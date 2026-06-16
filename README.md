@@ -1,244 +1,41 @@
 Quantum Shield Trinity
-![Build](https://img.shields.io/badge/build-passing-brightgreen)
-![License](https://img.shields.io/badge/license-MIT-blue)
-![Node](https://img.shields.io/badge/node-20-green)
-![Security](https://img.shields.io/badge/security-AI%20Powered-red)
-![Quantum](https://img.shields.io/badge/quantum-ready-purple)
-![OWASP](https://img.shields.io/badge/OWASP-mapped-orange)
+
+Quantum Risk Intelligence for Web3, Smart Contracts, and Modern Software
+
+Quantum Shield Trinity is an advanced security intelligence platform built to analyze software risk, smart contract exposure, dependency threats, attack paths, and emerging quantum-computing vulnerabilities.
+
+It combines repository scanning, dependency intelligence, attack-surface mapping, exploit simulation, smart contract auditing, quantum-readiness analysis, remediation guidance, executive reporting, and GitHub security automation into one unified workflow.
+
 Public Scan Results
 
-View public demo scan results:
+View the latest public demo scan:
 
 https://bilyeutaylor9-lang.github.io/quantum-shield-trinity/results/
 
 ⸻
 
-Quantum Risk Intelligence for Web3, Smart Contracts, and Modern Software
+What Quantum Shield Trinity Does
 
-Quantum Shield Trinity is an advanced security intelligence platform designed for developers, security teams, blockchain projects, and enterprises seeking deeper visibility into software risk, attack paths, smart contract vulnerabilities, supply chain threats, and emerging quantum-computing exposure.
-
-The platform combines repository analysis, dependency intelligence, attack-surface mapping, exploit simulation, automated remediation guidance, smart contract auditing, attack-path generation, compliance mapping, and quantum-readiness evaluation into a single security workflow.
-
-⸻
-
-Core Security Platform
-
-Repository Intelligence
-
-* Source code analysis
-* Repository inventory generation
-* Security pattern detection
-* Risk classification
-* Finding prioritization
-* Security posture evaluation
-
-Dependency Intelligence
-
-* Dependency discovery
-* Supply chain analysis
-* Vulnerable package identification
-* Outdated dependency detection
-* Third-party exposure assessment
-* Dependency security scoring
-
-Attack Surface Analysis
-
-* Attack vector discovery
-* Sensitive exposure detection
-* Dangerous configuration analysis
-* Authentication review
-* Access control evaluation
-* Attack surface scoring
-
-Smart Contract Security
-
-* Solidity auditing
-* Reentrancy detection
-* Delegatecall analysis
-* tx.origin misuse detection
-* Hardcoded address review
-* Access-control validation
-* Oracle-risk assessment
-* Upgradeability review
-
-Exploit Simulation
-
-* Attack-chain generation
-* Impact estimation
-* Threat forecasting
-* Exploitability scoring
-* Risk prioritization
-
-Attack Path Intelligence
-
-* Entry-point discovery
-* Privilege-escalation modeling
-* Lateral-movement analysis
-* Attack-path visualization
-* Defensive recommendation generation
-
-Remediation Guidance
-
-* Root-cause explanations
-* Risk justification
-* Developer remediation guidance
-* Example fixes
-* Security best-practice recommendations
-
-AutoFix Engine
-
-* Automated patch suggestions
-* Safe-fix identification
-* Confidence scoring
-* Developer-assisted remediation
-* Patch generation workflows
+* Scans repositories for security risk
+* Audits Solidity smart contracts
+* Detects dependency and supply-chain exposure
+* Maps attack surfaces and attack paths
+* Simulates exploit risk
+* Scores security posture
+* Generates remediation guidance
+* Produces executive security reports
+* Exports SARIF for GitHub Code Scanning
+* Evaluates quantum-readiness and cryptographic exposure
 
 ⸻
 
-Quantum Security Platform
+Core Engines
 
-Quantum Readiness Engine
-
-* Quantum readiness scoring
-* Cryptographic inventory analysis
-* RSA exposure detection
-* ECC exposure detection
-* Migration readiness evaluation
-
-Quantum Exposure Forecast Engine
-
-* Future cryptographic risk forecasting
-* Security lifecycle analysis
-* Quantum migration planning
-* Long-term exposure estimation
-
-Quantum Attack Simulation Engine
-
-* Quantum threat modeling
-* Cryptographic compromise simulations
-* Future attack forecasting
-* Impact analysis
-
-Migration Shield Engine
-
-* Post-quantum migration planning
-* Priority recommendations
-* Migration roadmaps
-* Cryptographic modernization guidance
-
-⸻
-
-Compliance & Security Intelligence
-
-Compliance Mapping Engine
-
-Maps findings to recognized security standards:
-
-* CWE Mapping
-* OWASP Mapping
-* Security Framework Correlation
-* Compliance Reporting
-
-Root Cause Engine
-
-* Root-cause discovery
-* Security failure analysis
-* Risk correlation
-* Threat clustering
-
-Security Assessment Engine
-
-* Security posture evaluation
-* Threat aggregation
-* Risk classification
-* Executive assessment reporting
-
-Security Audit Loop Engine
-
-* Continuous analysis
-* Recursive validation
-* Security monitoring workflows
-* Finding correlation
-
-Security Copilot Engine
-
-* AI-assisted security guidance
-* Threat explanations
-* Security recommendations
-* Developer assistance
-
-⸻
-
-Reporting & Intelligence Layer
-
-Executive Report Engine
-
-* Executive summaries
-* Risk dashboards
-* Leadership reporting
-* Security scorecards
-
-Wallet Risk Engine
-
-* Wallet exposure analysis
-* Risk classification
-* Security recommendations
-
-Crypto Inventory Engine
-
-* Cryptographic asset discovery
-* Algorithm inventory
-* Key management analysis
-* Quantum exposure mapping
-
-JSON Export Engine
-
-* Machine-readable reporting
-* API integration support
-* Pipeline automation
-
-⸻
-
-Reports Generated
-
-Quantum Shield Trinity automatically generates:
-
-HTML Security Report
-
-Interactive security dashboard with findings, scores, attack paths, remediation guidance, and intelligence summaries.
-
-JSON Export
-
-Machine-readable security intelligence for integrations and automation.
-
-Executive Report
-
-Leadership-focused security summaries and risk assessments.
-
-SARIF Report
-
-GitHub Code Scanning compatible format.
-
-Markdown Reports
-
-Developer-friendly report format for documentation and issue tracking.
-
-⸻
-
-Engine Architecture
-
-src/
-├── engines/
-├── reporters/
-├── scanners/
-├── models/
-├── utils/
-└── cli.js
-
-Current Engine Inventory
+Security Intelligence
 
 * Repository Scanner Engine
 * Dependency Intelligence Engine
+* Dependency Risk Engine
 * Attack Surface Engine
 * Smart Contract Audit Engine
 * Exploit Simulation Engine
@@ -246,74 +43,110 @@ Current Engine Inventory
 * Security Score Engine
 * Remediation Engine
 * AutoFix Engine
+
+Quantum Security
+
 * Quantum Readiness Engine
 * Quantum Exposure Forecast Engine
 * Quantum Attack Simulation Engine
 * Migration Shield Engine
+* Crypto Inventory Engine
+
+Compliance & Reporting
+
 * Compliance Mapping Engine
 * Root Cause Engine
 * Security Assessment Engine
 * Security Audit Loop Engine
 * Security Copilot Engine
 * Executive Report Engine
-* Wallet Risk Engine
-* Crypto Inventory Engine
 * JSON Export Engine
+* SARIF Report Generator
+* HTML Report Generator
+* Markdown Report Generator
+
+⸻
+
+Reports Generated
+
+Quantum Shield Trinity generates:
+
+* report.html
+* report.json
+* executive-report.json
+* executive-summary.json
+* report.sarif
+* badge.svg
+* evidence-graph.json
+* wallet-risk-report.json
+* dependency-risk-report.json
+* migration-shield-report.json
+* quantum-risk-export.json
+* smart-contract-context-report.json
+* quantum-exposure-forecast-report.json
+* quantum-attack-simulation-report.json
+* root-cause-report.json
+* security-assessment-report.json
+* security-audit-loop-report.json
+* security-copilot-report.json
+* code-flow-report.json
+* route-exposure-report.json
+* trust-boundary-report.json
+* attack-chain-builder-report.json
+
+⸻
+
+Installation
+
+npm install
+
+⸻
+
+Usage
+
+Scan the current repository:
+
+npm run scan -- .
+
+Scan the source folder:
+
+npm run scan -- src
+
+Scan a GitHub repository URL:
+
+npm run scan -- https://github.com/user/repository
 
 ⸻
 
 CI/CD Integration
 
-Quantum Shield Trinity supports GitHub Actions security automation.
+Quantum Shield Trinity supports GitHub Actions automation.
 
-Features
+The workflow can:
 
-* Automated repository scanning
-* Continuous risk monitoring
-* Security artifact generation
-* SARIF export generation
-* GitHub security workflow integration
-* Security dashboard publishing
-
-⸻
-
-Example Usage
-
-npm install
-npm run scan -- .
-
-Generated outputs:
-
-report.html
-report.json
-executive-report.json
-report.sarif
+* Run scans on push
+* Run scans on pull requests
+* Run manual scans with custom targets
+* Upload scan artifacts
+* Publish public HTML reports
+* Upload SARIF to GitHub Code Scanning
+* Generate public security dashboards
 
 ⸻
 
 Platform Statistics
 
-Category	Count
+Category	Status
 Security Engines	20+
-Quantum Modules	4
-Report Formats	4
-Compliance Frameworks	CWE + OWASP
-CI/CD Ready	✅
+Quantum Modules	4+
+Report Formats	HTML, JSON, SARIF, Markdown
+Compliance Mapping	CWE + OWASP
 GitHub Actions Ready	✅
 Smart Contract Security	✅
 Quantum Readiness Analysis	✅
 AutoFix Suggestions	✅
 Attack Path Modeling	✅
-
-⸻
-
-Vision
-
-Quantum Shield Trinity was created to bridge the gap between traditional application security, blockchain security, software supply-chain defense, and emerging quantum-computing threats.
-
-As quantum capabilities continue to evolve, organizations need visibility into cryptographic exposure, software risk, dependency vulnerabilities, attack surfaces, and migration readiness.
-
-Quantum Shield Trinity provides a unified framework for understanding, prioritizing, and reducing those risks.
+Executive Reporting	✅
 
 ⸻
 
@@ -326,13 +159,44 @@ Version 2.0
 * Historical risk tracking
 * Risk trend analytics
 * Multi-repository scanning
-* Cloud infrastructure analysis
 * Infrastructure-as-Code scanning
+* Cloud infrastructure analysis
 * Smart contract exploit forecasting
 * Post-quantum migration dashboards
 * Enterprise reporting suite
 * Security benchmarking
 * Automated patch validation
+
+Future Vision
+
+* Reactive security automation
+* Cross-chain threat monitoring
+* Wallet and protocol risk intelligence
+* Security oracle network
+* Institutional-grade risk dashboards
+* Autonomous defense workflows
+
+⸻
+
+Project Structure
+
+src/
+├── engines/
+├── reporters/
+├── scanners/
+├── models/
+├── utils/
+└── cli.js
+
+⸻
+
+Vision
+
+Quantum Shield Trinity was created to bridge traditional application security, blockchain security, software supply-chain defense, and emerging quantum-computing threats.
+
+As software systems become more complex and quantum capabilities advance, organizations need better visibility into cryptographic exposure, dependency risk, smart contract vulnerabilities, attack surfaces, and migration readiness.
+
+Quantum Shield Trinity provides a unified framework for understanding, prioritizing, and reducing those risks.
 
 ⸻
 
