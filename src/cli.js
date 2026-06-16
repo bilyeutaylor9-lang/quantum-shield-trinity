@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import fs from "fs";
+import path from "path";
 import { runQuantumShieldScan } from "./index.js";
 import {
   isGitHubUrl,
@@ -8,59 +9,112 @@ import {
   cleanupClonedRepo
 } from "./utils/githubCloneScanner.js";
 
-const inputTarget = process.argv[2] ?? "src";
+function parseArgs(argv = []) {
+  const args = {
+    target: "src",
+    profile: "deep",
+    outDir: ".",
+    failOn: "none"
+  };
 
-let targetDirectory = inputTarget;
+  const positional = [];
+
+  for (let i = 0; i < argv.length; i++) {
+    const arg = argv[i];
+
+    if (arg === "--profile") args.profile = argv[++i] ?? "deep";
+    else if (arg === "--out") args.outDir = argv[++i] ?? ".";
+    else if (arg === "--fail-on") args.failOn = argv[++i] ?? "none";
+    else positional.push(arg);
+  }
+
+  if (positional[0]) args.target = positional[0];
+
+  return args;
+}
+
+const cli = parseArgs(process.argv.slice(2));
+
+let targetDirectory = cli.target;
 let clonedRepo = null;
 
 const scanOptions = {
+  profile: cli.profile,
   maxEvidenceItems: 100,
   attackChain: {
-    maxDepth: 3,
-    limit: 25,
-    maxNodes: 250,
-    maxEdges: 750,
-    maxStarts: 50,
-    maxNeighborsPerNode: 20,
-    maxChainsToExplore: 500
+    maxDepth: cli.profile === "quick" ? 2 : 3,
+    limit: cli.profile === "quick" ? 10 : 25,
+    maxNodes: cli.profile === "quick" ? 100 : 250,
+    maxEdges: cli.profile === "quick" ? 250 : 750,
+    maxStarts: cli.profile === "quick" ? 20 : 50,
+    maxNeighborsPerNode: cli.profile === "quick" ? 10 : 20,
+    maxChainsToExplore: cli.profile === "quick" ? 150 : 500
   }
 };
 
-const safeWriteJson = (fileName, data) => {
-  fs.writeFileSync(fileName, JSON.stringify(data ?? {}, null, 2), "utf8");
-};
+function ensureOutDir(outDir) {
+  fs.mkdirSync(outDir, { recursive: true });
+}
 
-const safeWriteText = (fileName, data) => {
-  fs.writeFileSync(fileName, data ?? "", "utf8");
-};
+function outPath(fileName) {
+  return path.join(cli.outDir, fileName);
+}
 
-console.log("Quantum Shield Trinity");
-console.log("----------------------");
+function safeWriteJson(fileName, data) {
+  if (data === undefined || data === null) return;
+  fs.writeFileSync(outPath(fileName), JSON.stringify(data, null, 2), "utf8");
+}
 
-try {
-  if (isGitHubUrl(inputTarget)) {
-    console.log(`GitHub URL detected: ${inputTarget}`);
-    console.log("Clone mode: shallow + blobless optimized clone");
-    console.log("");
+function safeWriteText(fileName, data) {
+  if (data === undefined || data === null) return;
+  fs.writeFileSync(outPath(fileName), String(data), "utf8");
+}
 
-    clonedRepo = cloneGitHubRepo(inputTarget, {
-      depth: 1,
-      singleBranch: true,
-      blobless: true
-    });
+function getSeverityCounts(report = {}) {
+  const summary = report.summary ?? {};
+  const score = report.securityScoreReport ?? {};
 
-    targetDirectory = clonedRepo.targetPath;
+  return {
+    critical:
+      summary.criticalFindings ??
+      score.findingCounts?.critical ??
+      report.criticalFindings ??
+      0,
+    high:
+      summary.highFindings ??
+      score.findingCounts?.high ??
+      report.highFindings ??
+      0,
+    medium:
+      summary.mediumFindings ??
+      score.findingCounts?.medium ??
+      report.mediumFindings ??
+      0,
+    low:
+      summary.lowFindings ??
+      score.findingCounts?.low ??
+      report.lowFindings ??
+      0
+  };
+}
+
+function shouldFailBuild(report = {}, failOn = "none") {
+  const counts = getSeverityCounts(report);
+
+  if (failOn === "critical") return counts.critical > 0;
+  if (failOn === "high") return counts.critical > 0 || counts.high > 0;
+  if (failOn === "medium") {
+    return counts.critical > 0 || counts.high > 0 || counts.medium > 0;
   }
 
-  console.log(`Scanning target: ${inputTarget}`);
-  console.log(`Resolved directory: ${targetDirectory}`);
-  console.log("");
+  return false;
+}
 
-  const report = runQuantumShieldScan(targetDirectory, scanOptions);
-
+function writeArtifacts(report, inputTarget, resolvedDirectory) {
   safeWriteJson("report.json", report);
   safeWriteText("report.html", report.htmlReport);
   safeWriteJson("report.sarif", report.sarifReport);
+
   safeWriteText("badge.svg", report.securityBadgeReport?.svg);
   safeWriteText("badge.html", report.securityBadgeReport?.html);
   safeWriteJson("badge.json", report.securityBadgeReport?.badgeData);
@@ -82,17 +136,22 @@ try {
   safeWriteJson("route-exposure-report.json", report.routeExposureReport);
   safeWriteJson("trust-boundary-report.json", report.trustBoundaryReport);
   safeWriteJson("attack-chain-builder-report.json", report.attackChainBuilderReport);
+  safeWriteJson("auto-fix-report.json", report.autoFixReport);
+  safeWriteJson("attack-path-report.json", report.attackPathReport);
+  safeWriteJson("compliance-mapping-report.json", report.complianceMappingReport);
+  safeWriteJson("crypto-inventory-report.json", report.cryptoInventoryReport);
+  safeWriteText("markdown-report.md", report.markdownReport);
 
   safeWriteJson("executive-report.json", {
     platform: "Quantum Shield Trinity",
     version: report.version,
     scannedTarget: inputTarget,
-    resolvedDirectory: targetDirectory,
+    resolvedDirectory,
+    profile: cli.profile,
+    generatedAt: new Date().toISOString(),
     summary: report.summary,
-    markdownReport: report.markdownReport,
     securityScoreReport: report.securityScoreReport,
     executiveReportEngineReport: report.executiveReportEngineReport,
-    jsonExportReport: report.jsonExportReport,
     remediationReport: report.remediationReport,
     quantumReadinessReport: report.quantumReadinessReport,
     walletReport: report.walletReport,
@@ -117,16 +176,47 @@ try {
     securityBadgeReport: report.securityBadgeReport
   });
 
+  const counts = getSeverityCounts(report);
+
+  safeWriteJson("scan-summary.json", {
+    platform: "Quantum Shield Trinity",
+    target: inputTarget,
+    resolvedDirectory,
+    profile: cli.profile,
+    generatedAt: new Date().toISOString(),
+    score: report.summary?.score ?? report.securityScoreReport?.securityScore ?? null,
+    riskLevel:
+      report.summary?.repositoryRiskLevel ??
+      report.securityScoreReport?.riskLevel ??
+      "UNKNOWN",
+    findings: counts,
+    quantum: {
+      score: report.quantumReadinessReport?.quantumReadinessScore ?? null,
+      riskLevel: report.quantumReadinessReport?.quantumRiskLevel ?? "UNKNOWN",
+      migrationReadiness:
+        report.quantumReadinessReport?.migrationReadiness ?? "UNKNOWN"
+    },
+    evidenceGraph: {
+      nodes: report.evidenceGraphReport?.nodes?.length ?? 0,
+      edges: report.evidenceGraphReport?.edges?.length ?? 0,
+      riskLevel: report.evidenceGraphReport?.summary?.risk?.level ?? "UNKNOWN"
+    }
+  });
+}
+
+function printConsoleSummary(report = {}) {
   const summary = report.summary ?? {};
+  const counts = getSeverityCounts(report);
 
   console.log("Executive Summary");
   console.log("-----------------");
-  console.log(`Risk Level: ${summary.repositoryRiskLevel ?? "UNKNOWN"}`);
-  console.log(`Score: ${summary.score ?? "N/A"}/100`);
+  console.log(`Risk Level: ${summary.repositoryRiskLevel ?? report.securityScoreReport?.riskLevel ?? "UNKNOWN"}`);
+  console.log(`Score: ${summary.score ?? report.securityScoreReport?.securityScore ?? "N/A"}/100`);
   console.log(`Scanned Files: ${summary.scannedFiles ?? report.scannedFiles ?? "N/A"}`);
-  console.log(`Critical Findings: ${summary.criticalFindings ?? 0}`);
-  console.log(`High Findings: ${summary.highFindings ?? 0}`);
-  console.log(`Medium Findings: ${summary.mediumFindings ?? 0}`);
+  console.log(`Critical Findings: ${counts.critical}`);
+  console.log(`High Findings: ${counts.high}`);
+  console.log(`Medium Findings: ${counts.medium}`);
+  console.log(`Low Findings: ${counts.low}`);
   console.log("");
 
   console.log("Deep Scan X");
@@ -144,14 +234,6 @@ try {
   console.log(`Graph Risk Level: ${report.evidenceGraphReport?.summary?.risk?.level ?? "UNKNOWN"}`);
   console.log("");
 
-  console.log("Wallet Quantum Risk");
-  console.log("-------------------");
-  console.log(`Wallet Address: ${report.walletReport?.walletAddress ?? "Unknown"}`);
-  console.log(`Risk Score: ${report.walletReport?.score ?? "N/A"}/100`);
-  console.log(`Risk Level: ${report.walletReport?.riskLevel ?? "UNKNOWN"}`);
-  console.log(`Recommendation: ${report.walletReport?.recommendation ?? "Review wallet exposure."}`);
-  console.log("");
-
   console.log("Executive Security Score");
   console.log("------------------------");
   console.log(`Security Score: ${report.securityScoreReport?.securityScore ?? "N/A"}/100`);
@@ -167,13 +249,54 @@ try {
   console.log(`Migration Readiness: ${report.quantumReadinessReport?.migrationReadiness ?? "UNKNOWN"}`);
   console.log("");
 
-  console.log("Report Generated");
-  console.log("----------------");
+  console.log("Reports Generated");
+  console.log("-----------------");
+  console.log(`Output Directory: ${cli.outDir}`);
   console.log("HTML Report: report.html");
   console.log("JSON Report: report.json");
   console.log("SARIF Report: report.sarif");
   console.log("Executive Report: executive-report.json");
+  console.log("Scan Summary: scan-summary.json");
   console.log("");
+}
+
+console.log("Quantum Shield Trinity");
+console.log("----------------------");
+console.log(`Profile: ${cli.profile}`);
+console.log(`Output Directory: ${cli.outDir}`);
+console.log(`Fail On: ${cli.failOn}`);
+console.log("");
+
+try {
+  ensureOutDir(cli.outDir);
+
+  if (isGitHubUrl(cli.target)) {
+    console.log(`GitHub URL detected: ${cli.target}`);
+    console.log("Clone mode: shallow + blobless optimized clone");
+    console.log("");
+
+    clonedRepo = cloneGitHubRepo(cli.target, {
+      depth: 1,
+      singleBranch: true,
+      blobless: true
+    });
+
+    targetDirectory = clonedRepo.targetPath;
+  }
+
+  console.log(`Scanning target: ${cli.target}`);
+  console.log(`Resolved directory: ${targetDirectory}`);
+  console.log("");
+
+  const report = runQuantumShieldScan(targetDirectory, scanOptions);
+
+  writeArtifacts(report, cli.target, targetDirectory);
+  printConsoleSummary(report);
+
+  if (shouldFailBuild(report, cli.failOn)) {
+    console.error(`Build failed because --fail-on=${cli.failOn} threshold was met.`);
+    process.exitCode = 2;
+  }
 } catch (error) {
   console.error("");
   console.error("Quantum Shield Trinity scan failed.");
