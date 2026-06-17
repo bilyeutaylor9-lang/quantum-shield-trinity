@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import "forge-std/Test.sol";
 
 import "../src/examples/vulnerable-contract.sol";
-import "../src/examples/examplesreentrancy-attacker.sol";
+import "../src/examples/examplesreetrancy-attacker.sol";
 import "../src/examples/examplestx-origin-phishing.sol";
 import "../src/examples/examplesdelegatecall-victim.sol";
 import "../src/examples/examplesdelegatecall-takeover.sol";
@@ -37,7 +37,8 @@ contract VulnerableExamplesTest is Test {
         vault.deposit{value: 5 ether}();
 
         vm.prank(attacker);
-        ReentrancyAttacker attack = new ReentrancyAttacker(address(vault));
+        ReentrancyAttacker attack =
+            new ReentrancyAttacker(address(vault));
 
         vm.prank(attacker);
         attack.attack{value: 1 ether}();
@@ -59,7 +60,8 @@ contract VulnerableExamplesTest is Test {
     }
 
     function testDelegatecallTakeover() public {
-        DelegatecallVictim victim = new DelegatecallVictim();
+        DelegatecallVictim victim =
+            new DelegatecallVictim();
 
         MaliciousImplementation malicious =
             new MaliciousImplementation();
