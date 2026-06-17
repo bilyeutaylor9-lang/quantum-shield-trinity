@@ -20,8 +20,9 @@ contract VulnerableExamplesTest is Test {
         vm.deal(user, 10 ether);
         vm.deal(attacker, 10 ether);
 
-        vm.prank(owner);
+        vm.startPrank(owner, owner);
         vault = new VulnerableVault();
+        vm.stopPrank();
     }
 
     function testDepositWorks() public {
@@ -52,7 +53,7 @@ contract VulnerableExamplesTest is Test {
         vm.prank(user);
         vault.deposit{value: 2 ether}();
 
-        vm.prank(owner);
+        vm.prank(owner, owner);
         phishing.trickVictim();
 
         assertEq(address(vault).balance, 0);
