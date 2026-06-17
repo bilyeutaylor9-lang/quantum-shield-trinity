@@ -4,10 +4,10 @@ pragma solidity ^0.8.20;
 import "forge-std/Test.sol";
 
 import "../src/examples/vulnerable-contract.sol";
-import "../src/examples/examplesreetrancy-attacker.sol";
+import "../src/examples/reetrancy-attacker.sol";
 import "../src/examples/examplestx-origin-phishing.sol";
 import "../src/examples/examplesdelegatecall-victim.sol";
-import "../src/examples/examplesdelegatecall-takeover.sol";
+import "../src/examples/delegatecall-takeover.sol";
 
 contract VulnerableExamplesTest is Test {
     VulnerableVault vault;
@@ -21,7 +21,7 @@ contract VulnerableExamplesTest is Test {
         vm.deal(user, 10 ether);
         vm.deal(attacker, 10 ether);
 
-        vm.prank(owner, owner);
+        vm.prank(owner);
         vault = new VulnerableVault();
     }
 
@@ -53,7 +53,7 @@ contract VulnerableExamplesTest is Test {
         vm.prank(user);
         vault.deposit{value: 2 ether}();
 
-        vm.prank(owner, owner);
+        vm.prank(owner);
         phishing.trickVictim();
 
         assertEq(address(vault).balance, 0);
