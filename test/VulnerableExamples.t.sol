@@ -5,7 +5,7 @@ import "forge-std/Test.sol";
 
 import "../src/examples/vulnerable-contract.sol";
 import "../src/examples/reetrancy-attacker.sol";
-import "../src/examples/examplestx-origin-phishing.sol";
+import "../src/examples/tx-origin-phishing.sol";
 import "../src/examples/examplesdelegatecall-victim.sol";
 import "../src/examples/delegatecall-takeover.sol";
 
