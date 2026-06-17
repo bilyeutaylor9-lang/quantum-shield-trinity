@@ -1,0 +1,1238 @@
+{
+  "version": "2.1.0",
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "Quantum Shield Trinity",
+          "version": "1.3.0",
+          "informationUri": "https://github.com/bilyeutaylor9-lang/quantum-shield-trinity",
+          "rules": [
+            {
+              "id": "LOCKFILE_DEPENDENCY_SIGNAL",
+              "name": "Lockfile Dependency Signal",
+              "shortDescription": {
+                "text": "Inventory signing flows and prepare a quantum migration roadmap."
+              },
+              "fullDescription": {
+                "text": "Inventory signing flows and prepare a quantum migration roadmap."
+              },
+              "help": {
+                "text": "Inventory signing flows and prepare a quantum migration roadmap."
+              },
+              "properties": {
+                "category": "Lockfile Dependency Signal",
+                "severity": "HIGH"
+              }
+            },
+            {
+              "id": "BLOCKCHAIN_DEPENDENCY",
+              "name": "Blockchain Dependency",
+              "shortDescription": {
+                "text": "Prepare signing abstractions and wallet security guidance."
+              },
+              "fullDescription": {
+                "text": "Prepare signing abstractions and wallet security guidance."
+              },
+              "help": {
+                "text": "Prepare signing abstractions and wallet security guidance."
+              },
+              "properties": {
+                "category": "Blockchain Dependency",
+                "severity": "MEDIUM"
+              }
+            },
+            {
+              "id": "HARDCODED_ADDRESS_RISK",
+              "name": "Hardcoded Address Risk",
+              "shortDescription": {
+                "text": "Verify hardcoded addresses are intentional, documented, and network-specific."
+              },
+              "fullDescription": {
+                "text": "Verify hardcoded addresses are intentional, documented, and network-specific."
+              },
+              "help": {
+                "text": "Verify hardcoded addresses are intentional, documented, and network-specific."
+              },
+              "properties": {
+                "category": "Hardcoded Blockchain Address",
+                "severity": "MEDIUM"
+              }
+            },
+            {
+              "id": "ADMIN_CENTRALIZATION_RISK",
+              "name": "Admin Centralization Risk",
+              "shortDescription": {
+                "text": "Review admin privileges. Consider multisig, timelocks, and role separation."
+              },
+              "fullDescription": {
+                "text": "Review admin privileges. Consider multisig, timelocks, and role separation."
+              },
+              "help": {
+                "text": "Review admin privileges. Consider multisig, timelocks, and role separation."
+              },
+              "properties": {
+                "category": "Admin Control Risk",
+                "severity": "MEDIUM"
+              }
+            },
+            {
+              "id": "MISSING_ACCESS_CONTROL_REVIEW",
+              "name": "Missing Access Control Review",
+              "shortDescription": {
+                "text": "Review public/external functions for required access control, input validation, and rate limits."
+              },
+              "fullDescription": {
+                "text": "Review public/external functions for required access control, input validation, and rate limits."
+              },
+              "help": {
+                "text": "Review public/external functions for required access control, input validation, and rate limits."
+              },
+              "properties": {
+                "category": "Access Control Review",
+                "severity": "MEDIUM"
+              }
+            },
+            {
+              "id": "HARDCODED_ADDRESS",
+              "name": "Hardcoded Address",
+              "shortDescription": {
+                "text": "Verify hardcoded addresses are intentional, documented, network-specific, and configurable."
+              },
+              "fullDescription": {
+                "text": "Verify hardcoded addresses are intentional, documented, network-specific, and configurable."
+              },
+              "help": {
+                "text": "Verify hardcoded addresses are intentional, documented, network-specific, and configurable."
+              },
+              "properties": {
+                "category": "Configuration Review",
+                "severity": "MEDIUM"
+              }
+            },
+            {
+              "id": "TIMESTAMP_DEPENDENCE",
+              "name": "Timestamp Dependence",
+              "shortDescription": {
+                "text": "Avoid relying on block timestamps for critical randomness, price, or settlement logic."
+              },
+              "fullDescription": {
+                "text": "Avoid relying on block timestamps for critical randomness, price, or settlement logic."
+              },
+              "help": {
+                "text": "Avoid relying on block timestamps for critical randomness, price, or settlement logic."
+              },
+              "properties": {
+                "category": "Time Manipulation Risk",
+                "severity": "MEDIUM"
+              }
+            },
+            {
+              "id": "OWNERADMIN_CONTROL",
+              "name": "Owner/Admin Control",
+              "shortDescription": {
+                "text": "Review admin privileges. Consider multisig, timelock, and least-privilege role design."
+              },
+              "fullDescription": {
+                "text": "Review admin privileges. Consider multisig, timelock, and least-privilege role design."
+              },
+              "help": {
+                "text": "Review admin privileges. Consider multisig, timelock, and least-privilege role design."
+              },
+              "properties": {
+                "category": "Centralization Review",
+                "severity": "HIGH"
+              }
+            },
+            {
+              "id": "UNBOUNDED_LOOP_RISK",
+              "name": "Unbounded Loop Risk",
+              "shortDescription": {
+                "text": "Review loops for unbounded iteration and gas exhaustion risk."
+              },
+              "fullDescription": {
+                "text": "Review loops for unbounded iteration and gas exhaustion risk."
+              },
+              "help": {
+                "text": "Review loops for unbounded iteration and gas exhaustion risk."
+              },
+              "properties": {
+                "category": "Gas Risk",
+                "severity": "HIGH"
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "LOCKFILE_DEPENDENCY_SIGNAL",
+          "level": "error",
+          "message": {
+            "text": "Inventory signing flows and prepare a quantum migration roadmap."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/lib/openzeppelin-contracts/package-lock.json"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "dependency",
+            "severity": "HIGH",
+            "category": "Lockfile Dependency Signal",
+            "confidence": "unknown",
+            "recommendation": "Inventory signing flows and prepare a quantum migration roadmap."
+          }
+        },
+        {
+          "ruleId": "LOCKFILE_DEPENDENCY_SIGNAL",
+          "level": "warning",
+          "message": {
+            "text": "Audit hashing and encryption usage."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/lib/openzeppelin-contracts/package-lock.json"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "dependency",
+            "severity": "MEDIUM",
+            "category": "Lockfile Dependency Signal",
+            "confidence": "unknown",
+            "recommendation": "Audit hashing and encryption usage."
+          }
+        },
+        {
+          "ruleId": "BLOCKCHAIN_DEPENDENCY",
+          "level": "warning",
+          "message": {
+            "text": "Prepare signing abstractions and wallet security guidance."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/lib/openzeppelin-contracts/package.json"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "dependency",
+            "severity": "MEDIUM",
+            "category": "Blockchain Dependency",
+            "confidence": "unknown",
+            "recommendation": "Prepare signing abstractions and wallet security guidance."
+          }
+        },
+        {
+          "ruleId": "LOCKFILE_DEPENDENCY_SIGNAL",
+          "level": "error",
+          "message": {
+            "text": "Inventory signing flows and prepare a quantum migration roadmap."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/lib/v2-core/yarn.lock"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "dependency",
+            "severity": "HIGH",
+            "category": "Lockfile Dependency Signal",
+            "confidence": "unknown",
+            "recommendation": "Inventory signing flows and prepare a quantum migration roadmap."
+          }
+        },
+        {
+          "ruleId": "LOCKFILE_DEPENDENCY_SIGNAL",
+          "level": "error",
+          "message": {
+            "text": "Inventory signing flows and prepare a quantum migration roadmap."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/lib/v2-periphery/yarn.lock"
+                },
+                "region": {
+                  "startLine": 1
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "dependency",
+            "severity": "HIGH",
+            "category": "Lockfile Dependency Signal",
+            "confidence": "unknown",
+            "recommendation": "Inventory signing flows and prepare a quantum migration roadmap."
+          }
+        },
+        {
+          "ruleId": "HARDCODED_ADDRESS_RISK",
+          "level": "warning",
+          "message": {
+            "text": "Verify hardcoded addresses are intentional, documented, and network-specific."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/dashboard/contracts.js"
+                },
+                "region": {
+                  "startLine": 4
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "attack-surface",
+            "severity": "MEDIUM",
+            "category": "Hardcoded Blockchain Address",
+            "confidence": "unknown",
+            "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific."
+          }
+        },
+        {
+          "ruleId": "HARDCODED_ADDRESS_RISK",
+          "level": "warning",
+          "message": {
+            "text": "Verify hardcoded addresses are intentional, documented, and network-specific."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/dashboard/contracts.js"
+                },
+                "region": {
+                  "startLine": 5
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "attack-surface",
+            "severity": "MEDIUM",
+            "category": "Hardcoded Blockchain Address",
+            "confidence": "unknown",
+            "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific."
+          }
+        },
+        {
+          "ruleId": "HARDCODED_ADDRESS_RISK",
+          "level": "warning",
+          "message": {
+            "text": "Verify hardcoded addresses are intentional, documented, and network-specific."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/dashboard/contracts.js"
+                },
+                "region": {
+                  "startLine": 6
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "attack-surface",
+            "severity": "MEDIUM",
+            "category": "Hardcoded Blockchain Address",
+            "confidence": "unknown",
+            "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific."
+          }
+        },
+        {
+          "ruleId": "HARDCODED_ADDRESS_RISK",
+          "level": "warning",
+          "message": {
+            "text": "Verify hardcoded addresses are intentional, documented, and network-specific."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/script/DeployAISentinel.s.sol"
+                },
+                "region": {
+                  "startLine": 15
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "attack-surface",
+            "severity": "MEDIUM",
+            "category": "Hardcoded Blockchain Address",
+            "confidence": "unknown",
+            "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific."
+          }
+        },
+        {
+          "ruleId": "ADMIN_CENTRALIZATION_RISK",
+          "level": "warning",
+          "message": {
+            "text": "Review admin privileges. Consider multisig, timelocks, and role separation."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverL1.sol"
+                },
+                "region": {
+                  "startLine": 23
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "attack-surface",
+            "severity": "MEDIUM",
+            "category": "Admin Control Risk",
+            "confidence": "unknown",
+            "recommendation": "Review admin privileges. Consider multisig, timelocks, and role separation."
+          }
+        },
+        {
+          "ruleId": "ADMIN_CENTRALIZATION_RISK",
+          "level": "warning",
+          "message": {
+            "text": "Review admin privileges. Consider multisig, timelocks, and role separation."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverL1.sol"
+                },
+                "region": {
+                  "startLine": 30
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "attack-surface",
+            "severity": "MEDIUM",
+            "category": "Admin Control Risk",
+            "confidence": "unknown",
+            "recommendation": "Review admin privileges. Consider multisig, timelocks, and role separation."
+          }
+        },
+        {
+          "ruleId": "HARDCODED_ADDRESS_RISK",
+          "level": "warning",
+          "message": {
+            "text": "Verify hardcoded addresses are intentional, documented, and network-specific."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol"
+                },
+                "region": {
+                  "startLine": 19
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "attack-surface",
+            "severity": "MEDIUM",
+            "category": "Hardcoded Blockchain Address",
+            "confidence": "unknown",
+            "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific."
+          }
+        },
+        {
+          "ruleId": "HARDCODED_ADDRESS_RISK",
+          "level": "warning",
+          "message": {
+            "text": "Verify hardcoded addresses are intentional, documented, and network-specific."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol"
+                },
+                "region": {
+                  "startLine": 20
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "attack-surface",
+            "severity": "MEDIUM",
+            "category": "Hardcoded Blockchain Address",
+            "confidence": "unknown",
+            "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific."
+          }
+        },
+        {
+          "ruleId": "ADMIN_CENTRALIZATION_RISK",
+          "level": "warning",
+          "message": {
+            "text": "Review admin privileges. Consider multisig, timelocks, and role separation."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipL1.sol"
+                },
+                "region": {
+                  "startLine": 25
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "attack-surface",
+            "severity": "MEDIUM",
+            "category": "Admin Control Risk",
+            "confidence": "unknown",
+            "recommendation": "Review admin privileges. Consider multisig, timelocks, and role separation."
+          }
+        },
+        {
+          "ruleId": "ADMIN_CENTRALIZATION_RISK",
+          "level": "warning",
+          "message": {
+            "text": "Review admin privileges. Consider multisig, timelocks, and role separation."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipL1.sol"
+                },
+                "region": {
+                  "startLine": 33
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "attack-surface",
+            "severity": "MEDIUM",
+            "category": "Admin Control Risk",
+            "confidence": "unknown",
+            "recommendation": "Review admin privileges. Consider multisig, timelocks, and role separation."
+          }
+        },
+        {
+          "ruleId": "HARDCODED_ADDRESS_RISK",
+          "level": "warning",
+          "message": {
+            "text": "Verify hardcoded addresses are intentional, documented, and network-specific."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol"
+                },
+                "region": {
+                  "startLine": 16
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "attack-surface",
+            "severity": "MEDIUM",
+            "category": "Hardcoded Blockchain Address",
+            "confidence": "unknown",
+            "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific."
+          }
+        },
+        {
+          "ruleId": "HARDCODED_ADDRESS_RISK",
+          "level": "warning",
+          "message": {
+            "text": "Verify hardcoded addresses are intentional, documented, and network-specific."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol"
+                },
+                "region": {
+                  "startLine": 17
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "attack-surface",
+            "severity": "MEDIUM",
+            "category": "Hardcoded Blockchain Address",
+            "confidence": "unknown",
+            "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific."
+          }
+        },
+        {
+          "ruleId": "ADMIN_CENTRALIZATION_RISK",
+          "level": "warning",
+          "message": {
+            "text": "Review admin privileges. Consider multisig, timelocks, and role separation."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoL1.sol"
+                },
+                "region": {
+                  "startLine": 26
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "attack-surface",
+            "severity": "MEDIUM",
+            "category": "Admin Control Risk",
+            "confidence": "unknown",
+            "recommendation": "Review admin privileges. Consider multisig, timelocks, and role separation."
+          }
+        },
+        {
+          "ruleId": "ADMIN_CENTRALIZATION_RISK",
+          "level": "warning",
+          "message": {
+            "text": "Review admin privileges. Consider multisig, timelocks, and role separation."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoL1.sol"
+                },
+                "region": {
+                  "startLine": 34
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "attack-surface",
+            "severity": "MEDIUM",
+            "category": "Admin Control Risk",
+            "confidence": "unknown",
+            "recommendation": "Review admin privileges. Consider multisig, timelocks, and role separation."
+          }
+        },
+        {
+          "ruleId": "HARDCODED_ADDRESS_RISK",
+          "level": "warning",
+          "message": {
+            "text": "Verify hardcoded addresses are intentional, documented, and network-specific."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoReactive.sol"
+                },
+                "region": {
+                  "startLine": 27
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "attack-surface",
+            "severity": "MEDIUM",
+            "category": "Hardcoded Blockchain Address",
+            "confidence": "unknown",
+            "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific."
+          }
+        },
+        {
+          "ruleId": "HARDCODED_ADDRESS_RISK",
+          "level": "warning",
+          "message": {
+            "text": "Verify hardcoded addresses are intentional, documented, and network-specific."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoReactive.sol"
+                },
+                "region": {
+                  "startLine": 28
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "attack-surface",
+            "severity": "MEDIUM",
+            "category": "Hardcoded Blockchain Address",
+            "confidence": "unknown",
+            "recommendation": "Verify hardcoded addresses are intentional, documented, and network-specific."
+          }
+        },
+        {
+          "ruleId": "MISSING_ACCESS_CONTROL_REVIEW",
+          "level": "warning",
+          "message": {
+            "text": "Review public/external functions for required access control, input validation, and rate limits."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/script/DeployAISentinel.s.sol"
+                },
+                "region": {
+                  "startLine": 12
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "smart-contract-audit",
+            "severity": "MEDIUM",
+            "category": "Access Control Review",
+            "confidence": 68,
+            "recommendation": "Review public/external functions for required access control, input validation, and rate limits."
+          }
+        },
+        {
+          "ruleId": "HARDCODED_ADDRESS",
+          "level": "warning",
+          "message": {
+            "text": "Verify hardcoded addresses are intentional, documented, network-specific, and configurable."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/script/DeployAISentinel.s.sol"
+                },
+                "region": {
+                  "startLine": 15
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "smart-contract-audit",
+            "severity": "MEDIUM",
+            "category": "Configuration Review",
+            "confidence": 40,
+            "recommendation": "Verify hardcoded addresses are intentional, documented, network-specific, and configurable."
+          }
+        },
+        {
+          "ruleId": "TIMESTAMP_DEPENDENCE",
+          "level": "warning",
+          "message": {
+            "text": "Avoid relying on block timestamps for critical randomness, price, or settlement logic."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/ai-sentinel-cross-chain/aisentinelcallback.sol"
+                },
+                "region": {
+                  "startLine": 17
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "smart-contract-audit",
+            "severity": "MEDIUM",
+            "category": "Time Manipulation Risk",
+            "confidence": 60,
+            "recommendation": "Avoid relying on block timestamps for critical randomness, price, or settlement logic."
+          }
+        },
+        {
+          "ruleId": "OWNERADMIN_CONTROL",
+          "level": "error",
+          "message": {
+            "text": "Review admin privileges. Consider multisig, timelock, and least-privilege role design."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverL1.sol"
+                },
+                "region": {
+                  "startLine": 23
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "smart-contract-audit",
+            "severity": "HIGH",
+            "category": "Centralization Review",
+            "confidence": 85,
+            "recommendation": "Review admin privileges. Consider multisig, timelock, and least-privilege role design."
+          }
+        },
+        {
+          "ruleId": "OWNERADMIN_CONTROL",
+          "level": "error",
+          "message": {
+            "text": "Review admin privileges. Consider multisig, timelock, and least-privilege role design."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverL1.sol"
+                },
+                "region": {
+                  "startLine": 30
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "smart-contract-audit",
+            "severity": "HIGH",
+            "category": "Centralization Review",
+            "confidence": 85,
+            "recommendation": "Review admin privileges. Consider multisig, timelock, and least-privilege role design."
+          }
+        },
+        {
+          "ruleId": "MISSING_ACCESS_CONTROL_REVIEW",
+          "level": "error",
+          "message": {
+            "text": "Review public/external functions for required access control, input validation, and rate limits."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol"
+                },
+                "region": {
+                  "startLine": 67
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "smart-contract-audit",
+            "severity": "HIGH",
+            "category": "Access Control Review",
+            "confidence": 85,
+            "recommendation": "Review public/external functions for required access control, input validation, and rate limits."
+          }
+        },
+        {
+          "ruleId": "HARDCODED_ADDRESS",
+          "level": "error",
+          "message": {
+            "text": "Verify hardcoded addresses are intentional, documented, network-specific, and configurable."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol"
+                },
+                "region": {
+                  "startLine": 19
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "smart-contract-audit",
+            "severity": "HIGH",
+            "category": "Configuration Review",
+            "confidence": 72,
+            "recommendation": "Verify hardcoded addresses are intentional, documented, network-specific, and configurable."
+          }
+        },
+        {
+          "ruleId": "HARDCODED_ADDRESS",
+          "level": "error",
+          "message": {
+            "text": "Verify hardcoded addresses are intentional, documented, network-specific, and configurable."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol"
+                },
+                "region": {
+                  "startLine": 20
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "smart-contract-audit",
+            "severity": "HIGH",
+            "category": "Configuration Review",
+            "confidence": 77,
+            "recommendation": "Verify hardcoded addresses are intentional, documented, network-specific, and configurable."
+          }
+        },
+        {
+          "ruleId": "OWNERADMIN_CONTROL",
+          "level": "error",
+          "message": {
+            "text": "Review admin privileges. Consider multisig, timelock, and least-privilege role design."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipL1.sol"
+                },
+                "region": {
+                  "startLine": 25
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "smart-contract-audit",
+            "severity": "HIGH",
+            "category": "Centralization Review",
+            "confidence": 85,
+            "recommendation": "Review admin privileges. Consider multisig, timelock, and least-privilege role design."
+          }
+        },
+        {
+          "ruleId": "OWNERADMIN_CONTROL",
+          "level": "error",
+          "message": {
+            "text": "Review admin privileges. Consider multisig, timelock, and least-privilege role design."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipL1.sol"
+                },
+                "region": {
+                  "startLine": 33
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "smart-contract-audit",
+            "severity": "HIGH",
+            "category": "Centralization Review",
+            "confidence": 85,
+            "recommendation": "Review admin privileges. Consider multisig, timelock, and least-privilege role design."
+          }
+        },
+        {
+          "ruleId": "MISSING_ACCESS_CONTROL_REVIEW",
+          "level": "error",
+          "message": {
+            "text": "Review public/external functions for required access control, input validation, and rate limits."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol"
+                },
+                "region": {
+                  "startLine": 64
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "smart-contract-audit",
+            "severity": "HIGH",
+            "category": "Access Control Review",
+            "confidence": 85,
+            "recommendation": "Review public/external functions for required access control, input validation, and rate limits."
+          }
+        },
+        {
+          "ruleId": "HARDCODED_ADDRESS",
+          "level": "error",
+          "message": {
+            "text": "Verify hardcoded addresses are intentional, documented, network-specific, and configurable."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol"
+                },
+                "region": {
+                  "startLine": 16
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "smart-contract-audit",
+            "severity": "HIGH",
+            "category": "Configuration Review",
+            "confidence": 72,
+            "recommendation": "Verify hardcoded addresses are intentional, documented, network-specific, and configurable."
+          }
+        },
+        {
+          "ruleId": "HARDCODED_ADDRESS",
+          "level": "error",
+          "message": {
+            "text": "Verify hardcoded addresses are intentional, documented, network-specific, and configurable."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol"
+                },
+                "region": {
+                  "startLine": 17
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "smart-contract-audit",
+            "severity": "HIGH",
+            "category": "Configuration Review",
+            "confidence": 77,
+            "recommendation": "Verify hardcoded addresses are intentional, documented, network-specific, and configurable."
+          }
+        },
+        {
+          "ruleId": "UNBOUNDED_LOOP_RISK",
+          "level": "error",
+          "message": {
+            "text": "Review loops for unbounded iteration and gas exhaustion risk."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol"
+                },
+                "region": {
+                  "startLine": 86
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "smart-contract-audit",
+            "severity": "HIGH",
+            "category": "Gas Risk",
+            "confidence": 77,
+            "recommendation": "Review loops for unbounded iteration and gas exhaustion risk."
+          }
+        },
+        {
+          "ruleId": "OWNERADMIN_CONTROL",
+          "level": "error",
+          "message": {
+            "text": "Review admin privileges. Consider multisig, timelock, and least-privilege role design."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoL1.sol"
+                },
+                "region": {
+                  "startLine": 26
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "smart-contract-audit",
+            "severity": "HIGH",
+            "category": "Centralization Review",
+            "confidence": 85,
+            "recommendation": "Review admin privileges. Consider multisig, timelock, and least-privilege role design."
+          }
+        },
+        {
+          "ruleId": "OWNERADMIN_CONTROL",
+          "level": "error",
+          "message": {
+            "text": "Review admin privileges. Consider multisig, timelock, and least-privilege role design."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoL1.sol"
+                },
+                "region": {
+                  "startLine": 34
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "smart-contract-audit",
+            "severity": "HIGH",
+            "category": "Centralization Review",
+            "confidence": 85,
+            "recommendation": "Review admin privileges. Consider multisig, timelock, and least-privilege role design."
+          }
+        },
+        {
+          "ruleId": "MISSING_ACCESS_CONTROL_REVIEW",
+          "level": "error",
+          "message": {
+            "text": "Review public/external functions for required access control, input validation, and rate limits."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoReactive.sol"
+                },
+                "region": {
+                  "startLine": 74
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "smart-contract-audit",
+            "severity": "HIGH",
+            "category": "Access Control Review",
+            "confidence": 85,
+            "recommendation": "Review public/external functions for required access control, input validation, and rate limits."
+          }
+        },
+        {
+          "ruleId": "HARDCODED_ADDRESS",
+          "level": "error",
+          "message": {
+            "text": "Verify hardcoded addresses are intentional, documented, network-specific, and configurable."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoReactive.sol"
+                },
+                "region": {
+                  "startLine": 27
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "smart-contract-audit",
+            "severity": "HIGH",
+            "category": "Configuration Review",
+            "confidence": 77,
+            "recommendation": "Verify hardcoded addresses are intentional, documented, network-specific, and configurable."
+          }
+        },
+        {
+          "ruleId": "HARDCODED_ADDRESS",
+          "level": "error",
+          "message": {
+            "text": "Verify hardcoded addresses are intentional, documented, network-specific, and configurable."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoReactive.sol"
+                },
+                "region": {
+                  "startLine": 28
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "smart-contract-audit",
+            "severity": "HIGH",
+            "category": "Configuration Review",
+            "confidence": 77,
+            "recommendation": "Verify hardcoded addresses are intentional, documented, network-specific, and configurable."
+          }
+        },
+        {
+          "ruleId": "UNBOUNDED_LOOP_RISK",
+          "level": "error",
+          "message": {
+            "text": "Review loops for unbounded iteration and gas exhaustion risk."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "Users/user/reactive-smart-contract-demos/src/legacy/uniswap-v2-history/UniswapHistoryDemoReactive.sol"
+                },
+                "region": {
+                  "startLine": 85
+                }
+              }
+            }
+          ],
+          "properties": {
+            "source": "smart-contract-audit",
+            "severity": "HIGH",
+            "category": "Gas Risk",
+            "confidence": 77,
+            "recommendation": "Review loops for unbounded iteration and gas exhaustion risk."
+          }
+        }
+      ]
+    }
+  ]
+}
