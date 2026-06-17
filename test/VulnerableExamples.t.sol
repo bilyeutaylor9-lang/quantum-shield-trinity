@@ -20,29 +20,33 @@ contract VulnerableExamplesTest is Test {
         vm.deal(user, 10 ether);
         vm.deal(attacker, 10 ether);
 
-        vm.prank(owner, owner);
+        vm.startPrank(owner, owner);
         vault = new VulnerableVault();
+        vm.stopPrank();
     }
 
     function testDepositWorks() public {
-        vm.prank(user);
+        vm.startPrank(user);
         vault.deposit{value: 1 ether}();
+        vm.stopPrank();
 
         assertEq(vault.balances(user), 1 ether);
     }
 
     function testReentrancyAttackDeploys() public {
-        vm.prank(attacker);
+        vm.startPrank(attacker);
         ReentrancyAttacker attack =
             new ReentrancyAttacker(address(vault));
+        vm.stopPrank();
 
         assertEq(attack.owner(), attacker);
     }
 
     function testTxOriginPhishingContractDeploys() public {
-        vm.prank(attacker);
+        vm.startPrank(attacker);
         TxOriginPhishingAttack phishing =
             new TxOriginPhishingAttack(address(vault));
+        vm.stopPrank();
 
         assertEq(phishing.attacker(), attacker);
     }
