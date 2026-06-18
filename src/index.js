@@ -12,6 +12,7 @@ import { aiAgentRiskEngine } from "./engines/aiAgentRiskEngine.js";
 import { mcpSecurityEngine } from "./engines/mcpSecurityEngine.js";
 import { ragSecurityEngine } from "./engines/ragSecurityEngine.js";
 import { agentMemorySecurityEngine } from "./engines/agentMemorySecurityEngine.js";
+import { modelSupplyChainSecurityEngine } from "./engines/modelSupplyChainSecurityEngine.js";
 import { exploitSimulationEngine } from "./engines/exploitSimulationEngine.js";
 import { securityScoreEngine } from "./engines/securityScoreEngine.js";
 import { remediationEngine } from "./engines/remediationEngine.js";
@@ -58,6 +59,7 @@ export {
   mcpSecurityEngine,
   ragSecurityEngine,
   agentMemorySecurityEngine,
+  modelSupplyChainSecurityEngine,
   exploitSimulationEngine,
   securityScoreEngine,
   remediationEngine,
@@ -232,6 +234,9 @@ const buildNormalizedFindingsReport = (report = {}, runtimeOptions = {}) => {
     ),
     ...(report.agentMemorySecurityReport?.findings ?? []).map((item) =>
       normalizeFindingShape(item, "agentMemorySecurityEngine")
+    ),
+    ...(report.modelSupplyChainSecurityReport?.findings ?? []).map((item) =>
+      normalizeFindingShape(item, "modelSupplyChainSecurityEngine")
     ),
     ...(report.smartContractContextReport?.contexts ?? []).map((item) =>
       normalizeFindingShape(item, "smartContractContextEngine")
@@ -700,6 +705,10 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
     agentMemorySecurityEngine(scanResult.files)
   );
 
+  const modelSupplyChainSecurityReport = timedStep("modelSupplyChainSecurityEngine", () =>
+    modelSupplyChainSecurityEngine(scanResult.files)
+  );
+
   const aiAgentRiskReport = timedStep("aiAgentRiskEngine", () =>
     aiAgentRiskEngine({
       files: scanResult.files,
@@ -808,6 +817,7 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
     mcpSecurityReport,
     ragSecurityReport,
     agentMemorySecurityReport,
+    modelSupplyChainSecurityReport,
     aiAgentRiskReport,
     smartContractContextReport,
     quantumReadinessReport,
@@ -847,6 +857,7 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
       mcpSecurityReport,
       ragSecurityReport,
       agentMemorySecurityReport,
+      modelSupplyChainSecurityReport,
       aiAgentRiskReport,
       smartContractContextReport,
       exploitSimulationReport,
@@ -898,6 +909,7 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
       { engine: "mcpSecurityEngine", items: mcpSecurityReport.findings },
       { engine: "ragSecurityEngine", items: ragSecurityReport.findings },
       { engine: "agentMemorySecurityEngine", items: agentMemorySecurityReport.findings },
+      { engine: "modelSupplyChainSecurityEngine", items: modelSupplyChainSecurityReport.findings },
       { engine: "aiAgentRiskEngine", items: aiAgentRiskReport.findings },
       { engine: "smartContractContextEngine", items: smartContractContextReport.contexts },
       { engine: "codeFlowScannerEngine", items: codeFlowReport.findings },
@@ -970,6 +982,10 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
         agentMemoryRiskScore: agentMemorySecurityReport.summary?.riskScore ?? null,
         agentMemoryFindings: agentMemorySecurityReport.summary?.totalFindings ?? 0,
         agentMemoryMissingControls: agentMemorySecurityReport.summary?.missingControls ?? 0,
+        modelSupplyChainRiskLevel: modelSupplyChainSecurityReport.summary?.riskLevel ?? "UNKNOWN",
+        modelSupplyChainRiskScore: modelSupplyChainSecurityReport.summary?.riskScore ?? null,
+        modelSupplyChainFindings: modelSupplyChainSecurityReport.summary?.totalFindings ?? 0,
+        modelSupplyChainMissingControls: modelSupplyChainSecurityReport.summary?.missingControls ?? 0,
         aiAgentRiskLevel: aiAgentRiskReport.summary?.riskLevel ?? "UNKNOWN",
         aiAgentRiskScore: aiAgentRiskReport.summary?.riskScore ?? null,
         aiAgentRiskFindings: aiAgentRiskReport.summary?.totalFindings ?? 0,
@@ -1002,6 +1018,7 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
       { engine: "mcpSecurityEngine", items: mcpSecurityReport.findings },
       { engine: "ragSecurityEngine", items: ragSecurityReport.findings },
       { engine: "agentMemorySecurityEngine", items: agentMemorySecurityReport.findings },
+      { engine: "modelSupplyChainSecurityEngine", items: modelSupplyChainSecurityReport.findings },
       { engine: "aiAgentRiskEngine", items: aiAgentRiskReport.findings },
       { engine: "smartContractContextEngine", items: smartContractContextReport.contexts },
       { engine: "codeFlowScannerEngine", items: codeFlowReport.findings },
@@ -1186,6 +1203,15 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
     )
   );
 
+  timedStep("evidenceGraph.add.modelSupplyChainSecurityEngine", () =>
+    addEvidenceItemsToGraph(
+      evidenceGraph,
+      limitEvidenceItems(modelSupplyChainSecurityReport.findings, runtimeOptions.maxEvidenceItems),
+      "modelSupplyChainSecurityEngine",
+      "model_supply_chain_security"
+    )
+  );
+
   timedStep("evidenceGraph.add.aiAgentRiskEngine", () =>
     addEvidenceItemsToGraph(
       evidenceGraph,
@@ -1323,6 +1349,7 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
       mcpSecurityReport,
       ragSecurityReport,
       agentMemorySecurityReport,
+      modelSupplyChainSecurityReport,
       aiAgentRiskReport,
       dependencyBehaviorReport: report.dependencyBehaviorReport,
       semanticConfigReport: report.semanticConfigReport
@@ -1348,7 +1375,7 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
       ...report,
       executiveReport: { summary },
       assessmentReport: report.securityAssessmentReport ?? report.assessmentReport ?? {},
-      auditReport: { smartContractAuditReport, reactiveSecurityReport, promptInjectionReport, agentDiscoveryReport, toolPermissionReport, mcpSecurityReport, ragSecurityReport, agentMemorySecurityReport, aiAgentRiskReport, securityAuditLoopReport },
+      auditReport: { smartContractAuditReport, reactiveSecurityReport, promptInjectionReport, agentDiscoveryReport, toolPermissionReport, mcpSecurityReport, ragSecurityReport, agentMemorySecurityReport, modelSupplyChainSecurityReport, aiAgentRiskReport, securityAuditLoopReport },
       riskProfile: {
         wallet: walletReport,
         inventory: {
@@ -1409,6 +1436,13 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
           totalFindings: agentMemorySecurityReport.summary?.totalFindings ?? 0,
           capabilities: agentMemorySecurityReport.summary?.detectedCapabilities ?? [],
           missingControls: agentMemorySecurityReport.summary?.missingControls ?? 0
+        },
+        modelSupplyChainSecurity: {
+          riskLevel: modelSupplyChainSecurityReport.summary?.riskLevel ?? "UNKNOWN",
+          riskScore: modelSupplyChainSecurityReport.summary?.riskScore ?? null,
+          totalFindings: modelSupplyChainSecurityReport.summary?.totalFindings ?? 0,
+          capabilities: modelSupplyChainSecurityReport.summary?.detectedCapabilities ?? [],
+          missingControls: modelSupplyChainSecurityReport.summary?.missingControls ?? 0
         },
         aiAgentRisk: {
           riskLevel: aiAgentRiskReport.summary?.riskLevel ?? "UNKNOWN",
@@ -1539,6 +1573,17 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
           capabilities: agentMemorySecurityReport.summary?.detectedCapabilities ?? [],
           missingControls: agentMemorySecurityReport.summary?.missingControls ?? 0
         },
+        modelSupplyChainSecurity: {
+          riskLevel: modelSupplyChainSecurityReport.summary?.riskLevel ?? "UNKNOWN",
+          riskScore: modelSupplyChainSecurityReport.summary?.riskScore ?? null,
+          findings: modelSupplyChainSecurityReport.summary?.totalFindings ?? 0,
+          critical: modelSupplyChainSecurityReport.summary?.critical ?? 0,
+          high: modelSupplyChainSecurityReport.summary?.high ?? 0,
+          medium: modelSupplyChainSecurityReport.summary?.medium ?? 0,
+          low: modelSupplyChainSecurityReport.summary?.low ?? 0,
+          capabilities: modelSupplyChainSecurityReport.summary?.detectedCapabilities ?? [],
+          missingControls: modelSupplyChainSecurityReport.summary?.missingControls ?? 0
+        },
         aiAgentRisk: {
           riskLevel: aiAgentRiskReport.summary?.riskLevel ?? "UNKNOWN",
           riskScore: aiAgentRiskReport.summary?.riskScore ?? null,
@@ -1607,6 +1652,7 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
     mcpSecurityReport,
     ragSecurityReport,
     agentMemorySecurityReport,
+    modelSupplyChainSecurityReport,
     aiAgentRiskReport,
     profile: runtimeOptions.profile
   });
@@ -1672,6 +1718,15 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
   console.log(`[QST] Findings: ${agentMemorySecurityReport.summary?.totalFindings ?? 0}`);
   console.log(`[QST] Memory Capabilities: ${(agentMemorySecurityReport.summary?.detectedCapabilities ?? []).join(", ") || "None"}`);
   console.log(`[QST] Missing Controls: ${agentMemorySecurityReport.summary?.missingControls ?? 0}`);
+
+  console.log("");
+  console.log("[QST] Model Supply Chain Security");
+  console.log("---------------------------------");
+  console.log(`[QST] Risk Score: ${modelSupplyChainSecurityReport.summary?.riskScore ?? "N/A"}`);
+  console.log(`[QST] Risk Level: ${modelSupplyChainSecurityReport.summary?.riskLevel ?? "UNKNOWN"}`);
+  console.log(`[QST] Findings: ${modelSupplyChainSecurityReport.summary?.totalFindings ?? 0}`);
+  console.log(`[QST] Model Capabilities: ${(modelSupplyChainSecurityReport.summary?.detectedCapabilities ?? []).join(", ") || "None"}`);
+  console.log(`[QST] Missing Controls: ${modelSupplyChainSecurityReport.summary?.missingControls ?? 0}`);
 
   console.log("");
   console.log("[QST] AI Agent Risk");
