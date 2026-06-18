@@ -1,6 +1,5 @@
-// src/index.js
 // Quantum Shield Trinity v2.5.0
-// Upgraded with Reactive Security Engine + Prompt Injection AI Security Engine + Agent Discovery Engine + Tool Permission Engine wiring
+// Upgraded with Reactive Security Engine + Prompt Injection AI Security Engine + Agent Discovery Engine + Tool Permission Engine + AI Agent Risk Engine wiring
 
 import { fileScanner } from "./scanners/fileScanner.js";
 import { repositoryScannerEngine } from "./engines/repositoryScannerEngine.js";
@@ -12,6 +11,7 @@ import { reactiveSecurityEngine } from "./engines/reactiveSecurityEngine.js";
 import { promptInjectionEngine } from "./engines/promptInjectionEngine.js";
 import { agentDiscoveryEngine } from "./engines/agentDiscoveryEngine.js";
 import { toolPermissionEngine } from "./engines/toolPermissionEngine.js";
+import { aiAgentRiskEngine } from "./engines/aiAgentRiskEngine.js";
 import { exploitSimulationEngine } from "./engines/exploitSimulationEngine.js";
 import { securityScoreEngine } from "./engines/securityScoreEngine.js";
 import { remediationEngine } from "./engines/remediationEngine.js";
@@ -54,6 +54,7 @@ export {
   promptInjectionEngine,
   agentDiscoveryEngine,
   toolPermissionEngine,
+  aiAgentRiskEngine,
   exploitSimulationEngine,
   securityScoreEngine,
   remediationEngine,
@@ -216,6 +217,9 @@ const buildNormalizedFindingsReport = (report = {}, runtimeOptions = {}) => {
     ),
     ...(report.toolPermissionReport?.findings ?? []).map((item) =>
       normalizeFindingShape(item, "toolPermissionEngine")
+    ),
+    ...(report.aiAgentRiskReport?.findings ?? []).map((item) =>
+      normalizeFindingShape(item, "aiAgentRiskEngine")
     ),
     ...(report.smartContractContextReport?.contexts ?? []).map((item) =>
       normalizeFindingShape(item, "smartContractContextEngine")
@@ -672,6 +676,15 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
     toolPermissionEngine(scanResult.files)
   );
 
+  const aiAgentRiskReport = timedStep("aiAgentRiskEngine", () =>
+    aiAgentRiskEngine({
+      files: scanResult.files,
+      agentDiscoveryReport,
+      toolPermissionReport,
+      promptInjectionReport
+    })
+  );
+
   const quantumReadinessReport = timedStep("quantumReadinessEngine", () =>
     quantumReadinessEngine(scanResult.files)
   );
@@ -767,6 +780,7 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
     promptInjectionReport,
     agentDiscoveryReport,
     toolPermissionReport,
+    aiAgentRiskReport,
     smartContractContextReport,
     quantumReadinessReport,
     cryptoInventoryReport,
@@ -802,6 +816,7 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
       promptInjectionReport,
       agentDiscoveryReport,
       toolPermissionReport,
+      aiAgentRiskReport,
       smartContractContextReport,
       exploitSimulationReport,
       quantumReadinessReport,
@@ -849,6 +864,7 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
       { engine: "promptInjectionEngine", items: promptInjectionReport.findings },
       { engine: "agentDiscoveryEngine", items: agentDiscoveryReport.findings },
       { engine: "toolPermissionEngine", items: toolPermissionReport.findings },
+      { engine: "aiAgentRiskEngine", items: aiAgentRiskReport.findings },
       { engine: "smartContractContextEngine", items: smartContractContextReport.contexts },
       { engine: "codeFlowScannerEngine", items: codeFlowReport.findings },
       { engine: "routeExposureEngine", items: routeExposureReport.findings },
@@ -906,6 +922,9 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
         detectedToolCapabilities: toolPermissionReport.summary?.totalCapabilities ?? 0,
         missingToolApprovalGates: toolPermissionReport.summary?.missingApprovalGates ?? 0,
         missingToolPermissionPolicies: toolPermissionReport.summary?.missingPermissionPolicies ?? 0,
+        aiAgentRiskLevel: aiAgentRiskReport.summary?.riskLevel ?? "UNKNOWN",
+        aiAgentRiskScore: aiAgentRiskReport.summary?.riskScore ?? null,
+        aiAgentRiskFindings: aiAgentRiskReport.summary?.totalFindings ?? 0,
         codeFlowRiskLevel: codeFlowReport.riskLevel,
         routeExposureRiskLevel: routeExposureReport.routeExposureRiskLevel,
         trustBoundaryRiskLevel: trustBoundaryReport.trustBoundaryRiskLevel,
@@ -932,6 +951,7 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
       { engine: "promptInjectionEngine", items: promptInjectionReport.findings },
       { engine: "agentDiscoveryEngine", items: agentDiscoveryReport.findings },
       { engine: "toolPermissionEngine", items: toolPermissionReport.findings },
+      { engine: "aiAgentRiskEngine", items: aiAgentRiskReport.findings },
       { engine: "smartContractContextEngine", items: smartContractContextReport.contexts },
       { engine: "codeFlowScannerEngine", items: codeFlowReport.findings },
       { engine: "routeExposureEngine", items: routeExposureReport.findings },
@@ -1088,6 +1108,15 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
     )
   );
 
+  timedStep("evidenceGraph.add.aiAgentRiskEngine", () =>
+    addEvidenceItemsToGraph(
+      evidenceGraph,
+      limitEvidenceItems(aiAgentRiskReport.findings, runtimeOptions.maxEvidenceItems),
+      "aiAgentRiskEngine",
+      "ai_agent_risk"
+    )
+  );
+
   timedStep("evidenceGraph.add.smartContractContextEngine", () =>
     addEvidenceItemsToGraph(
       evidenceGraph,
@@ -1213,6 +1242,7 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
       promptInjectionReport,
       agentDiscoveryReport,
       toolPermissionReport,
+      aiAgentRiskReport,
       dependencyBehaviorReport: report.dependencyBehaviorReport,
       semanticConfigReport: report.semanticConfigReport
     })
@@ -1237,7 +1267,7 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
       ...report,
       executiveReport: { summary },
       assessmentReport: report.securityAssessmentReport ?? report.assessmentReport ?? {},
-      auditReport: { smartContractAuditReport, reactiveSecurityReport, promptInjectionReport, agentDiscoveryReport, toolPermissionReport, securityAuditLoopReport },
+      auditReport: { smartContractAuditReport, reactiveSecurityReport, promptInjectionReport, agentDiscoveryReport, toolPermissionReport, aiAgentRiskReport, securityAuditLoopReport },
       riskProfile: {
         wallet: walletReport,
         inventory: {
@@ -1275,6 +1305,11 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
           capabilities: toolPermissionReport.summary?.detectedCapabilities ?? [],
           missingApprovalGates: toolPermissionReport.summary?.missingApprovalGates ?? 0,
           missingPermissionPolicies: toolPermissionReport.summary?.missingPermissionPolicies ?? 0
+        },
+        aiAgentRisk: {
+          riskLevel: aiAgentRiskReport.summary?.riskLevel ?? "UNKNOWN",
+          riskScore: aiAgentRiskReport.summary?.riskScore ?? null,
+          totalFindings: aiAgentRiskReport.summary?.totalFindings ?? 0
         },
         normalizedFindings: {
           total: normalizedFindingsReport.totalFindingsAfterFilter,
@@ -1365,6 +1400,15 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
           missingApprovalGates: toolPermissionReport.summary?.missingApprovalGates ?? 0,
           missingPermissionPolicies: toolPermissionReport.summary?.missingPermissionPolicies ?? 0
         },
+        aiAgentRisk: {
+          riskLevel: aiAgentRiskReport.summary?.riskLevel ?? "UNKNOWN",
+          riskScore: aiAgentRiskReport.summary?.riskScore ?? null,
+          findings: aiAgentRiskReport.summary?.totalFindings ?? 0,
+          critical: aiAgentRiskReport.summary?.critical ?? 0,
+          high: aiAgentRiskReport.summary?.high ?? 0,
+          medium: aiAgentRiskReport.summary?.medium ?? 0,
+          low: aiAgentRiskReport.summary?.low ?? 0
+        },
         deepScan: {
           codeFlowRiskLevel: codeFlowReport.riskLevel,
           routeExposureRiskLevel: routeExposureReport.routeExposureRiskLevel,
@@ -1421,6 +1465,7 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
     promptInjectionReport,
     agentDiscoveryReport,
     toolPermissionReport,
+    aiAgentRiskReport,
     profile: runtimeOptions.profile
   });
 
@@ -1456,6 +1501,13 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
   console.log(`[QST] Tool Capabilities: ${(toolPermissionReport.summary?.detectedCapabilities ?? []).join(", ") || "None"}`);
   console.log(`[QST] Missing Approval Gates: ${toolPermissionReport.summary?.missingApprovalGates ?? 0}`);
   console.log(`[QST] Missing Permission Policies: ${toolPermissionReport.summary?.missingPermissionPolicies ?? 0}`);
+
+  console.log("");
+  console.log("[QST] AI Agent Risk");
+  console.log("-------------------");
+  console.log(`[QST] Risk Score: ${aiAgentRiskReport.summary?.riskScore ?? "N/A"}`);
+  console.log(`[QST] Risk Level: ${aiAgentRiskReport.summary?.riskLevel ?? "UNKNOWN"}`);
+  console.log(`[QST] Findings: ${aiAgentRiskReport.summary?.totalFindings ?? 0}`);
 
   console.log("");
   console.log("[QST] Normalized Findings");
