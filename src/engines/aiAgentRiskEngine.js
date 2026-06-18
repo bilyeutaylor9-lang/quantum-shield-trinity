@@ -1,21 +1,5 @@
 
- * Quantum Shield Trinity
- * AI Agent Risk Engine
- *
- * Purpose:
- * Correlates AI-agent discovery, prompt-injection exposure, and tool permissions
- * into higher-level agent weaponization risk.
- *
- * Detects:
- * - autonomous execution
- * - recursive agent loops
- * - self-modifying prompts/agents
- * - agent-to-agent communication
- * - tool escalation chains
- * - prompt-injection-to-tool-abuse chains
- * - missing approval gates on powerful agents
- * - unsafe multi-agent orchestration
- */
+
 
 const SUPPORTED_EXTENSIONS = [
   ".js",
