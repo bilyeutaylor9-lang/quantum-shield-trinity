@@ -1,4 +1,4 @@
-src/index.js
+src
 // Quantum Shield Trinity v2.5.0
 // Upgraded with Reactive Security Engine + Prompt Injection AI Security Engine wiring
 
