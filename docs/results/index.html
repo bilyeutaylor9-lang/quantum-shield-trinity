@@ -130,12 +130,12 @@
 
       <div class="card">
         <div class="label">Risk Level</div>
-        <div class="value risk-high">HIGH</div>
+        <div class="value risk-critical">CRITICAL</div>
       </div>
 
       <div class="card">
         <div class="label">Grade</div>
-        <div class="value">D</div>
+        <div class="value">F</div>
       </div>
 
       <div class="card">
@@ -154,7 +154,7 @@
       <div class="card">
         <div class="label">AutoFix Suggestions</div>
         <div class="value">50</div>
-        <div class="small">0 safe fixes</div>
+        <div class="small">16 safe fixes</div>
       </div>
 
       <div class="card">
@@ -165,7 +165,7 @@
 
       <div class="card">
         <div class="label">CWE / OWASP Mapped</div>
-        <div class="value">79</div>
+        <div class="value">100</div>
         <div class="small">Compliance references</div>
       </div>
     </div>
@@ -180,19 +180,19 @@
         </tr>
         <tr>
           <td>Files Scanned</td>
-          <td>52</td>
+          <td>57</td>
         </tr>
         <tr>
           <td>Critical Findings</td>
-          <td class="risk-critical">0</td>
+          <td class="risk-critical">92</td>
         </tr>
         <tr>
           <td>High Findings</td>
-          <td class="risk-high">34</td>
+          <td class="risk-high">350</td>
         </tr>
         <tr>
           <td>Medium Findings</td>
-          <td class="risk-medium">24</td>
+          <td class="risk-medium">124</td>
         </tr>
         <tr>
           <td>Low Findings</td>
@@ -201,83 +201,12 @@
       </table>
 
       <h3>Top Priority</h3>
-      <p>Prioritize high-risk findings and reduce exposed attack paths.</p>
+      <p>Immediately address critical findings before deployment.</p>
     </div>
 
     <div class="section">
       <h2>Smart Contract Audit</h2>
-      <table>
-    <thead>
-      <tr>
-        <th>Severity</th>
-        <th>Finding</th>
-        <th>File</th>
-        <th>Line</th>
-        <th>Recommendation</th>
-      </tr>
-    </thead>
-    <tbody><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Owner/Admin Control</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverL1.sol</td>
-        <td>23</td>
-        <td>Review admin privileges. Consider multisig, timelock, and least-privilege role design.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Owner/Admin Control</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverL1.sol</td>
-        <td>30</td>
-        <td>Review admin privileges. Consider multisig, timelock, and least-privilege role design.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Missing Access Control Review</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol</td>
-        <td>67</td>
-        <td>Review public/external functions for required access control, input validation, and rate limits.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Hardcoded Address</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol</td>
-        <td>19</td>
-        <td>Verify hardcoded addresses are intentional, documented, network-specific, and configurable.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Hardcoded Address</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol</td>
-        <td>20</td>
-        <td>Verify hardcoded addresses are intentional, documented, network-specific, and configurable.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Owner/Admin Control</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipL1.sol</td>
-        <td>25</td>
-        <td>Review admin privileges. Consider multisig, timelock, and least-privilege role design.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Owner/Admin Control</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipL1.sol</td>
-        <td>33</td>
-        <td>Review admin privileges. Consider multisig, timelock, and least-privilege role design.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Missing Access Control Review</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol</td>
-        <td>64</td>
-        <td>Review public/external functions for required access control, input validation, and rate limits.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Hardcoded Address</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol</td>
-        <td>16</td>
-        <td>Verify hardcoded addresses are intentional, documented, network-specific, and configurable.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Hardcoded Address</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol</td>
-        <td>17</td>
-        <td>Verify hardcoded addresses are intentional, documented, network-specific, and configurable.</td>
-      </tr></tbody>
-  </table>
+      <p>No smart contract findings detected.</p>
     </div>
 
     <div class="section">
@@ -294,75 +223,75 @@
       </tr>
     </thead>
     <tbody><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Owner/Admin Control Attack Path</td>
-        <td>Public or externally reachable code path</td>
-        <td>Potential security, reliability, or operational risk.</td>
-        <td>Medium-High</td>
-        <td>Review the affected path, add validation, reduce privileges, and re-run the scan.</td>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk Attack Path</td>
+        <td>Low-level delegatecall execution path</td>
+        <td>Potential storage takeover, privilege escalation, or arbitrary logic execution.</td>
+        <td>High</td>
+        <td>Restrict delegatecall targets, require trusted implementations, and protect upgrade controls.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk Attack Path</td>
+        <td>Low-level delegatecall execution path</td>
+        <td>Potential storage takeover, privilege escalation, or arbitrary logic execution.</td>
+        <td>High</td>
+        <td>Restrict delegatecall targets, require trusted implementations, and protect upgrade controls.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk Attack Path</td>
+        <td>Low-level delegatecall execution path</td>
+        <td>Potential storage takeover, privilege escalation, or arbitrary logic execution.</td>
+        <td>High</td>
+        <td>Restrict delegatecall targets, require trusted implementations, and protect upgrade controls.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk Attack Path</td>
+        <td>Low-level delegatecall execution path</td>
+        <td>Potential storage takeover, privilege escalation, or arbitrary logic execution.</td>
+        <td>High</td>
+        <td>Restrict delegatecall targets, require trusted implementations, and protect upgrade controls.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk Attack Path</td>
+        <td>Low-level delegatecall execution path</td>
+        <td>Potential storage takeover, privilege escalation, or arbitrary logic execution.</td>
+        <td>High</td>
+        <td>Restrict delegatecall targets, require trusted implementations, and protect upgrade controls.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk Attack Path</td>
+        <td>Low-level delegatecall execution path</td>
+        <td>Potential storage takeover, privilege escalation, or arbitrary logic execution.</td>
+        <td>High</td>
+        <td>Restrict delegatecall targets, require trusted implementations, and protect upgrade controls.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk Attack Path</td>
+        <td>Low-level delegatecall execution path</td>
+        <td>Potential storage takeover, privilege escalation, or arbitrary logic execution.</td>
+        <td>High</td>
+        <td>Restrict delegatecall targets, require trusted implementations, and protect upgrade controls.</td>
       </tr><tr>
         <td><span class="badge risk-high">HIGH</span></td>
-        <td>Owner/Admin Control Attack Path</td>
-        <td>Public or externally reachable code path</td>
-        <td>Potential security, reliability, or operational risk.</td>
+        <td>tx.origin Risk Attack Path</td>
+        <td>Authorization check using tx.origin</td>
+        <td>Potential authorization bypass through phishing-style contract calls.</td>
         <td>Medium-High</td>
-        <td>Review the affected path, add validation, reduce privileges, and re-run the scan.</td>
+        <td>Replace tx.origin with msg.sender and enforce explicit role-based access control.</td>
       </tr><tr>
         <td><span class="badge risk-high">HIGH</span></td>
-        <td>Missing Access Control Review Attack Path</td>
-        <td>Public or externally reachable code path</td>
-        <td>Potential security, reliability, or operational risk.</td>
+        <td>tx.origin Risk Attack Path</td>
+        <td>Authorization check using tx.origin</td>
+        <td>Potential authorization bypass through phishing-style contract calls.</td>
         <td>Medium-High</td>
-        <td>Review the affected path, add validation, reduce privileges, and re-run the scan.</td>
+        <td>Replace tx.origin with msg.sender and enforce explicit role-based access control.</td>
       </tr><tr>
         <td><span class="badge risk-high">HIGH</span></td>
-        <td>Hardcoded Address Attack Path</td>
-        <td>Network-specific address dependency</td>
-        <td>Potential network migration failure or dependency misrouting.</td>
+        <td>tx.origin Risk Attack Path</td>
+        <td>Authorization check using tx.origin</td>
+        <td>Potential authorization bypass through phishing-style contract calls.</td>
         <td>Medium-High</td>
-        <td>Move addresses into deployment configuration, constructor parameters, or verified registry contracts.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Hardcoded Address Attack Path</td>
-        <td>Network-specific address dependency</td>
-        <td>Potential network migration failure or dependency misrouting.</td>
-        <td>Medium-High</td>
-        <td>Move addresses into deployment configuration, constructor parameters, or verified registry contracts.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Owner/Admin Control Attack Path</td>
-        <td>Public or externally reachable code path</td>
-        <td>Potential security, reliability, or operational risk.</td>
-        <td>Medium-High</td>
-        <td>Review the affected path, add validation, reduce privileges, and re-run the scan.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Owner/Admin Control Attack Path</td>
-        <td>Public or externally reachable code path</td>
-        <td>Potential security, reliability, or operational risk.</td>
-        <td>Medium-High</td>
-        <td>Review the affected path, add validation, reduce privileges, and re-run the scan.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Missing Access Control Review Attack Path</td>
-        <td>Public or externally reachable code path</td>
-        <td>Potential security, reliability, or operational risk.</td>
-        <td>Medium-High</td>
-        <td>Review the affected path, add validation, reduce privileges, and re-run the scan.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Hardcoded Address Attack Path</td>
-        <td>Network-specific address dependency</td>
-        <td>Potential network migration failure or dependency misrouting.</td>
-        <td>Medium-High</td>
-        <td>Move addresses into deployment configuration, constructor parameters, or verified registry contracts.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Hardcoded Address Attack Path</td>
-        <td>Network-specific address dependency</td>
-        <td>Potential network migration failure or dependency misrouting.</td>
-        <td>Medium-High</td>
-        <td>Move addresses into deployment configuration, constructor parameters, or verified registry contracts.</td>
+        <td>Replace tx.origin with msg.sender and enforce explicit role-based access control.</td>
       </tr></tbody>
   </table>
     </div>
@@ -381,75 +310,75 @@
       </tr>
     </thead>
     <tbody><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Owner/Admin Control</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverL1.sol</td>
-        <td>23</td>
-        <td>MEDIUM</td>
-        <td>Review the affected code path, reduce privileges, add validation, and re-run the scan.</td>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>src/engines/attackPathGeneratorEngine.js</td>
+        <td>52</td>
+        <td>LOW</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict target implementations and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>src/engines/attackPathGeneratorEngine.js</td>
+        <td>75</td>
+        <td>LOW</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict target implementations and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>src/engines/attackPathGeneratorEngine.js</td>
+        <td>77</td>
+        <td>LOW</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict target implementations and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>src/engines/attackPathGeneratorEngine.js</td>
+        <td>142</td>
+        <td>LOW</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict target implementations and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>src/engines/attackPathGeneratorEngine.js</td>
+        <td>168</td>
+        <td>LOW</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict target implementations and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>src/engines/attackPathGeneratorEngine.js</td>
+        <td>181</td>
+        <td>LOW</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict target implementations and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>src/engines/attackPathGeneratorEngine.js</td>
+        <td>182</td>
+        <td>LOW</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict target implementations and protect upgrade paths.</td>
       </tr><tr>
         <td><span class="badge risk-high">HIGH</span></td>
-        <td>Owner/Admin Control</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverL1.sol</td>
-        <td>30</td>
-        <td>MEDIUM</td>
-        <td>Review the affected code path, reduce privileges, add validation, and re-run the scan.</td>
+        <td>tx.origin Risk</td>
+        <td>src/engines/attackPathGeneratorEngine.js</td>
+        <td>53</td>
+        <td>HIGH</td>
+        <td>Replace tx.origin authorization with msg.sender and enforce explicit role-based access control.</td>
       </tr><tr>
         <td><span class="badge risk-high">HIGH</span></td>
-        <td>Missing Access Control Review</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol</td>
-        <td>67</td>
-        <td>MEDIUM</td>
-        <td>Review the affected code path, reduce privileges, add validation, and re-run the scan.</td>
+        <td>tx.origin Risk</td>
+        <td>src/engines/attackPathGeneratorEngine.js</td>
+        <td>84</td>
+        <td>HIGH</td>
+        <td>Replace tx.origin authorization with msg.sender and enforce explicit role-based access control.</td>
       </tr><tr>
         <td><span class="badge risk-high">HIGH</span></td>
-        <td>Hardcoded Address</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol</td>
-        <td>19</td>
-        <td>MEDIUM</td>
-        <td>Move hardcoded addresses into constructor parameters, deployment configuration, or environment variables.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Hardcoded Address</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/src/legacy/erc20-turnovers/TokenTurnoverReactive.sol</td>
-        <td>20</td>
-        <td>MEDIUM</td>
-        <td>Move hardcoded addresses into constructor parameters, deployment configuration, or environment variables.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Owner/Admin Control</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipL1.sol</td>
-        <td>25</td>
-        <td>MEDIUM</td>
-        <td>Review the affected code path, reduce privileges, add validation, and re-run the scan.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Owner/Admin Control</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipL1.sol</td>
-        <td>33</td>
-        <td>MEDIUM</td>
-        <td>Review the affected code path, reduce privileges, add validation, and re-run the scan.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Missing Access Control Review</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol</td>
-        <td>64</td>
-        <td>MEDIUM</td>
-        <td>Review the affected code path, reduce privileges, add validation, and re-run the scan.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Hardcoded Address</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol</td>
-        <td>16</td>
-        <td>MEDIUM</td>
-        <td>Move hardcoded addresses into constructor parameters, deployment configuration, or environment variables.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Hardcoded Address</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/src/legacy/erc721-ownership/NftOwnershipReactive.sol</td>
-        <td>17</td>
-        <td>MEDIUM</td>
-        <td>Move hardcoded addresses into constructor parameters, deployment configuration, or environment variables.</td>
+        <td>tx.origin Risk</td>
+        <td>src/engines/attackPathGeneratorEngine.js</td>
+        <td>88</td>
+        <td>HIGH</td>
+        <td>Replace tx.origin authorization with msg.sender and enforce explicit role-based access control.</td>
       </tr></tbody>
   </table>
     </div>
@@ -467,65 +396,65 @@
       </tr>
     </thead>
     <tbody><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Owner/Admin Control</td>
-        <td>High</td>
-        <td>4-8 hours</td>
-        <td>Review the affected code path, add validation, reduce privileges, improve error handling, and re-run the scan after remediation.</td>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>Immediate</td>
+        <td>1-3 days</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict targets, validate implementation addresses, and protect upgrade functions.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>Immediate</td>
+        <td>1-3 days</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict targets, validate implementation addresses, and protect upgrade functions.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>Immediate</td>
+        <td>1-3 days</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict targets, validate implementation addresses, and protect upgrade functions.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>Immediate</td>
+        <td>1-3 days</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict targets, validate implementation addresses, and protect upgrade functions.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>Immediate</td>
+        <td>1-3 days</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict targets, validate implementation addresses, and protect upgrade functions.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>Immediate</td>
+        <td>1-3 days</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict targets, validate implementation addresses, and protect upgrade functions.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>Immediate</td>
+        <td>1-3 days</td>
+        <td>Avoid delegatecall unless absolutely required. Restrict targets, validate implementation addresses, and protect upgrade functions.</td>
       </tr><tr>
         <td><span class="badge risk-high">HIGH</span></td>
-        <td>Owner/Admin Control</td>
+        <td>tx.origin Risk</td>
         <td>High</td>
         <td>4-8 hours</td>
-        <td>Review the affected code path, add validation, reduce privileges, improve error handling, and re-run the scan after remediation.</td>
+        <td>Replace tx.origin authorization with msg.sender and enforce explicit role-based or owner-based access control.</td>
       </tr><tr>
         <td><span class="badge risk-high">HIGH</span></td>
-        <td>Missing Access Control Review</td>
+        <td>tx.origin Risk</td>
         <td>High</td>
         <td>4-8 hours</td>
-        <td>Review the affected code path, add validation, reduce privileges, improve error handling, and re-run the scan after remediation.</td>
+        <td>Replace tx.origin authorization with msg.sender and enforce explicit role-based or owner-based access control.</td>
       </tr><tr>
         <td><span class="badge risk-high">HIGH</span></td>
-        <td>Hardcoded Address</td>
+        <td>tx.origin Risk</td>
         <td>High</td>
         <td>4-8 hours</td>
-        <td>Move hardcoded addresses into deployment configuration, environment variables, or constructor parameters.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Hardcoded Address</td>
-        <td>High</td>
-        <td>4-8 hours</td>
-        <td>Move hardcoded addresses into deployment configuration, environment variables, or constructor parameters.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Owner/Admin Control</td>
-        <td>High</td>
-        <td>4-8 hours</td>
-        <td>Review the affected code path, add validation, reduce privileges, improve error handling, and re-run the scan after remediation.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Owner/Admin Control</td>
-        <td>High</td>
-        <td>4-8 hours</td>
-        <td>Review the affected code path, add validation, reduce privileges, improve error handling, and re-run the scan after remediation.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Missing Access Control Review</td>
-        <td>High</td>
-        <td>4-8 hours</td>
-        <td>Review the affected code path, add validation, reduce privileges, improve error handling, and re-run the scan after remediation.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Hardcoded Address</td>
-        <td>High</td>
-        <td>4-8 hours</td>
-        <td>Move hardcoded addresses into deployment configuration, environment variables, or constructor parameters.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Hardcoded Address</td>
-        <td>High</td>
-        <td>4-8 hours</td>
-        <td>Move hardcoded addresses into deployment configuration, environment variables, or constructor parameters.</td>
+        <td>Replace tx.origin authorization with msg.sender and enforce explicit role-based or owner-based access control.</td>
       </tr></tbody>
   </table>
     </div>
@@ -544,89 +473,89 @@
       </tr>
     </thead>
     <tbody><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Owner/Admin Control</td>
-        <td>CWE-693</td>
-        <td>SC03: Logic Errors</td>
-        <td>A04: Insecure Design</td>
-        <td>Review the affected code, reduce privileges, add validation, and re-run the scan.</td>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>CWE-829</td>
+        <td>SC06: Unchecked External Calls</td>
+        <td>A08: Software and Data Integrity Failures</td>
+        <td>Restrict delegatecall targets, validate implementations, and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>CWE-829</td>
+        <td>SC06: Unchecked External Calls</td>
+        <td>A08: Software and Data Integrity Failures</td>
+        <td>Restrict delegatecall targets, validate implementations, and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>CWE-829</td>
+        <td>SC06: Unchecked External Calls</td>
+        <td>A08: Software and Data Integrity Failures</td>
+        <td>Restrict delegatecall targets, validate implementations, and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>CWE-829</td>
+        <td>SC06: Unchecked External Calls</td>
+        <td>A08: Software and Data Integrity Failures</td>
+        <td>Restrict delegatecall targets, validate implementations, and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>CWE-829</td>
+        <td>SC06: Unchecked External Calls</td>
+        <td>A08: Software and Data Integrity Failures</td>
+        <td>Restrict delegatecall targets, validate implementations, and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>CWE-829</td>
+        <td>SC06: Unchecked External Calls</td>
+        <td>A08: Software and Data Integrity Failures</td>
+        <td>Restrict delegatecall targets, validate implementations, and protect upgrade paths.</td>
+      </tr><tr>
+        <td><span class="badge risk-critical">CRITICAL</span></td>
+        <td>Delegatecall Risk</td>
+        <td>CWE-829</td>
+        <td>SC06: Unchecked External Calls</td>
+        <td>A08: Software and Data Integrity Failures</td>
+        <td>Restrict delegatecall targets, validate implementations, and protect upgrade paths.</td>
       </tr><tr>
         <td><span class="badge risk-high">HIGH</span></td>
-        <td>Owner/Admin Control</td>
-        <td>CWE-693</td>
-        <td>SC03: Logic Errors</td>
-        <td>A04: Insecure Design</td>
-        <td>Review the affected code, reduce privileges, add validation, and re-run the scan.</td>
+        <td>tx.origin Risk</td>
+        <td>CWE-346</td>
+        <td>SC01: Access Control Vulnerabilities</td>
+        <td>A01: Broken Access Control</td>
+        <td>Use msg.sender and explicit role-based or owner-based access control.</td>
       </tr><tr>
         <td><span class="badge risk-high">HIGH</span></td>
-        <td>Missing Access Control Review</td>
-        <td>CWE-693</td>
-        <td>SC03: Logic Errors</td>
-        <td>A04: Insecure Design</td>
-        <td>Review the affected code, reduce privileges, add validation, and re-run the scan.</td>
+        <td>tx.origin Risk</td>
+        <td>CWE-346</td>
+        <td>SC01: Access Control Vulnerabilities</td>
+        <td>A01: Broken Access Control</td>
+        <td>Use msg.sender and explicit role-based or owner-based access control.</td>
       </tr><tr>
         <td><span class="badge risk-high">HIGH</span></td>
-        <td>Hardcoded Address</td>
-        <td>CWE-547</td>
-        <td>SC10: Denial of Service / Operational Risk</td>
-        <td>A05: Security Misconfiguration</td>
-        <td>Move addresses into constructor parameters, deployment config, or verified registries.</td>
+        <td>tx.origin Risk</td>
+        <td>CWE-346</td>
+        <td>SC01: Access Control Vulnerabilities</td>
+        <td>A01: Broken Access Control</td>
+        <td>Use msg.sender and explicit role-based or owner-based access control.</td>
       </tr><tr>
         <td><span class="badge risk-high">HIGH</span></td>
-        <td>Hardcoded Address</td>
-        <td>CWE-547</td>
-        <td>SC10: Denial of Service / Operational Risk</td>
-        <td>A05: Security Misconfiguration</td>
-        <td>Move addresses into constructor parameters, deployment config, or verified registries.</td>
+        <td>tx.origin Risk</td>
+        <td>CWE-346</td>
+        <td>SC01: Access Control Vulnerabilities</td>
+        <td>A01: Broken Access Control</td>
+        <td>Use msg.sender and explicit role-based or owner-based access control.</td>
       </tr><tr>
         <td><span class="badge risk-high">HIGH</span></td>
-        <td>Owner/Admin Control</td>
-        <td>CWE-693</td>
-        <td>SC03: Logic Errors</td>
-        <td>A04: Insecure Design</td>
-        <td>Review the affected code, reduce privileges, add validation, and re-run the scan.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Owner/Admin Control</td>
-        <td>CWE-693</td>
-        <td>SC03: Logic Errors</td>
-        <td>A04: Insecure Design</td>
-        <td>Review the affected code, reduce privileges, add validation, and re-run the scan.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Missing Access Control Review</td>
-        <td>CWE-693</td>
-        <td>SC03: Logic Errors</td>
-        <td>A04: Insecure Design</td>
-        <td>Review the affected code, reduce privileges, add validation, and re-run the scan.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Hardcoded Address</td>
-        <td>CWE-547</td>
-        <td>SC10: Denial of Service / Operational Risk</td>
-        <td>A05: Security Misconfiguration</td>
-        <td>Move addresses into constructor parameters, deployment config, or verified registries.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Hardcoded Address</td>
-        <td>CWE-547</td>
-        <td>SC10: Denial of Service / Operational Risk</td>
-        <td>A05: Security Misconfiguration</td>
-        <td>Move addresses into constructor parameters, deployment config, or verified registries.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Unbounded Loop Risk</td>
-        <td>CWE-693</td>
-        <td>SC03: Logic Errors</td>
-        <td>A04: Insecure Design</td>
-        <td>Review the affected code, reduce privileges, add validation, and re-run the scan.</td>
-      </tr><tr>
-        <td><span class="badge risk-high">HIGH</span></td>
-        <td>Owner/Admin Control</td>
-        <td>CWE-693</td>
-        <td>SC03: Logic Errors</td>
-        <td>A04: Insecure Design</td>
-        <td>Review the affected code, reduce privileges, add validation, and re-run the scan.</td>
+        <td>tx.origin Risk</td>
+        <td>CWE-346</td>
+        <td>SC01: Access Control Vulnerabilities</td>
+        <td>A01: Broken Access Control</td>
+        <td>Use msg.sender and explicit role-based or owner-based access control.</td>
       </tr></tbody>
   </table>
     </div>
@@ -642,7 +571,7 @@
         <td>CRITICAL</td>
       </tr><tr>
         <td>Quantum Findings</td>
-        <td>60</td>
+        <td>244</td>
       </tr><tr>
         <td>Migration Readiness</td>
         <td>Migration planning required</td>
@@ -664,64 +593,64 @@
     </thead>
     <tbody><tr>
         <td><span class="badge risk-medium">MEDIUM</span></td>
-        <td>TLS / HTTPS Usage</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/README.md</td>
-        <td>5</td>
-        <td>Inventory TLS endpoints and certificates. Track post-quantum TLS support as standards mature.</td>
+        <td>Encryption Usage</td>
+        <td>src/cli.js</td>
+        <td>142</td>
+        <td>Inventory encryption usage and identify where asymmetric cryptography is used.</td>
       </tr><tr>
-        <td><span class="badge risk-medium">MEDIUM</span></td>
-        <td>TLS / HTTPS Usage</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/README.md</td>
-        <td>22</td>
-        <td>Inventory TLS endpoints and certificates. Track post-quantum TLS support as standards mature.</td>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>RSA Usage</td>
+        <td>src/data/quantumRules.js</td>
+        <td>3</td>
+        <td>Inventory RSA usage and plan migration to ML-KEM for key establishment or ML-DSA / SLH-DSA for signatures.</td>
       </tr><tr>
-        <td><span class="badge risk-medium">MEDIUM</span></td>
-        <td>TLS / HTTPS Usage</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/README.md</td>
-        <td>26</td>
-        <td>Inventory TLS endpoints and certificates. Track post-quantum TLS support as standards mature.</td>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>RSA Usage</td>
+        <td>src/data/quantumRules.js</td>
+        <td>4</td>
+        <td>Inventory RSA usage and plan migration to ML-KEM for key establishment or ML-DSA / SLH-DSA for signatures.</td>
       </tr><tr>
-        <td><span class="badge risk-medium">MEDIUM</span></td>
-        <td>TLS / HTTPS Usage</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/README.md</td>
-        <td>30</td>
-        <td>Inventory TLS endpoints and certificates. Track post-quantum TLS support as standards mature.</td>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>RSA Usage</td>
+        <td>src/data/quantumRules.js</td>
+        <td>8</td>
+        <td>Inventory RSA usage and plan migration to ML-KEM for key establishment or ML-DSA / SLH-DSA for signatures.</td>
       </tr><tr>
-        <td><span class="badge risk-medium">MEDIUM</span></td>
-        <td>TLS / HTTPS Usage</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/README.md</td>
-        <td>34</td>
-        <td>Inventory TLS endpoints and certificates. Track post-quantum TLS support as standards mature.</td>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>RSA Usage</td>
+        <td>src/data/quantumRules.js</td>
+        <td>9</td>
+        <td>Inventory RSA usage and plan migration to ML-KEM for key establishment or ML-DSA / SLH-DSA for signatures.</td>
       </tr><tr>
-        <td><span class="badge risk-medium">MEDIUM</span></td>
-        <td>TLS / HTTPS Usage</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/README.md</td>
-        <td>38</td>
-        <td>Inventory TLS endpoints and certificates. Track post-quantum TLS support as standards mature.</td>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>ECC Usage</td>
+        <td>src/data/quantumRules.js</td>
+        <td>12</td>
+        <td>Inventory elliptic-curve usage and plan migration toward post-quantum signature and key-establishment algorithms.</td>
       </tr><tr>
-        <td><span class="badge risk-medium">MEDIUM</span></td>
-        <td>TLS / HTTPS Usage</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/README.md</td>
-        <td>42</td>
-        <td>Inventory TLS endpoints and certificates. Track post-quantum TLS support as standards mature.</td>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>ECDSA Signature Usage</td>
+        <td>src/data/quantumRules.js</td>
+        <td>12</td>
+        <td>Review ECDSA and EIP-712 signature flows for replay protection and long-term post-quantum migration.</td>
       </tr><tr>
-        <td><span class="badge risk-medium">MEDIUM</span></td>
-        <td>TLS / HTTPS Usage</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/README.md</td>
-        <td>46</td>
-        <td>Inventory TLS endpoints and certificates. Track post-quantum TLS support as standards mature.</td>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>ECC Usage</td>
+        <td>src/data/quantumRules.js</td>
+        <td>13</td>
+        <td>Inventory elliptic-curve usage and plan migration toward post-quantum signature and key-establishment algorithms.</td>
       </tr><tr>
-        <td><span class="badge risk-medium">MEDIUM</span></td>
-        <td>TLS / HTTPS Usage</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/README.md</td>
-        <td>50</td>
-        <td>Inventory TLS endpoints and certificates. Track post-quantum TLS support as standards mature.</td>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>ECDSA Signature Usage</td>
+        <td>src/data/quantumRules.js</td>
+        <td>13</td>
+        <td>Review ECDSA and EIP-712 signature flows for replay protection and long-term post-quantum migration.</td>
       </tr><tr>
-        <td><span class="badge risk-medium">MEDIUM</span></td>
-        <td>TLS / HTTPS Usage</td>
-        <td>/tmp/qst-scan-R693VC/Reactive-Network-reactive-smart-contract-demos/README.md</td>
-        <td>54</td>
-        <td>Inventory TLS endpoints and certificates. Track post-quantum TLS support as standards mature.</td>
+        <td><span class="badge risk-high">HIGH</span></td>
+        <td>secp256k1 Usage</td>
+        <td>src/data/quantumRules.js</td>
+        <td>14</td>
+        <td>Review secp256k1 wallet/signature dependencies and prepare a post-quantum migration roadmap.</td>
       </tr></tbody>
   </table>
     </div>
@@ -731,22 +660,22 @@
       <table>
     <tbody><tr>
         <td>Risk Level</td>
-        <td>MEDIUM</td>
+        <td>CRITICAL</td>
       </tr><tr>
         <td>Attack Surface Score</td>
-        <td>60/100</td>
+        <td>100/100</td>
       </tr><tr>
         <td>Total Attack Findings</td>
-        <td>12</td>
+        <td>124</td>
       </tr><tr>
         <td>Critical Attack Paths</td>
-        <td>0</td>
+        <td>25</td>
       </tr><tr>
         <td>High Attack Paths</td>
-        <td>0</td>
+        <td>71</td>
       </tr><tr>
         <td>Medium Attack Paths</td>
-        <td>12</td>
+        <td>28</td>
       </tr></tbody>
   </table>
     </div>
@@ -756,19 +685,19 @@
       <table>
     <tbody><tr>
         <td>Simulation Risk Level</td>
-        <td>LOW</td>
+        <td>CRITICAL</td>
       </tr><tr>
         <td>Simulation Score</td>
-        <td>0/100</td>
+        <td>100/100</td>
       </tr><tr>
         <td>Total Simulations</td>
-        <td>0</td>
+        <td>4</td>
       </tr><tr>
         <td>Critical Simulations</td>
-        <td>0</td>
+        <td>1</td>
       </tr><tr>
         <td>High Simulations</td>
-        <td>0</td>
+        <td>3</td>
       </tr></tbody>
   </table>
     </div>
@@ -783,7 +712,7 @@
       <table>
     <tbody><tr>
         <td>Inventory Risk</td>
-        <td>HIGH</td>
+        <td>CRITICAL</td>
       </tr><tr>
         <td>Detected Items</td>
         <td>0</td>
