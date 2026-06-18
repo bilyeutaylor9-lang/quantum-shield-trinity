@@ -1,6 +1,3 @@
-// Quantum Shield Trinity v2.5.0
-// Upgraded with Reactive Security Engine + Prompt Injection AI Security Engine + Agent Discovery Engine + Tool Permission Engine + AI Agent Risk Engine wiring
-
 import { fileScanner } from "./scanners/fileScanner.js";
 import { repositoryScannerEngine } from "./engines/repositoryScannerEngine.js";
 import { dependencyIntelligenceEngine } from "./engines/dependencyIntelligenceEngine.js";
@@ -12,6 +9,7 @@ import { promptInjectionEngine } from "./engines/promptInjectionEngine.js";
 import { agentDiscoveryEngine } from "./engines/agentDiscoveryEngine.js";
 import { toolPermissionEngine } from "./engines/toolPermissionEngine.js";
 import { aiAgentRiskEngine } from "./engines/aiAgentRiskEngine.js";
+import { mcpSecurityEngine } from "./engines/mcpSecurityEngine.js";
 import { exploitSimulationEngine } from "./engines/exploitSimulationEngine.js";
 import { securityScoreEngine } from "./engines/securityScoreEngine.js";
 import { remediationEngine } from "./engines/remediationEngine.js";
@@ -55,6 +53,7 @@ export {
   agentDiscoveryEngine,
   toolPermissionEngine,
   aiAgentRiskEngine,
+  mcpSecurityEngine,
   exploitSimulationEngine,
   securityScoreEngine,
   remediationEngine,
@@ -220,6 +219,9 @@ const buildNormalizedFindingsReport = (report = {}, runtimeOptions = {}) => {
     ),
     ...(report.aiAgentRiskReport?.findings ?? []).map((item) =>
       normalizeFindingShape(item, "aiAgentRiskEngine")
+    ),
+    ...(report.mcpSecurityReport?.findings ?? []).map((item) =>
+      normalizeFindingShape(item, "mcpSecurityEngine")
     ),
     ...(report.smartContractContextReport?.contexts ?? []).map((item) =>
       normalizeFindingShape(item, "smartContractContextEngine")
@@ -676,12 +678,17 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
     toolPermissionEngine(scanResult.files)
   );
 
+  const mcpSecurityReport = timedStep("mcpSecurityEngine", () =>
+    mcpSecurityEngine(scanResult.files)
+  );
+
   const aiAgentRiskReport = timedStep("aiAgentRiskEngine", () =>
     aiAgentRiskEngine({
       files: scanResult.files,
       agentDiscoveryReport,
       toolPermissionReport,
-      promptInjectionReport
+      promptInjectionReport,
+      mcpSecurityReport
     })
   );
 
@@ -780,6 +787,7 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
     promptInjectionReport,
     agentDiscoveryReport,
     toolPermissionReport,
+    mcpSecurityReport,
     aiAgentRiskReport,
     smartContractContextReport,
     quantumReadinessReport,
@@ -816,6 +824,7 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
       promptInjectionReport,
       agentDiscoveryReport,
       toolPermissionReport,
+      mcpSecurityReport,
       aiAgentRiskReport,
       smartContractContextReport,
       exploitSimulationReport,
@@ -864,6 +873,7 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
       { engine: "promptInjectionEngine", items: promptInjectionReport.findings },
       { engine: "agentDiscoveryEngine", items: agentDiscoveryReport.findings },
       { engine: "toolPermissionEngine", items: toolPermissionReport.findings },
+      { engine: "mcpSecurityEngine", items: mcpSecurityReport.findings },
       { engine: "aiAgentRiskEngine", items: aiAgentRiskReport.findings },
       { engine: "smartContractContextEngine", items: smartContractContextReport.contexts },
       { engine: "codeFlowScannerEngine", items: codeFlowReport.findings },
@@ -922,6 +932,12 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
         detectedToolCapabilities: toolPermissionReport.summary?.totalCapabilities ?? 0,
         missingToolApprovalGates: toolPermissionReport.summary?.missingApprovalGates ?? 0,
         missingToolPermissionPolicies: toolPermissionReport.summary?.missingPermissionPolicies ?? 0,
+        mcpSecurityRiskLevel: mcpSecurityReport.summary?.riskLevel ?? "UNKNOWN",
+        mcpSecurityRiskScore: mcpSecurityReport.summary?.riskScore ?? null,
+        mcpSecurityFindings: mcpSecurityReport.summary?.totalFindings ?? 0,
+        mcpMissingAuth: mcpSecurityReport.summary?.missingAuth ?? 0,
+        mcpMissingApproval: mcpSecurityReport.summary?.missingApproval ?? 0,
+        mcpMissingAllowlist: mcpSecurityReport.summary?.missingAllowlist ?? 0,
         aiAgentRiskLevel: aiAgentRiskReport.summary?.riskLevel ?? "UNKNOWN",
         aiAgentRiskScore: aiAgentRiskReport.summary?.riskScore ?? null,
         aiAgentRiskFindings: aiAgentRiskReport.summary?.totalFindings ?? 0,
@@ -951,6 +967,7 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
       { engine: "promptInjectionEngine", items: promptInjectionReport.findings },
       { engine: "agentDiscoveryEngine", items: agentDiscoveryReport.findings },
       { engine: "toolPermissionEngine", items: toolPermissionReport.findings },
+      { engine: "mcpSecurityEngine", items: mcpSecurityReport.findings },
       { engine: "aiAgentRiskEngine", items: aiAgentRiskReport.findings },
       { engine: "smartContractContextEngine", items: smartContractContextReport.contexts },
       { engine: "codeFlowScannerEngine", items: codeFlowReport.findings },
@@ -1108,6 +1125,15 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
     )
   );
 
+  timedStep("evidenceGraph.add.mcpSecurityEngine", () =>
+    addEvidenceItemsToGraph(
+      evidenceGraph,
+      limitEvidenceItems(mcpSecurityReport.findings, runtimeOptions.maxEvidenceItems),
+      "mcpSecurityEngine",
+      "mcp_security"
+    )
+  );
+
   timedStep("evidenceGraph.add.aiAgentRiskEngine", () =>
     addEvidenceItemsToGraph(
       evidenceGraph,
@@ -1242,6 +1268,7 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
       promptInjectionReport,
       agentDiscoveryReport,
       toolPermissionReport,
+      mcpSecurityReport,
       aiAgentRiskReport,
       dependencyBehaviorReport: report.dependencyBehaviorReport,
       semanticConfigReport: report.semanticConfigReport
@@ -1267,7 +1294,7 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
       ...report,
       executiveReport: { summary },
       assessmentReport: report.securityAssessmentReport ?? report.assessmentReport ?? {},
-      auditReport: { smartContractAuditReport, reactiveSecurityReport, promptInjectionReport, agentDiscoveryReport, toolPermissionReport, aiAgentRiskReport, securityAuditLoopReport },
+      auditReport: { smartContractAuditReport, reactiveSecurityReport, promptInjectionReport, agentDiscoveryReport, toolPermissionReport, mcpSecurityReport, aiAgentRiskReport, securityAuditLoopReport },
       riskProfile: {
         wallet: walletReport,
         inventory: {
@@ -1305,6 +1332,15 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
           capabilities: toolPermissionReport.summary?.detectedCapabilities ?? [],
           missingApprovalGates: toolPermissionReport.summary?.missingApprovalGates ?? 0,
           missingPermissionPolicies: toolPermissionReport.summary?.missingPermissionPolicies ?? 0
+        },
+        mcpSecurity: {
+          riskLevel: mcpSecurityReport.summary?.riskLevel ?? "UNKNOWN",
+          riskScore: mcpSecurityReport.summary?.riskScore ?? null,
+          totalFindings: mcpSecurityReport.summary?.totalFindings ?? 0,
+          capabilities: mcpSecurityReport.summary?.detectedCapabilities ?? [],
+          missingAuth: mcpSecurityReport.summary?.missingAuth ?? 0,
+          missingApproval: mcpSecurityReport.summary?.missingApproval ?? 0,
+          missingAllowlist: mcpSecurityReport.summary?.missingAllowlist ?? 0
         },
         aiAgentRisk: {
           riskLevel: aiAgentRiskReport.summary?.riskLevel ?? "UNKNOWN",
@@ -1400,6 +1436,19 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
           missingApprovalGates: toolPermissionReport.summary?.missingApprovalGates ?? 0,
           missingPermissionPolicies: toolPermissionReport.summary?.missingPermissionPolicies ?? 0
         },
+        mcpSecurity: {
+          riskLevel: mcpSecurityReport.summary?.riskLevel ?? "UNKNOWN",
+          riskScore: mcpSecurityReport.summary?.riskScore ?? null,
+          findings: mcpSecurityReport.summary?.totalFindings ?? 0,
+          critical: mcpSecurityReport.summary?.critical ?? 0,
+          high: mcpSecurityReport.summary?.high ?? 0,
+          medium: mcpSecurityReport.summary?.medium ?? 0,
+          low: mcpSecurityReport.summary?.low ?? 0,
+          capabilities: mcpSecurityReport.summary?.detectedCapabilities ?? [],
+          missingAuth: mcpSecurityReport.summary?.missingAuth ?? 0,
+          missingApproval: mcpSecurityReport.summary?.missingApproval ?? 0,
+          missingAllowlist: mcpSecurityReport.summary?.missingAllowlist ?? 0
+        },
         aiAgentRisk: {
           riskLevel: aiAgentRiskReport.summary?.riskLevel ?? "UNKNOWN",
           riskScore: aiAgentRiskReport.summary?.riskScore ?? null,
@@ -1465,6 +1514,7 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
     promptInjectionReport,
     agentDiscoveryReport,
     toolPermissionReport,
+    mcpSecurityReport,
     aiAgentRiskReport,
     profile: runtimeOptions.profile
   });
@@ -1501,6 +1551,17 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
   console.log(`[QST] Tool Capabilities: ${(toolPermissionReport.summary?.detectedCapabilities ?? []).join(", ") || "None"}`);
   console.log(`[QST] Missing Approval Gates: ${toolPermissionReport.summary?.missingApprovalGates ?? 0}`);
   console.log(`[QST] Missing Permission Policies: ${toolPermissionReport.summary?.missingPermissionPolicies ?? 0}`);
+
+  console.log("");
+  console.log("[QST] MCP Security");
+  console.log("------------------");
+  console.log(`[QST] Risk Score: ${mcpSecurityReport.summary?.riskScore ?? "N/A"}`);
+  console.log(`[QST] Risk Level: ${mcpSecurityReport.summary?.riskLevel ?? "UNKNOWN"}`);
+  console.log(`[QST] Findings: ${mcpSecurityReport.summary?.totalFindings ?? 0}`);
+  console.log(`[QST] MCP Capabilities: ${(mcpSecurityReport.summary?.detectedCapabilities ?? []).join(", ") || "None"}`);
+  console.log(`[QST] Missing Auth: ${mcpSecurityReport.summary?.missingAuth ?? 0}`);
+  console.log(`[QST] Missing Approval: ${mcpSecurityReport.summary?.missingApproval ?? 0}`);
+  console.log(`[QST] Missing Allowlist: ${mcpSecurityReport.summary?.missingAllowlist ?? 0}`);
 
   console.log("");
   console.log("[QST] AI Agent Risk");
