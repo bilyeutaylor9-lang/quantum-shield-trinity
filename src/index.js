@@ -92,7 +92,7 @@ export {
   summaryFormatter
 };
 
-const QST_VERSION = "2.5.0";
+const QST_VERSION = "2.6.0";
 
 const DEFAULT_IGNORE_PATHS = [
   "node_modules/",
@@ -1756,3 +1756,6 @@ export function runQuantumShieldScan(targetDirectory = "src", options = {}) {
 
   return report;
 }
+
+export const quantumShieldTrinity = runQuantumShieldScan;
+export default runQuantumShieldScan;
